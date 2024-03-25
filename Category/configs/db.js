@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 dotenv.config();
 const mongo = process.env.MONGO;
+console.log(mongo);
 
 export default async () => {
   try {
