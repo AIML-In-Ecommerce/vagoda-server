@@ -1,5 +1,6 @@
 FROM node:16
 
+RUN rm -rf /usr/src/app
 
 WORKDIR /usr/src/app/user
 
