@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { DiscountType } from "./shared/enums";
+import { DiscountType } from "./shared/enums.js";
 
 const Schema = mongoose.Schema;
 
