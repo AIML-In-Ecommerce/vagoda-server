@@ -13,7 +13,7 @@ const PromotionSchema = new Schema({
   },
   discountType: {
     type: String,
-    enum: Object.values(discountType),
+    enum: Object.values(DiscountType),
     required: true
   },
   discountValue: {
