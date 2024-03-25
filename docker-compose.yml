@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3002:3002"
+    volumes:
+      - .:/usr/src/app/user
 
   cart:
     build:
@@ -14,6 +16,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3003:3003"
+    volumes:
+      - .:/usr/src/app/cart
 
   shop:
     build:
@@ -21,6 +25,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3004:3004"
+    volumes:
+      - .:/usr/src/app/shop
 
   category:
     build:
@@ -28,6 +34,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3005:3005"
+    volumes:
+      - .:/usr/src/app/category
 
   product:
     build:
@@ -35,6 +43,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3006:3006"
+    volumes:
+      - .:/usr/src/app/product
 
   review:
     build:
@@ -42,6 +52,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3007:3007"
+    volumes:
+      - .:/usr/src/app/review
 
   promotion:
     build:
@@ -49,6 +61,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3008:3008"
+    volumes:
+      - .:/usr/src/app/promotion
 
   order:
     build:
@@ -56,3 +70,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3009:3009"
+    volumes:
+      - .:/usr/src/app/order
