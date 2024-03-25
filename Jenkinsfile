@@ -10,6 +10,12 @@ pipeline {
                 // Thực hiện git pull từ nhánh feature/init-server
                 git branch: 'main', url: 'https://github.com/AIML-In-Ecommerce/techzone-server'
         }
+        stage('Install Docker Compose') {
+            steps {
+                sh 'curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose'
+                sh 'chmod +x /usr/local/bin/docker-compose'
+            }
+        }
 
             }
         stage('Install Dependencies') {
@@ -45,12 +51,7 @@ pipeline {
                 }
             }
         }
-        stage('Install Docker Compose') {
-            steps {
-                sh 'sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose'
-                sh 'sudo chmod +x /usr/local/bin/docker-compose'
-            }
-        }
+        
 
 
         stage('Build') {
