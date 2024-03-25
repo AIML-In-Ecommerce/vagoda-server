@@ -8,7 +8,7 @@ services:
     ports:
       - "3002:3002"
     volumes:
-      - .:/usr/src/app/user
+      - .:/usr/src/datn/user
 
   cart:
     build:
@@ -17,7 +17,7 @@ services:
     ports:
       - "3003:3003"
     volumes:
-      - .:/usr/src/app/cart
+      - .:/usr/src/datn/cart
 
   shop:
     build:
@@ -26,7 +26,7 @@ services:
     ports:
       - "3004:3004"
     volumes:
-      - .:/usr/src/app/shop
+      - .:/usr/src/datn/shop
 
   category:
     build:
@@ -35,7 +35,7 @@ services:
     ports:
       - "3005:3005"
     volumes:
-      - .:/usr/src/app/category
+      - .:/usr/src/datn/category
 
   product:
     build:
@@ -44,7 +44,7 @@ services:
     ports:
       - "3006:3006"
     volumes:
-      - .:/usr/src/app/product
+      - .:/usr/src/datn/product
 
   review:
     build:
@@ -53,7 +53,7 @@ services:
     ports:
       - "3007:3007"
     volumes:
-      - .:/usr/src/app/review
+      - .:/usr/src/datn/review
 
   promotion:
     build:
@@ -62,7 +62,7 @@ services:
     ports:
       - "3008:3008"
     volumes:
-      - .:/usr/src/app/promotion
+      - .:/usr/src/datn/promotion
 
   order:
     build:
@@ -71,4 +71,4 @@ services:
     ports:
       - "3009:3009"
     volumes:
-      - .:/usr/src/app/order
+      - .:/usr/src/datn/order
