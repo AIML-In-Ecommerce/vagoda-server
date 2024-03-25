@@ -75,7 +75,7 @@
                     script {
                         // Thay thế lệnh dưới đây bằng lệnh triển khai thực tế của bạn
                         echo 'Deployment step...'
-                        docker ps -a
+                        sh 'docker-compose ps'
                     }
                 }
             }
