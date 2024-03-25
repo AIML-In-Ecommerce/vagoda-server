@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3002:3002"
-    volumes:
-      - .:/usr/src/datn/user
+    # volumes:
+    #   - .:/usr/src/datn/user
 
   cart:
     build:
@@ -16,8 +16,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3003:3003"
-    volumes:
-      - .:/usr/src/datn/cart
+    # volumes:
+    #   - .:/usr/src/datn/cart
 
   shop:
     build:
@@ -25,8 +25,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3004:3004"
-    volumes:
-      - .:/usr/src/datn/shop
+    # volumes:
+    #   - .:/usr/src/datn/shop
 
   category:
     build:
@@ -34,8 +34,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3005:3005"
-    volumes:
-      - .:/usr/src/datn/category
+    # volumes:
+    #   - .:/usr/src/datn/category
 
   product:
     build:
@@ -43,8 +43,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3006:3006"
-    volumes:
-      - .:/usr/src/datn/product
+    # volumes:
+    #   - .:/usr/src/datn/product
 
   review:
     build:
@@ -52,8 +52,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3007:3007"
-    volumes:
-      - .:/usr/src/datn/review
+    # volumes:
+    #   - .:/usr/src/datn/review
 
   promotion:
     build:
@@ -61,8 +61,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3008:3008"
-    volumes:
-      - .:/usr/src/datn/promotion
+    # volumes:
+    #   - .:/usr/src/datn/promotion
 
   order:
     build:
@@ -70,5 +70,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3009:3009"
-    volumes:
-      - .:/usr/src/datn/order
+    # volumes:
+    #   - .:/usr/src/datn/order
