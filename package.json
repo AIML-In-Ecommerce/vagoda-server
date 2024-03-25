@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "http-errors": "^2.0.0",
+    "mongoose": "^8.2.1"
+  },
+  "name": "techzone",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AIML-In-Ecommerce/techzone-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AIML-In-Ecommerce/techzone-server/issues"
+  },
+  "homepage": "https://github.com/AIML-In-Ecommerce/techzone-server#readme"
+}

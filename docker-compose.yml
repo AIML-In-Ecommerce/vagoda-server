@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  user:
+    build:
+      context: .
+      dockerfile: Dockerfile.user
+    ports:
+      - "3002:3002"
+
+  cart:
+    build:
+      context: .
+      dockerfile: Dockerfile.cart
+    ports:
+      - "3003:3003"
+
+  shop:
+    build:
+      context: .
+      dockerfile: Dockerfile.shop
+    ports:
+      - "3004:3004"
+
+  category:
+    build:
+      context: .
+      dockerfile: Dockerfile.category
+    ports:
+      - "3005:3005"
+
+  product:
+    build:
+      context: .
+      dockerfile: Dockerfile.product
+    ports:
+      - "3006:3006"
+
+  review:
+    build:
+      context: .
+      dockerfile: Dockerfile.review
+    ports:
+      - "3007:3007"
+
+  promotion:
+    build:
+      context: .
+      dockerfile: Dockerfile.promotion
+    ports:
+      - "3008:3008"
+
+  order:
+    build:
+      context: .
+      dockerfile: Dockerfile.order
+    ports:
+      - "3009:3009"
