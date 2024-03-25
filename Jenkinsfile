@@ -9,6 +9,7 @@ pipeline {
             steps {
                 // Thực hiện git pull từ nhánh feature/init-server
                 git branch: 'main', url: 'https://github.com/AIML-In-Ecommerce/techzone-server'
+            }
         }
         stage('Install Docker Compose') {
             steps {
@@ -17,7 +18,6 @@ pipeline {
             }
         }
 
-            }
         stage('Install Dependencies') {
             steps {
                 // Bước này để cài đặt các dependencies của Node.js
