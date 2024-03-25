@@ -4,55 +4,55 @@ services:
   user:
     build:
       context: ./User
-      dockerfile: Dockerfile.User
+      dockerfile: Dockerfile
     ports:
       - "3002:3002"
 
   cart:
     build:
       context: ./Cart
-      dockerfile: Dockerfile.Cart
+      dockerfile: Dockerfile
     ports:
       - "3003:3003"
 
   shop:
     build:
       context: ./Shop
-      dockerfile: Dockerfile.Shop
+      dockerfile: Dockerfile
     ports:
       - "3004:3004"
 
   category:
     build:
       context: ./Category
-      dockerfile: Dockerfile.Category
+      dockerfile: Dockerfile
     ports:
       - "3005:3005"
 
   product:
     build:
       context: ./Product
-      dockerfile: Dockerfile.Product
+      dockerfile: Dockerfile
     ports:
       - "3006:3006"
 
   review:
     build:
       context: ./Review
-      dockerfile: Dockerfile.Review
+      dockerfile: Dockerfile
     ports:
       - "3007:3007"
 
   promotion:
     build:
       context: ./Promotion
-      dockerfile: Dockerfile.Promotion
+      dockerfile: Dockerfile
     ports:
       - "3008:3008"
 
   order:
     build:
       context: ./Order
-      dockerfile: Dockerfile.Order
+      dockerfile: Dockerfile
     ports:
       - "3009:3009"
