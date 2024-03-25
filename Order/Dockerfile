@@ -1,7 +1,7 @@
 FROM node:16
 
 
-WORKDIR /usr/src/app/order
+WORKDIR /usr/src/datn/order
 
 
 COPY package*.json ./

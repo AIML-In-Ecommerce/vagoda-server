@@ -1,7 +1,7 @@
 FROM node:16
 
 
-WORKDIR /usr/src/app/cart
+WORKDIR /usr/src/datn/cart
 
 
 COPY package*.json ./

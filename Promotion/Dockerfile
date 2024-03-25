@@ -1,7 +1,7 @@
 FROM node:16
 
 
-WORKDIR /usr/src/app/promotion
+WORKDIR /usr/src/datn/promotion
 
 
 COPY package*.json ./
