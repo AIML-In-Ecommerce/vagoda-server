@@ -3,56 +3,56 @@ version: "3"
 services:
   user:
     build:
-      context: .
+      context: ./User
       dockerfile: Dockerfile.user
     ports:
       - "3002:3002"
 
   cart:
     build:
-      context: .
+      context: ./Cart
       dockerfile: Dockerfile.cart
     ports:
       - "3003:3003"
 
   shop:
     build:
-      context: .
+      context: ./Shop
       dockerfile: Dockerfile.shop
     ports:
       - "3004:3004"
 
   category:
     build:
-      context: .
+      context: ./Category
       dockerfile: Dockerfile.category
     ports:
       - "3005:3005"
 
   product:
     build:
-      context: .
+      context: ./Product
       dockerfile: Dockerfile.product
     ports:
       - "3006:3006"
 
   review:
     build:
-      context: .
+      context: ./Review
       dockerfile: Dockerfile.review
     ports:
       - "3007:3007"
 
   promotion:
     build:
-      context: .
+      context: ./Promotion
       dockerfile: Dockerfile.promotion
     ports:
       - "3008:3008"
 
   order:
     build:
-      context: .
+      context: ./Order
       dockerfile: Dockerfile.order
     ports:
       - "3009:3009"
