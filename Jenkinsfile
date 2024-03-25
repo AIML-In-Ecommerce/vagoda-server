@@ -50,7 +50,7 @@ pipeline {
             steps {
                 // Bước này để thực hiện các bước build hoặc compile (nếu cần)
                 script {
-                    
+                    sh 'docker ps'
                      sh 'docker-compose up -d'
                         sh 'docker-compose ps'
                         sh 'docker-compose logs'
