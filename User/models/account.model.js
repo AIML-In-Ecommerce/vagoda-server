@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { AccountStatus, AccountType } from "../../shared/enums.js";
+import { AccountStatus, AccountType } from "../shared/enums.js";
 
 const Schema = mongoose.Schema;
 

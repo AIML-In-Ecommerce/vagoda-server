@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { OrderStatus } from '../shared/enums.js;
+import { OrderStatus } from "./shared/enums.js";
 
 const Schema = mongoose.Schema;
 

@@ -29,4 +29,4 @@ const DiscountType = {
   DIRECT_PRICE: "DIRECT_PRICE"
 };
 
-export { ProductStatus, AccountStatus, AccountType };
+export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType };

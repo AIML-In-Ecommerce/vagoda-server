@@ -1,19 +1,19 @@
 const ProductStatus = {
   AVAILABLE: "AVAILABLE",
   SOLD_OUT: "SOLD_OUT",
-  SALE: "SALE"
+  SALE: "SALE",
 };
 
 const AccountStatus = {
   ACTIVE: "ACTIVE",
   INACTIVE: "INACTIVE",
-  BANNED: "BANNED"
+  BANNED: "BANNED",
 };
 
 const AccountType = {
   SHOP: "SHOP",
   BUYER: "BUYER",
-  ADMIN: "ADMIN"
+  ADMIN: "ADMIN",
 };
 
 const OrderStatus = {
@@ -21,12 +21,12 @@ const OrderStatus = {
   DELIVERING: "DELIVERING",
   SHIPPING: "SHIPPING",
   COMPLETED: "COMPLETED",
-  CANCELLED: "CANCELLED"
+  CANCELLED: "CANCELLED",
 };
 
-const DiscountType = {  
+const DiscountType = {
   PERCENTAGE: "PERCENTAGE",
-  DIRECT_PRICE: "DIRECT_PRICE"
+  DIRECT_PRICE: "DIRECT_PRICE",
 };
 
-export { ProductStatus, AccountStatus, AccountType };
+export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType };
