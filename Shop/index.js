@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 
-import { errorHandler, notFound } from "../shared/helper/errorHandler.js";
+import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
 
 import shopRoute from "./shop.route.js";
