@@ -1,6 +1,6 @@
 import Promotion from "./promotion.model.js";
 
-const ProductService = {
+const PromotionService = {
   async getAll(filter, projection) {
     return await Promotion.find(filter).select(projection);
   },
