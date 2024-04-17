@@ -25,6 +25,21 @@ const UserSchema = new Schema({
     },
     phoneNumber: {
       type: String
+    },
+    coordinate: {
+      lng: {
+        type: Number
+      },
+      lat: {
+        type: Number
+      }
+    },
+    label: {
+      enum: ["HOME", "OFFICE"],
+    },
+    isDefault: {
+      type: Boolean,
+      default: false
     }
   }],
   account: {

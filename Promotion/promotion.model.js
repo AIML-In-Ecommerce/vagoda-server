@@ -20,6 +20,14 @@ const PromotionSchema = new Schema({
     type: Number,
     required: true
   },
+  upperBound: {
+    type: Number,
+    required: true
+  },
+  lowerBound: {
+    type: Number,
+    required: true
+  },
   quantity: {
     type: Number
   },
@@ -31,13 +39,17 @@ const PromotionSchema = new Schema({
     type: Date,
     required: true
   },
-  saleCategory: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category"
-  }],
+  // saleCategory: [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "Category"
+  // }],
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  code: {
+    type: String,
+    required: true
   }
 });
 

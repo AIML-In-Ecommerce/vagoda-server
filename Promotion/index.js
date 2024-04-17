@@ -2,7 +2,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
+import bodyParser from 'body-parser';
 
+import { specs, swaggerUi } from './configs/swagger.js';
 import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
 

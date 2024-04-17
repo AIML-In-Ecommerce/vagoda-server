@@ -38,6 +38,10 @@ const ProductSchema = new Schema({
     ref: "Shop",
     required: true,
   },
+  platformFee:{
+    type: Number,
+    required: true,
+  }
   status: {
     type: String,
     enum: Object.values(ProductStatus),
