@@ -8,7 +8,7 @@
             stage('Checkout') {
                 steps {
                     // Thực hiện git pull từ nhánh feature/init-server
-                    git branch: 'main', url: 'https://github.com/AIML-In-Ecommerce/techzone-server'
+                    git branch: 'main', url: 'https://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@github.com/AIML-In-Ecommerce/techzone-server'
                 }
             }
             
