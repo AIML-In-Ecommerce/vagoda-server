@@ -5,7 +5,7 @@ const Model = "Review";
 const ReviewController = {
   getAll: async (req, res, next) => {
     try {
-      const filter = req.body;
+      const filter = req.query;
       const list = await ReviewService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));

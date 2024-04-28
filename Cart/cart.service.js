@@ -2,7 +2,11 @@ import { Cart } from "./cart.model.js";
 
 const CartService = {
   async getAll(filter, projection) {
-    return await Cart.find(filter).select(projection);
+    return await Cart.find(filter).select(projection)
+    .populate({
+      path: 'products.product',
+      model: 'Product',
+    })
   },
   // async getAll() {
   //   return await AuthorizeRequest.find();

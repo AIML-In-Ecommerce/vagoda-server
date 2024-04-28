@@ -41,7 +41,7 @@ const ProductSchema = new Schema({
   platformFee:{
     type: Number,
     required: true,
-  }
+  },
   status: {
     type: String,
     enum: Object.values(ProductStatus),

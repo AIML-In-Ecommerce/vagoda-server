@@ -5,7 +5,16 @@ const Model = "Sub Category";
 const SubCategoryController = {
   getAll: async (req, res, next) => {
     try {
-      const filter = req.body;
+      const filter = req.query;
+      //await SubCategoryService.addData1();
+      //await SubCategoryService.addData2();
+      //await SubCategoryService.addData3();
+      //await SubCategoryService.addData4();
+      //await SubCategoryService.addData5();
+      //await SubCategoryService.addData6();
+      //await SubCategoryService.addData7();
+      //await SubCategoryService.addData8();
+      //await SubCategoryService.addData9();
       const list = await SubCategoryService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
@@ -19,6 +28,7 @@ const SubCategoryController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;

@@ -6,9 +6,21 @@ const router = express.Router();
 
 router.get("/categories", CategoryController.getAll);
 router.get("/category/:id", CategoryController.getById);
-router.post("/category", uploadCloud.single('category'), CategoryController.create);
-router.put("/category/:id", uploadCloud.single('category'),CategoryController.update);
-router.delete("/category/:id", uploadCloud.single('category'),CategoryController.delete);
+router.post(
+  "/category",
+  uploadCloud.single("category"),
+  CategoryController.create
+);
+router.put(
+  "/category/:id",
+  uploadCloud.single("category"),
+  CategoryController.update
+);
+router.delete(
+  "/category/:id",
+  uploadCloud.single("category"),
+  CategoryController.delete
+);
 
 export default router;
 

@@ -5,26 +5,26 @@ const Schema = mongoose.Schema;
 const SubCategoryTypeSchema = new Schema({
   key: {
     type: String,
-    required: true,
+    required: false,
   },
   urlKey: {
     type: String,
-    required: true,
+    required: false,
   },
   attributeName: {
     type: String,
-    required: true,
+    required: false,
   },
   name: {
     type: String,
     required: true,
   },
-  subCategory: [
-    {
+  subCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory",
+      required: true,
     },
-  ],
+  
 });
 
 const SubCategoryType = mongoose.model(

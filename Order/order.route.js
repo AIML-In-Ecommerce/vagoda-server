@@ -8,6 +8,8 @@ router.get("/order/:id", OrderController.getById);
 router.post("/order", OrderController.create);
 router.put("/order/:id", OrderController.update);
 router.delete("/order/:id", OrderController.delete);
+router.put("/order/cancel/:id", OrderController.delete);
+router.get("/order/statuses", OrderController.getStatus);
 
 export default router;
 
@@ -141,4 +143,28 @@ export default router;
  *     responses:
  *       200:
  *         description: Delete order successfully.
+ */
+
+/**
+ * @swagger
+ * /order/cancel/{id}:
+ *   put:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cancel order successfully.
+ */
+
+/**
+ * @swagger
+ * /orders/statuses:
+ *   get:
+ *     responses:
+ *       200:
+ *         description: Return all orderStatus.
  */

@@ -5,7 +5,7 @@ const Model = "Category";
 const CategoryController = {
   getAll: async (req, res, next) => {
     try {
-      const filter = req.body;
+      const filter = req.query;
       const list = await CategoryService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));

@@ -1,18 +1,18 @@
 import createError from "http-errors";
 import OrderService from "./order.service.js";
-const model = "order";
-const Model = "Order";
+import { OrderStatus } from "./shared/enums.js";
+const model = " order ";
+const Model = " Order ";
 const OrderController = {
   getAll: async (req, res, next) => {
     try {
-      const filter = req.body;
+      const filter = req.query;
       const list = await OrderService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
       res.json({
         message: "Get " + model + " list successfully",
-        status: 200,
         data: list,
       });
     } catch (error) {
@@ -28,7 +28,6 @@ const OrderController = {
       }
       res.json({
         message: "Get" + model + "successfully",
-        status: 200,
         data: object,
       });
     } catch (error) {
@@ -45,7 +44,6 @@ const OrderController = {
       }
       res.json({
         message: "Create" + model + "successfully",
-        status: 200,
         data: object,
       });
     } catch (error) {
@@ -62,7 +60,6 @@ const OrderController = {
       }
       res.json({
         message: "Update" + model + "successfully",
-        status: 200,
         data: object,
       });
     } catch (error) {
@@ -79,8 +76,38 @@ const OrderController = {
       }
       res.json({
         message: "Delete" + model + "successfully",
-        status: 200,
         data: object,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+
+  cancel: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const object = await OrderService.update(id, {orderStatus: OrderStatus.CANCELLED});
+      if (!object) {
+        return next(createError.BadRequest(Model + " not found"));
+      }
+      res.json({
+        message: "Cancel" + model + "successfully",
+        data: object,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  getStatus: async (req, res, next) => {
+    try {
+      
+      const list = OrderStatus;
+      if (!list) {
+        return next(createError.BadRequest("OrderStatus" + " list not found"));
+      }
+      res.json({
+        message: "Get OrderStatus list successfully",
+        data: list,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));

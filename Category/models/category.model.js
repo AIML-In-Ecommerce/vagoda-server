@@ -5,11 +5,11 @@ const Schema = mongoose.Schema;
 const CategorySchema = new Schema({
   key: {
     type: String,
-    required: true
+    required: false
   },
   urlKey: {
     type: String,
-    required: true
+    required: false
   },
   name: {
     type: String,
