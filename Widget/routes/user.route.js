@@ -1,5 +1,5 @@
 import express from 'express';
-import UserController from '../controllers/user.controller.js';
+import UserController from '../controllers/account.controller.js';
 import AccountController from '../controllers/account.controller.js';
 import uploadCloud from '../shared/uploader.js';
 
@@ -10,7 +10,6 @@ router.get('/user/:id', UserController.getById);
 router.post('/user', uploadCloud.array('avatar'), UserController.create);
 router.put('/user/:id', uploadCloud.array('avatar'), UserController.update);
 router.delete('/user/:id', uploadCloud.array('avatar'), UserController.delete);
-router.post('/user/register', UserController.register);
 
 export default router;
 

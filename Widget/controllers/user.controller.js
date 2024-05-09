@@ -1,12 +1,12 @@
 import createError from "http-errors";
-import ProductService from "./product.service.js";
-const model = "product";
-const Model = "Product";
-const ProductController = {
+import UserService from "../services/user.service.js";
+const model = "user";
+const Model = "User";
+const UserController = {
   getAll: async (req, res, next) => {
     try {
-      const filter = req.query;
-      const list = await ProductService.getAll(filter, "");
+      const filter = req.body;
+      const list = await UserService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
@@ -22,7 +22,7 @@ const ProductController = {
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await ProductService.getById(id);
+      const object = await UserService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -39,7 +39,7 @@ const ProductController = {
   create: async (req, res, next) => {
     try {
       const data = req.body;
-      const object = await ProductService.create(data);
+      const object = await UserService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
       }
@@ -56,7 +56,7 @@ const ProductController = {
     try {
       const data = req.body;
       const { id } = req.params;
-      const object = await ProductService.update(id, data);
+      const object = await UserService.update(id, data);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -73,7 +73,7 @@ const ProductController = {
   delete: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await ProductService.delete(id);
+      const object = await UserService.delete(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -88,4 +88,4 @@ const ProductController = {
   },
 };
 
-export default ProductController;
+export default UserController;

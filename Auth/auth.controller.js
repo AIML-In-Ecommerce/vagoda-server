@@ -14,10 +14,13 @@ const AuthController = {
         email,
         password,
       });
-      const shopResponse = await axios.post("http://14.225.218.109:3002/shop",{
+      if(accountType === "SHOP"){
+        const shopResponse = await axios.post("http://14.225.218.109:3002/shop",{
         shopName,
         account: accountResponse.data._id,
       });
+      }
+      
       // Trả về kết quả từ /account/register
       res.json({
         message: "Get " + model + " list successfully",

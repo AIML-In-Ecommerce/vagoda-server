@@ -1,0 +1,23 @@
+http:
+  port: 8000
+admin:
+  port: 9876
+  host: localhost
+apiEndpoints:
+  product_api:
+    host: 'localhost'
+    paths: ["/swagger", "/swagger/*"]
+serviceEndpoints:
+  product_service:
+    url: "http://localhost:3006"
+policies:
+  - proxy
+pipelines:
+  product_pipeline:
+    apiEndpoints:
+      - product_api
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: product_service
+              changeOrigin: true

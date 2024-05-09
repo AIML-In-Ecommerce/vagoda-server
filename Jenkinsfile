@@ -18,7 +18,9 @@
                     // Bước này để cài đặt các dependencies của Node.js
                     script {
                         sh 'npm install'
-                        
+                        dir('Auth') {
+                            sh 'npm install'
+                        }
                         dir('Cart') {
                             sh 'npm install'
                         }

@@ -1,6 +1,16 @@
 version: "3"
 
 services:
+  auth:
+      build:
+        context: ./Auth
+        dockerfile: Dockerfile
+      ports:
+        - "3001:3001"
+      env_file:
+        - .env
+      # volumes:
+      #   - .:/usr/src/datn/user
   user:
     build:
       context: ./User

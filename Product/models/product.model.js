@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ProductStatus } from "./shared/enums.js";
+import { ProductStatus } from "../shared/enums.js";
 
 const Schema = mongoose.Schema;
 const ProductSchema = new Schema({
@@ -7,10 +7,17 @@ const ProductSchema = new Schema({
     type: String,
     required: true,
   },
-  attribute: {
-    type: Object,
-    required: true,
-  },
+  attributes: [
+    attribute:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductAttribute",
+      required: true,
+    },
+    value:{
+      type: String,
+      required: true,
+    }
+],
   description: {
     type: String,
   },
@@ -59,6 +66,10 @@ const ProductSchema = new Schema({
   },
   requiredAttribute: {
     type: Object,
+  },
+  soldQuantity: {
+    type: Number,
+    default: 0,
   },
 });
 

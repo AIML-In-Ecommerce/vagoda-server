@@ -8,15 +8,12 @@ import { specs, swaggerUi } from './configs/swagger.js';
 import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
 
-import productRoute from "./routes/product.route.js";
-import productAttributeRoute from "";
+import userRoute from "./routes/user.route.js";
+import accountRoute from "./routes/account.route.js";
 const app = express();
 
-app.use(cors({
-  origin: '*'
-}));
 dotenv.config();
-const port = process.env.PRODUCT_PORT;
+const port = process.env.USER_PORT;
 db();
 
 const initializeExpress = (app) => {
@@ -29,7 +26,8 @@ const initializeExpress = (app) => {
 
 initializeExpress(app);
 
-app.use(productRoute);
+app.use(userRoute);
+app.use(accountRoute);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 

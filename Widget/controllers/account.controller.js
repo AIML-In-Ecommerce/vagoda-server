@@ -1,50 +1,12 @@
 import createError from "http-errors";
-import UserService from "../services/user.service.js";
 import AccountService from "../services/account.service.js";
-const model = "user";
-const Model = "User";
-const UserController = {
-  register: async (req, res, next) => {
-    try {
-      const {email, password, fullName, accountType} = req.body;
-      const account = await AccountService.create({email, password, accountType});
-      const userData = {
-        fullName,
-        account: account._id,
-      }
-      const object = await UserService.create(userData);
-      if (!object) {
-        return next(createError.BadRequest("Bad request!"));
-      }
-      res.json({
-        message: "Create" + model + "successfully",
-        status: 200,
-        data: object,
-      });
-    } catch (error) {
-      next(createError.InternalServerError(error.message));
-    }
-  },
+const model = "account";
+const Model = "Account";
+const AccountController = {
   getAll: async (req, res, next) => {
     try {
       const filter = req.body;
-      const list = await UserService.getAll(filter, "");
-      if (!list) {
-        return next(createError.BadRequest(Model + " list not found"));
-      }
-      res.json({
-        message: "Get " + model + " list successfully",
-        status: 200,
-        data: list,
-      });
-    } catch (error) {
-      next(createError.InternalServerError(error.message));
-    }
-  },
-  getAll: async (req, res, next) => {
-    try {
-      const filter = req.body;
-      const list = await UserService.getAll(filter, "");
+      const list = await AccountService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
@@ -60,7 +22,7 @@ const UserController = {
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await UserService.getById(id);
+      const object = await AccountService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -77,7 +39,7 @@ const UserController = {
   create: async (req, res, next) => {
     try {
       const data = req.body;
-      const object = await UserService.create(data);
+      const object = await AccountService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
       }
@@ -94,7 +56,7 @@ const UserController = {
     try {
       const data = req.body;
       const { id } = req.params;
-      const object = await UserService.update(id, data);
+      const object = await AccountService.update(id, data);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -111,7 +73,7 @@ const UserController = {
   delete: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await UserService.delete(id);
+      const object = await AccountService.delete(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -126,4 +88,4 @@ const UserController = {
   },
 };
 
-export default UserController;
+export default AccountController;
