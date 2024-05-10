@@ -17,7 +17,17 @@ const SubCategorySchema = new Schema({
   },
   image: {
     type: String
-  }
+  },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    require: false
+  },
+  subCategoryTypes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "SubCategoryType",
+    require: false
+  }]
 });
 
 const SubCategory = mongoose.model("SubCategory", SubCategorySchema);

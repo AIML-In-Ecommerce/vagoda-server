@@ -6,7 +6,7 @@ const SubCategoryController = {
   getAll: async (req, res, next) => {
     try {
       const filter = req.query;
-      await SubCategoryService.addData()
+      //await SubCategoryService.addData()
       //await SubCategoryService.addData1();
       //await SubCategoryService.addData2();
       //await SubCategoryService.addData3();

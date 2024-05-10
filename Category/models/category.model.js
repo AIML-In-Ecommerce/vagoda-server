@@ -16,11 +16,13 @@ const CategorySchema = new Schema({
     required: true
   },
   image: {
-    type: String
+    type: String,
+    required: false
   },
-  subCategoryType: [{
+  subCategories: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "SubCategoryType"
+    ref: "SubCategory",
+    require: false
   }]
 });
 

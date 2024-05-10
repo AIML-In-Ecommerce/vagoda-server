@@ -1,5 +1,7 @@
 import createError from "http-errors";
 import CategoryService from "../services/category.service.js";
+import SubCategoryService from "../services/subCategory.service.js";  
+import SubCategoryTypeService from "../services/subCategoryType.service.js";
 const model = "category";
 const Model = "Category";
 const CategoryController = {
@@ -10,6 +12,21 @@ const CategoryController = {
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
+      console.log(list);
+      for (const category of list) {
+        console.log("category: " )
+        const subcategories = await SubCategoryService.getAll({ category: category._id }, "");
+        
+        for (const subCategory of subcategories) {
+          console.log("sub: " )
+          const subcategorytypes = await SubCategoryTypeService.getAll({ subCategory: subCategory._id }, "");
+          console.log(subcategorytypes)
+          subCategory.subCategoryTypes = subcategorytypes;
+        }
+        category.subCategories = subcategories; // Gán danh sách subcategories vào thuộc tính subCategories của category
+      }
+      
+
       res.json({
         message: "Get " + model + " list successfully",
         status: 200,
