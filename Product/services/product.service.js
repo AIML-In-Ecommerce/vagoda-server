@@ -1,4 +1,4 @@
-import { Product } from "./product.model.js";
+import { Product } from "../models/product.model.js";
 
 const ProductService = {
   async getAll(filter, projection) {

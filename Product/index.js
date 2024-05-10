@@ -9,7 +9,6 @@ import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
 
 import productRoute from "./routes/product.route.js";
-import productAttributeRoute from "";
 const app = express();
 
 app.use(cors({
