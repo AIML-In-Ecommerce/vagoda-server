@@ -1,6 +1,7 @@
 import createError from "http-errors";
 import axios from "axios";
 import dotenv from "dotenv";
+import { generateAccessToken, generateRefreshToken } from "./utils/jwt.js";
 dotenv.config();
 
 const AuthController = {
@@ -38,18 +39,32 @@ const AuthController = {
   login: async (req, res, next) => {
     try {
       // Lấy thông tin đăng nhập từ request body
-      const { username, password } = req.body;
-
+      const { email, password } = req.body;
+      
       // Gọi HTTP tới /account/login để xác thực đăng nhập
-      const account = await axios.post("/account/login", {
-        username,
+      const account = await axios.post("http://localhost:3002/account/login", {
+        email,
         password,
       });
+      console.log("thien")
+      if(!account) {
+        return next(createError.BadRequest("Email or password was wrong!"));
+      }
 
+      const accessToken = generateAccessToken(account._id, account.accountType)
+      const { refreshToken, expireDate } = generateRefreshToken(
+        account._id,
+        account.accountType
+      );
+      
       // Trả về kết quả từ /account/login
-      res.json(accountResponse.data);
+      res.json({
+        message: "Login successfully",
+        status: 200,
+        data: {accessToken, refreshToken},
+      });
     } catch (error) {
-      // Xử lý lỗi nếu có
+      // console.log(error);
       next(createError.InternalServerError(error.message));
     }
   },

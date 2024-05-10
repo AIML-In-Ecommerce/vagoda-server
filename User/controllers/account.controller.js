@@ -27,11 +27,7 @@ const AccountController = {
         return next(createError.BadRequest("Email or password was wrong!"));
       }
       
-      res.json({
-        message: "Get " + model + " list successfully",
-        status: 200,
-        data: list,
-      });
+      res.json(account);
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }

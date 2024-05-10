@@ -981,6 +981,56 @@ const SubCategoryService = {
         console.error('Error:', error.message);
     }
   },
+  async addData() {
+    try {
+        await Category.deleteMany({}); 
+    await SubCategory.deleteMany({}); 
+    await SubCategoryType.deleteMany({});
+      // Add categories
+      const categories = ["Nam", "Nữ", "Trẻ Em"];
+      for (const categoryName of categories) {
+        await Category.create({ name: categoryName });
+      }
+  
+      // Add subcategories
+      const subcategories = {
+        "Nam": ["Áo Nam", "Quần Nam", "Đồ Bộ Nam", "Đồ Thể Thao Nam", "Đồ Lót Nam", "Giày Nam - Dép Nam", "Phụ Kiện Nam"],
+        "Nữ": ["Áo Nữ", "Quần Nữ", "Đồ Bộ Nữ", "Đồ Thể Thao Nữ", "Đồ Lót Nữ", "Chân Váy Nữ", "Đầm Nữ - Váy Nữ", "Phụ Kiện Nữ", "Giày Nữ - Dép Nữ"],
+        "Trẻ Em": ["Áo Trẻ Em", "Quần Trẻ Em", "Đồ Bộ Trẻ Em", "Đồ Thể Thao Trẻ Em", "Đầm/Váy Bé Gái", "Giày Dép Trẻ Em", "Phụ Kiện Trẻ Em"]
+      };
+      for (const [categoryName, subcategoryNames] of Object.entries(subcategories)) {
+        const category = await Category.findOne({ name: categoryName });
+        if (category) {
+          for (const subcategoryName of subcategoryNames) {
+            await SubCategory.create({ name: subcategoryName, category: category._id });
+          }
+        }
+      }
+  
+      // Add subcategory types
+      const subcategoryTypes = {
+        "Áo Nữ": ["Áo Polo", "Áo Thun", "Áo Chống Nắng", "Áo Sơ Mi", "Áo Khoác", "Áo Nỉ", "Áo Giữ Nhiệt", "Áo Len"],
+        "Quần Nữ": ["Quần Jeans", "Quần Short", "Quần Âu", "Quần Kaki", "Quần Nỉ"],
+        "Đồ Bộ Nữ": ["Đồ Bộ Nữ Mặc Nhà"],
+        "Đồ Lót Nữ": ["Áo lót", "Quần lót"],
+        "Đồ Thể Thao Nữ": ["Bộ Thể Thao", "Áo Thun Thể Thao", "Quần Thể Thao"],
+        "Giày Nữ - Dép Nữ": ["Giày Thể Thao", "Giày Cao Gót", "Sandal", "Dép kẹp"],
+        // Add subcategory types for other subcategories similarly
+      };
+      for (const [subcategoryName, subcategoryTypeNames] of Object.entries(subcategoryTypes)) {
+        const subcategory = await SubCategory.findOne({ name: subcategoryName });
+        if (subcategory) {
+          for (const subcategoryTypeName of subcategoryTypeNames) {
+            await SubCategoryType.create({ name: subcategoryTypeName, subCategory: subcategory._id });
+          }
+        }
+      }
+  
+      console.log("Data added successfully!");
+    } catch (error) {
+      console.error("Error adding data:", error);
+    }
+  }  
 
 };
 
