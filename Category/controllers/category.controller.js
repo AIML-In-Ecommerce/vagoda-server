@@ -20,7 +20,7 @@ const CategoryController = {
         for (const subCategory of subcategories) {
           console.log("sub: " )
           const subcategorytypes = await SubCategoryTypeService.getAll({ subCategory: subCategory._id }, "");
-          console.log(subcategorytypes)
+          console.log(subcategorytypes  )
           subCategory.subCategoryTypes = subcategorytypes;
         }
         category.subCategories = subcategories; // Gán danh sách subcategories vào thuộc tính subCategories của category

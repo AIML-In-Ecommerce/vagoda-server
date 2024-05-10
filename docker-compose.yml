@@ -98,3 +98,14 @@ services:
       - .env
     # volumes:
     #   - .:/usr/src/datn/order
+
+  widget:
+    build:
+      context: ./Widget
+      dockerfile: Dockerfile
+    ports:
+      - "3010:3010"
+    env_file:
+      - .env
+    # volumes:
+    #   - .:/usr/src/datn/order
