@@ -19,6 +19,23 @@ const AccountController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  check: async (req, res, next) => {
+    try {
+      const {email, password} = req.body;
+      const account = await AccountService.check(email, password);
+      if (!account) {
+        return next(createError.BadRequest("Email or password was wrong!"));
+      }
+      
+      res.json({
+        message: "Get " + model + " list successfully",
+        status: 200,
+        data: list,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;

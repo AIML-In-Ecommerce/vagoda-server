@@ -14,6 +14,8 @@ const AuthController = {
         email,
         password,
       });
+      console.log(accountResponse)
+      const data = accountResponse.data;
       if(accountType === "SHOP"){
         const shopResponse = await axios.post("http://14.225.218.109:3002/shop",{
         shopName,
@@ -23,9 +25,9 @@ const AuthController = {
       
       // Trả về kết quả từ /account/register
       res.json({
-        message: "Get " + model + " list successfully",
+        message:  "Register successfully",
         status: 200,
-        data: accountResponse.data,
+        data: data,
       });
     } catch (error) {
       console.log(error)
@@ -39,7 +41,7 @@ const AuthController = {
       const { username, password } = req.body;
 
       // Gọi HTTP tới /account/login để xác thực đăng nhập
-      const accountResponse = await axios.post("/account/login", {
+      const account = await axios.post("/account/login", {
         username,
         password,
       });

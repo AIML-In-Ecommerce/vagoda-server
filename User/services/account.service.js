@@ -7,6 +7,9 @@ const AccountService = {
   // async getAll() {
   //   return await AuthorizeRequest.find();
   // },
+  async check(email, password) {
+    return await Account.findOne({ email, password });
+  }
 
   async getById(id) {
     return await Account.findById(id);
