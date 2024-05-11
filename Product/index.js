@@ -9,14 +9,16 @@ import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
 
 import productRoute from "./routes/product.route.js";
-import productAttributeRoute from "";
+// import productAttributeRoute from "";
 const app = express();
 
 app.use(cors({
   origin: '*'
 }));
 dotenv.config();
-const port = process.env.PRODUCT_PORT;
+// const port = process.env.PRODUCT_PORT;
+const port = 3006
+
 db();
 
 const initializeExpress = (app) => {

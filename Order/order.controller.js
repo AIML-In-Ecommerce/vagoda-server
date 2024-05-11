@@ -4,10 +4,17 @@ import { OrderStatus } from "./shared/enums.js";
 const model = " order ";
 const Model = " Order ";
 const OrderController = {
-  getAll: async (req, res, next) => {
+
+  /**
+   * req.query = 
+   * {
+   *  userId: string
+   * }
+   */
+  getAllCustomerOrders: async (req, res, next) => {
     try {
       const filter = req.query;
-      const list = await OrderService.getAll(filter, "");
+      const list = await OrderService.getAllCustomerOrders(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }

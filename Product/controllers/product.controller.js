@@ -1,5 +1,7 @@
 import createError from "http-errors";
-import ProductService from "../services/product.service.js";
+import ProductService from "../services/product.service";
+
+
 const model = "product";
 const Model = "Product";
 const ProductController = {
@@ -19,10 +21,11 @@ const ProductController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await ProductService.getById(id);
+      const object = await Product.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }

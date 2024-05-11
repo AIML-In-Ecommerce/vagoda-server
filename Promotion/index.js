@@ -12,7 +12,9 @@ import promotionRoute from "./promotion.route.js";
 const app = express();
 
 dotenv.config();
-const port = process.env.PROMOTION_PORT;
+// const port = process.env.PROMOTION_PORT;
+const port = 3008;
+
 db();
 
 const initializeExpress = (app) => {

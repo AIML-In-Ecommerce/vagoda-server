@@ -2,7 +2,9 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 dotenv.config();
-const mongo = process.env.MONGO;
+// const mongo = process.env.MONGO;
+const mongo = "mongodb+srv://thien:thien123123@tttnpq.gd486ql.mongodb.net/"
+
 
 export default async () => {
   try {
