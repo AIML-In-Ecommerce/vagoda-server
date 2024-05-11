@@ -7,7 +7,6 @@ const Model = "Category";
 const CategoryController = {
   getAll: async (req, res, next) => {
     try {
-      console.log("get all category");
       const filter = req.query;
       const list = await CategoryService.getAll(filter, "");
       if (!list) {
@@ -26,8 +25,7 @@ const CategoryController = {
             subCategory: subCategory._id.toString(),
           });
           //console.log(subCategory.name);
-          console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-          console.log(subCategory);
+          subCategory.subCategories = subcategorytypes;
         }
         //console.log(" aaa subcategories: ", subcategories);
         category.subCategories = subcategories; // Gán danh sách subcategories vào thuộc tính subCategories của category

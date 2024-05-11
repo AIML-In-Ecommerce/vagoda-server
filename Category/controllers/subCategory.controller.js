@@ -7,7 +7,7 @@ const SubCategoryController = {
     try {
       console.log("get all sub category");
       const filter = req.query;
-      await SubCategoryService.addData();
+      //await SubCategoryService.addData();
       //await SubCategoryService.addData1();
       //await SubCategoryService.addData2();
       //await SubCategoryService.addData3();
