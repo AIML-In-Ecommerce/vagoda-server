@@ -10,6 +10,7 @@ const ProductController = {
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
+       next(createError.InternalServerError(error.message));
       res.json({
         message: "Get " + model + " list successfully",
         status: 200,

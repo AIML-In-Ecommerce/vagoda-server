@@ -5,8 +5,9 @@ const Model = "Sub Category";
 const SubCategoryController = {
   getAll: async (req, res, next) => {
     try {
+      console.log("get all sub category");
       const filter = req.query;
-      //await SubCategoryService.addData()
+      await SubCategoryService.addData();
       //await SubCategoryService.addData1();
       //await SubCategoryService.addData2();
       //await SubCategoryService.addData3();
@@ -29,7 +30,7 @@ const SubCategoryController = {
       next(createError.InternalServerError(error.message));
     }
   },
-  
+
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;

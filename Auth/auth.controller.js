@@ -7,9 +7,14 @@ dotenv.config();
 const AuthController = {
   register: async (req, res, next) => {
     try {
-      const { fullName, shopName, email, password, accountType} = req.body;
-
-      const accountResponse = await axios.post("http://14.225.218.109:3002/user/register", {
+      let { fullName, shopName, email, password, accountType} = req.body;
+      if(!fullName) {
+        fullName = "";
+      }
+      if(!shopName) {
+        shopName = "";
+      }
+      const accountResponse = await axios.post("http://localhost:3002/user/register", {
         fullName,
         shopName,
         email,
@@ -18,7 +23,7 @@ const AuthController = {
       console.log(accountResponse)
       const data = accountResponse.data;
       if(accountType === "SHOP"){
-        const shopResponse = await axios.post("http://14.225.218.109:3002/shop",{
+        const shopResponse = await axios.post("http://localhost:3002/shop",{
         shopName,
         account: accountResponse.data._id,
       });

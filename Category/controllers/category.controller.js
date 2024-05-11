@@ -1,31 +1,37 @@
 import createError from "http-errors";
 import CategoryService from "../services/category.service.js";
-import SubCategoryService from "../services/subCategory.service.js";  
+import SubCategoryService from "../services/subCategory.service.js";
 import SubCategoryTypeService from "../services/subCategoryType.service.js";
 const model = "category";
 const Model = "Category";
 const CategoryController = {
   getAll: async (req, res, next) => {
     try {
+      console.log("get all category");
       const filter = req.query;
       const list = await CategoryService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
       console.log(list);
-      for (const category of list) {
-        console.log("category: " )
-        const subcategories = await SubCategoryService.getAll({ category: category._id }, "");
-        
-        for (const subCategory of subcategories) {
-          console.log("sub: " )
-          const subcategorytypes = await SubCategoryTypeService.getAll({ subCategory: subCategory._id }, "");
-          console.log(subcategorytypes  )
-          subCategory.subCategoryTypes = subcategorytypes;
+      for (var category of list) {
+        const subcategories = await SubCategoryService.getAll(
+          { category: category._id.toString() },
+          ""
+        );
+
+        for (var subCategory of subcategories) {
+          // console.log("sub: " + subCategory.name);
+          const subcategorytypes = await SubCategoryTypeService.getAll({
+            subCategory: subCategory._id.toString(),
+          });
+          //console.log(subCategory.name);
+          console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+          console.log(subCategory);
         }
+        //console.log(" aaa subcategories: ", subcategories);
         category.subCategories = subcategories; // Gán danh sách subcategories vào thuộc tính subCategories của category
       }
-      
 
       res.json({
         message: "Get " + model + " list successfully",
@@ -33,6 +39,7 @@ const CategoryController = {
         data: list,
       });
     } catch (error) {
+      console.log(error);
       next(createError.InternalServerError(error.message));
     }
   },

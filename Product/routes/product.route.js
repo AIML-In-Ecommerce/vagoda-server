@@ -1,17 +1,29 @@
-import express from 'express';
-import ProductController from '../controllers/product.controller.js';
-import uploadCloud from '../shared/uploader.js';
+import express from "express";
+import ProductController from "../controllers/product.controller.js";
+import uploadCloud from "../shared/uploader.js";
 
 const router = express.Router();
 
-router.get('/products', ProductController.getAll);
-router.get('/product/:id', ProductController.getById);
-router.post('/product', uploadCloud.array('[product]'), ProductController.create);
-router.put('/product/:id', uploadCloud.array('[product]'),ProductController.update);
-router.delete('/product/:id', uploadCloud.array('[product]'),ProductController.delete);
-router.post('products/list', ProductController.getListByIds);
-router.get('/products/top-selling', ProductController.getTopSelling);
-router.get('/products/filter', ProductController.getFilteredProducts);
+router.get("/products", ProductController.getAll);
+router.get("/product/:id", ProductController.getById);
+router.post(
+  "/product",
+  uploadCloud.array("[product]"),
+  ProductController.create
+);
+router.put(
+  "/product/:id",
+  uploadCloud.array("[product]"),
+  ProductController.update
+);
+router.delete(
+  "/product/:id",
+  uploadCloud.array("[product]"),
+  ProductController.delete
+);
+router.post("products/list", ProductController.getListByIds);
+router.get("/products/top-selling", ProductController.getTopSelling);
+router.get("/products/filter", ProductController.getFilteredProducts);
 
 export default router;
 
@@ -44,7 +56,7 @@ export default router;
  *           type: number
  *         status:
  *           type: string
- *           enum: ['AVAILABLE', 'SOLD_OUT', 'OUT_OF_STOCK']
+ *           enum: ['AVAILABLE', 'SOLD_OUT', 'SALE']
  *         image:
  *           type: array
  *           items:

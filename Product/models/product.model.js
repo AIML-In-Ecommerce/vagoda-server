@@ -9,11 +9,13 @@ const ProductSchema = new Schema({
   },
 //   attributes: [
 //     attribute: {
+//     attribute:{
 //       type: mongoose.Schema.Types.ObjectId,
 //       ref: "ProductAttribute",
 //       required: true,
 //     },
 //     value: {
+//     value:{
 //       type: String,
 //       required: true,
 //     }
@@ -38,6 +40,12 @@ const ProductSchema = new Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory",
+    },
+  ],
+  subCategoryType: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategoryType",
     },
   ],
   shop: {

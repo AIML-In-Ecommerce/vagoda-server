@@ -23,7 +23,7 @@ const SubCategorySchema = new Schema({
     ref: "Category",
     require: false
   },
-  subCategoryTypes: [{
+  subCategories: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "SubCategoryType",
     require: false

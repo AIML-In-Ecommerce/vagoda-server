@@ -9,7 +9,7 @@ apiEndpoints:
     paths: ["/swagger", "/swagger/*"]
 serviceEndpoints:
   product_service:
-    url: "http://localhost:3006"
+    url: "http://localhost:3006/api-docs"
 policies:
   - proxy
 pipelines:
