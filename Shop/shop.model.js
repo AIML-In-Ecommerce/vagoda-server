@@ -18,11 +18,7 @@ const ShopInfoDesignSchema = new Schema({
   bannerUrl: {
     type: String,
     required: true,
-  },
-  account: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Account",
-  },
+  }
 });
 
 const ShopDetailSchema = new Schema({
@@ -60,6 +56,10 @@ const ShopSchema = new Schema({
   name: {
     type: String,
     required: true,
+  },
+  account: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Account",
   },
   location: {
     type: String,
