@@ -8,12 +8,12 @@ import { specs, swaggerUi } from './configs/swagger.js';
 import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
 
-import userRoute from "./routes/user.route.js";
-import accountRoute from "./routes/account.route.js";
+import widgetRoute from "./routes/widget.route.js";
+import collectionTypeRoute from "./routes/collectionType.route.js";
 const app = express();
 
 dotenv.config();
-const port = process.env.USER_PORT;
+const port = process.env.WIDGET_PORT;
 db();
 
 const initializeExpress = (app) => {
@@ -26,8 +26,8 @@ const initializeExpress = (app) => {
 
 initializeExpress(app);
 
-app.use(userRoute);
-app.use(accountRoute);
+app.use(widgetRoute);
+app.use(collectionTypeRoute);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 

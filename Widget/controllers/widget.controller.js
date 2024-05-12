@@ -1,12 +1,12 @@
 import createError from "http-errors";
-import UserService from "../services/user.service.js";
-const model = "user";
-const Model = "User";
-const UserController = {
+import WidgetService from "../services/widget.service.js";
+const model = " widget ";
+const Model = " Widget ";
+const WidgetController = {
   getAll: async (req, res, next) => {
     try {
       const filter = req.body;
-      const list = await UserService.getAll(filter, "");
+      const list = await WidgetService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
@@ -22,7 +22,7 @@ const UserController = {
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await UserService.getById(id);
+      const object = await WidgetService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -39,7 +39,7 @@ const UserController = {
   create: async (req, res, next) => {
     try {
       const data = req.body;
-      const object = await UserService.create(data);
+      const object = await WidgetService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
       }
@@ -56,7 +56,7 @@ const UserController = {
     try {
       const data = req.body;
       const { id } = req.params;
-      const object = await UserService.update(id, data);
+      const object = await WidgetService.update(id, data);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -73,7 +73,7 @@ const UserController = {
   delete: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await UserService.delete(id);
+      const object = await WidgetService.delete(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -88,4 +88,4 @@ const UserController = {
   },
 };
 
-export default UserController;
+export default WidgetController;

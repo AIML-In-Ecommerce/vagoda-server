@@ -1,14 +1,13 @@
 import express from "express";
-import UserController from "../controllers/account.controller.js";
-import AccountController from "../controllers/account.controller.js";
+import CollectionTypeController from "../controllers/collectionType.controller.js";
 
 const router = express.Router();
 
-router.get("/accounts", AccountController.getAll);
-router.get("/account/:id", AccountController.getById);
-router.post("/account", AccountController.create);
-router.put("/account/:id", AccountController.update);
-router.delete("/account/:id", AccountController.delete);
+router.get("/collectionTypes", CollectionTypeController.getAll);
+router.get("/collectionType/:id", CollectionTypeController.getById);
+router.post("/collectionType", CollectionTypeController.create);
+router.put("/collectionType/:id", CollectionTypeController.update);
+router.delete("/collectionType/:id", CollectionTypeController.delete);
 
 export default router;
 

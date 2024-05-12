@@ -2,18 +2,20 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
-import bodyParser from 'body-parser';
+import bodyParser from "body-parser";
 
-import { specs, swaggerUi } from './configs/swagger.js';
-import { errorHandler, notFound } from './shared/helper/errorHandler.js';
+import { specs, swaggerUi } from "./configs/swagger.js";
+import { errorHandler, notFound } from "./shared/helper/errorHandler.js";
 import db from "./configs/db.js";
 
 import productRoute from "./routes/product.route.js";
 const app = express();
 
-app.use(cors({
-  origin: '*'
-}));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 dotenv.config();
 const port = process.env.PRODUCT_PORT;
 db();

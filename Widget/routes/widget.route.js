@@ -1,15 +1,14 @@
 import express from 'express';
-import UserController from '../controllers/account.controller.js';
-import AccountController from '../controllers/account.controller.js';
+import WidgetController from '../controllers/widget.controller.js';
 import uploadCloud from '../shared/uploader.js';
 
 const router = express.Router();
 
-router.get('/users', UserController.getAll);
-router.get('/user/:id', UserController.getById);
-router.post('/user', uploadCloud.array('avatar'), UserController.create);
-router.put('/user/:id', uploadCloud.array('avatar'), UserController.update);
-router.delete('/user/:id', uploadCloud.array('avatar'), UserController.delete);
+router.get('/widgets', WidgetController.getAll);
+router.get('/widget/:id', WidgetController.getById);
+router.post('/widget', uploadCloud.array('avatar'), WidgetController.create);
+router.put('/widget/:id', uploadCloud.array('avatar'), WidgetController.update);
+router.delete('/widget/:id', WidgetController.delete);
 
 export default router;
 

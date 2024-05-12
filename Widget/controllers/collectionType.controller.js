@@ -1,12 +1,12 @@
 import createError from "http-errors";
-import AccountService from "../services/account.service.js";
-const model = "account";
-const Model = "Account";
-const AccountController = {
+import CollectionTypeService from "../services/collectionType.service.js";
+const model = "collection type";
+const Model = "Collection type";
+const CollectionTypeController = {
   getAll: async (req, res, next) => {
     try {
       const filter = req.body;
-      const list = await AccountService.getAll(filter, "");
+      const list = await CollectionTypeService.getAll(filter, "");
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
@@ -22,7 +22,7 @@ const AccountController = {
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await AccountService.getById(id);
+      const object = await CollectionTypeService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -39,7 +39,7 @@ const AccountController = {
   create: async (req, res, next) => {
     try {
       const data = req.body;
-      const object = await AccountService.create(data);
+      const object = await CollectionTypeService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
       }
@@ -56,7 +56,7 @@ const AccountController = {
     try {
       const data = req.body;
       const { id } = req.params;
-      const object = await AccountService.update(id, data);
+      const object = await CollectionTypeService.update(id, data);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -73,7 +73,7 @@ const AccountController = {
   delete: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await AccountService.delete(id);
+      const object = await CollectionTypeService.delete(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -88,4 +88,4 @@ const AccountController = {
   },
 };
 
-export default AccountController;
+export default CollectionTypeController;

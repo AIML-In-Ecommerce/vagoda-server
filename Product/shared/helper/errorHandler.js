@@ -2,7 +2,7 @@ import createError from "http-errors";
 //import logger from '../utils/logger.js';
 //import moment from "moment-timezone";
 const notFound = (req, res, next) => {
-  next(createError.NotFound("This route does not exist"));
+  next(createError.NotFound("Not found"));
 };
 
 const errorHandler = (error, req, res, next) => {
@@ -12,7 +12,6 @@ const errorHandler = (error, req, res, next) => {
   // logger.error({
   //     message: `${error.message}`,
   // });
-  console.log(error);
   res
     .status(error.status || 500)
     .send({ message: error.message, status: error.status || 500 });

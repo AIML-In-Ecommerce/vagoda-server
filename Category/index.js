@@ -33,7 +33,7 @@ app.use(subCategoryTypeRoute);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-app.use(notFound);
+//app.use(notFound);
 app.use(errorHandler);
 app.listen(port, () => {
   console.log(`Your app is running at http://localhost:${port}`);

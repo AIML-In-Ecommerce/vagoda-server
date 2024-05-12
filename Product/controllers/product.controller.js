@@ -10,13 +10,13 @@ const ProductController = {
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
-       next(createError.InternalServerError(error.message));
       res.json({
         message: "Get " + model + " list successfully",
         status: 200,
         data: list,
       });
     } catch (error) {
+      
       next(createError.InternalServerError(error.message));
     }
   },
@@ -89,7 +89,7 @@ const ProductController = {
   },
   getListByIds: async (req, res, next) => {
     try {
-      const { ids } = req.body; 
+      const { ids } = req.body;
       const productList = await ProductService.getListByIds(ids);
       if (!productList) {
         return next(createError.BadRequest("Products not found"));
@@ -119,18 +119,20 @@ const ProductController = {
   getFilteredProducts: async (req, res, next) => {
     try {
       const filterOptions = {
-        keyword: req.query.keyword || '',
-        shopId: req.query.shopId || '',
-        price: req.query.price ? req.query.price.split(',').map(Number) : [],
-        category: req.query.category || '',
-        subCategory: req.query.subCategory || '',
-        rating: req.query.rating ? req.query.rating.split(',').map(Number) : [],
-        sortBy: req.query.sortBy || '',
+        keyword: req.query.keyword || "",
+        shopId: req.query.shopId || "",
+        price: req.query.price ? req.query.price.split(",").map(Number) : [],
+        category: req.query.category || "",
+        subCategory: req.query.subCategory || "",
+        rating: req.query.rating ? req.query.rating.split(",").map(Number) : [],
+        sortBy: req.query.sortBy || "",
         index: parseInt(req.query.index) || 0,
-        amount: parseInt(req.query.amount) || 10 // Default amount per page is 10
+        amount: parseInt(req.query.amount) || 10, // Default amount per page is 10
       };
 
-      const filteredProducts = await ProductService.getFilteredProducts(filterOptions);
+      const filteredProducts = await ProductService.getFilteredProducts(
+        filterOptions
+      );
       res.json(filteredProducts);
     } catch (error) {
       next(createError.InternalServerError(error.message));
