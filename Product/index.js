@@ -22,7 +22,7 @@ db();
 
 const initializeExpress = (app) => {
   //app.use(express.static(path.join(__dirname, "public")));
-  //app.use(cors(corsOptions));
+  app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   //app.use(morgan("combined", { stream: logger.stream }));

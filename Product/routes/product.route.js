@@ -21,7 +21,7 @@ router.delete(
   uploadCloud.array("[product]"),
   ProductController.delete
 );
-router.post("products/list", ProductController.getListByIds);
+router.get("/products/list", ProductController.getListByIds);
 router.get("/products/top-selling", ProductController.getTopSelling);
 router.get("/products/filter", ProductController.getFilteredProducts);
 
@@ -136,7 +136,7 @@ export default router;
 /**
  * @swagger
  * /products/list:
- *   post:
+ *   get:
  *     summary: Get list of products by list of IDs
  *     requestBody:
  *       required: true

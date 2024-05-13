@@ -88,8 +88,10 @@ const ProductController = {
     }
   },
   getListByIds: async (req, res, next) => {
+    console.log("test")
     try {
       const { ids } = req.body;
+      console.log(ids)
       const productList = await ProductService.getListByIds(ids);
       if (!productList) {
         return next(createError.BadRequest("Products not found"));
