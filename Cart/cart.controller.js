@@ -1,5 +1,5 @@
 import createError from "http-errors";
-import CartService from "./cart.service.js";
+import CartService from "./cart.service.js"
 const model = "cart";
 const Model = "Cart";
 const CartController = {
@@ -86,6 +86,28 @@ const CartController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+  getCartByUserId: async (req, res, next) =>
+  {
+    try
+    {
+      const {userId} = req.params.id
+
+      //check userId in accessToken and userId in req.params.id
+      //if khac nhau ==> next(createError.Forbidden)
+
+      const cart = await CartService.getByUserId(userId)
+      if(cart == null)
+      {
+        return next(createError.NotFound())
+      }
+    }
+    catch(error)
+    {
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
 };
 
 export default CartController;

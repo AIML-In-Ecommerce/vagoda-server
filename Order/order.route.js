@@ -5,8 +5,8 @@ const router = express.Router();
 
 //customer
 router.get("/c/orders", OrderController.getAllCustomerOrders);
-router.get("/c/order/:id", OrderController.getById);
-router.post("/c/order", OrderController.create);
+router.get("/c/order", OrderController.getCustomerOrderById);
+router.post("/c/order/create", OrderController.create);
 router.put("/c/order/:id", OrderController.update);
 router.delete("/c/order/:id", OrderController.delete);
 router.put("/c/order/cancel/:id", OrderController.delete);
@@ -14,6 +14,9 @@ router.get("/c/order/statuses", OrderController.getStatus);
 
 
 //seller center
+// router.get("/s/orders", OrderController.getShopOrders)
+// router.get("/s/order",)
+
 
 export default router;
 
@@ -99,7 +102,7 @@ export default router;
 
 /**
  * @swagger
- * /order/{id}:
+ * /c/order/:
  *   get:
  *     parameters:
  *       - in: path

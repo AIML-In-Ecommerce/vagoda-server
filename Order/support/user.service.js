@@ -1,22 +1,26 @@
 
 
-// const publicUserAPI = "http://14.225.218.109:3002/user/"
-const publicUserAPI = "http://localhost:3002/user/"
+// const publicUserAPI = "http://14.225.218.109:3002/"
+const publicUserAPI = "http://localhost:3002/"
 
 const UserService = 
 {
     async getUserInfo(userId)
     {
-        const url = publicUserAPI + userId
+        const url = publicUserAPI + "user/" + userId
 
         try
         {
-            const response = await fetch(url)
+            const response = await fetch(url,
+                {
+                    method: "GET",
+                }
+            )
 
             if(response.status == 200)
             {
                 const data = await response.json()
-                return data
+                return data.data
             }
             else
             {

@@ -26,10 +26,11 @@ const ShopController = {
     try
     {
       const requestBody = req.body
+      const shopIds = requestBody.ids
 
-      const listOfShops = await ShopService.getByIds(requestBody)
+      const listOfShops = await ShopService.getByIds(shopIds)
 
-      if(!list)
+      if(!listOfShops)
       {
         return next(createError.BadRequest(Model + " list not found"));
       }

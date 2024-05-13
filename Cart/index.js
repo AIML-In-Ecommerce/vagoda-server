@@ -12,7 +12,9 @@ import cartRoute from "./cart.route.js";
 const app = express();
 
 dotenv.config();
-const port = process.env.CART_PORT;
+// const port = process.env.CART_PORT;
+const port = 3003
+
 db();
 
 const initializeExpress = (app) => {

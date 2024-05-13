@@ -20,9 +20,9 @@ const ShopService =
             )
             if(response.status == 200)
             {
-                const data = await response.json().data
+                const data = await response.json()
 
-                return data
+                return data.data
             }
             else
             {
@@ -41,21 +41,30 @@ const ShopService =
     {
         const url = publicAPIURL + "shops/"
 
-        const requestBody = JSON.stringify(shopInfos)
+        const requestBody = 
+        {
+            ids: shopInfos,
+        }
+
+        const stringifiedRequestBody = JSON.stringify(requestBody)
 
         try
         {
             const response = await fetch(url, 
                 {
                     method: "POST",
-                    body: requestBody
+                    body: stringifiedRequestBody,
+                    headers:
+                    {
+                        "Content-Type": "application/json"
+                    }
                 }
             )
             if(response.status == 200)
             {
                 const data = await response.json()
 
-                return data
+                return data.data
             }
             else
             {

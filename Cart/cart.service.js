@@ -1,4 +1,5 @@
-import { Cart } from "./cart.model.js";
+import { Cart } from "./cart.model.js"
+import ProductService from "./support/product.service.js";
 
 const CartService = {
   async getAll(filter, projection) {
@@ -28,6 +29,32 @@ const CartService = {
   async delete(id) {
     return await Cart.findByIdAndDelete(id);
   },
+
+  async getByUserId(id)
+  {
+    const rawCart = await Cart.findOne({_user: id})
+
+    const productInfos = new Map()
+
+    rawCart.products.forEach((item) =>
+    {
+      const productId = item.product.toString()
+      productInfos.set(productId, {})
+    })
+
+    const fetchedProductInfos = await ProductService.getProductByIds(Array.from(productInfos.keys()))
+    if(fetchedProductInfos == null)
+    {
+      return null;
+    }
+
+    // console.log(fetchedProductInfos)
+
+    return null;
+  },
+
+
+
 };
 
 export default CartService;

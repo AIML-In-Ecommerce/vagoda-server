@@ -1,6 +1,7 @@
 import createError from "http-errors";
 import OrderService from "./order.service.js";
 import { OrderStatus } from "./shared/enums.js";
+import UserService from "./support/user.service.js";
 const model = " order ";
 const Model = " Order ";
 const OrderController = {
@@ -26,13 +27,28 @@ const OrderController = {
       next(createError.InternalServerError(error.message));
     }
   },
-  getById: async (req, res, next) => {
+
+  getCustomerOrderById: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const object = await OrderService.getById(id);
+      const { orderId } = req.query;
+
+      const object = await OrderService.getById(orderId);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
+
+      // const userInfo = await UserService.getUserInfo(userId)
+      // if(userInfo == null)
+      // {
+      //   return next(createError.BadRequest(Model + " not found"));
+      // }
+      
+      //check userId in AccessToken and userId in order
+      // if(userInfo._id != object.user._id)
+      // {
+      //   return next(createError.Forbidden("Forbidden to access this resource"));
+      // }
+
       res.json({
         message: "Get" + model + "successfully",
         data: object,
@@ -120,6 +136,10 @@ const OrderController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+  //Seller center
+
+  getShopOrders
 };
 
 export default OrderController;

@@ -8,10 +8,10 @@ const router = express.Router();
 
 router.get('/products', ProductController.getAll);
 router.get('/product/:id', ProductController.getById);
+router.post('/products/list', ProductController.getListByIds);
 router.post('/product', uploadCloud.array('[product]'), ProductController.create);
 router.put('/product/:id', uploadCloud.array('[product]'),ProductController.update);
 router.delete('/product/:id', uploadCloud.array('[product]'),ProductController.delete);
-router.post('products/list', ProductController.getListByIds);
 router.get('/products/top-selling', ProductController.getTopSelling);
 router.get('/products/filter', ProductController.getFilteredProducts);
 
