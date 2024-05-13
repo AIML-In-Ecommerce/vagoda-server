@@ -121,25 +121,26 @@ const ProductController = {
   getFilteredProducts: async (req, res, next) => {
     try {
       const filterOptions = {
-        keyword: req.query.keyword || "",
-        shopId: req.query.shopId || "",
-        price: req.query.price ? req.query.price.split(",").map(Number) : [],
-        category: req.query.category || "",
-        subCategory: req.query.subCategory || "",
-        rating: req.query.rating ? req.query.rating.split(",").map(Number) : [],
-        sortBy: req.query.sortBy || "",
-        index: parseInt(req.query.index) || 0,
-        amount: parseInt(req.query.amount) || 10, // Default amount per page is 10
+        keyword: req.body.keyword || "",
+        shopId: req.body.shopId || "",
+        price: req.body.price ? req.body.price.split(",").map(Number) : [],
+        category: req.body.category ? req.body.category.split(",") : [],
+        subCategory: req.body.subCategory ? req.body.subCategory.split(",") : [],
+        subCategoryTypes: req.body.subCategoryTypes ? req.body.subCategoryTypes.split(",") : [],
+        rating: req.body.rating ? req.body.rating.split(",").map(Number) : [],
+        sortBy: req.body.sortBy || "",
+        index: parseInt(req.body.index) || 0,
+        amount: parseInt(req.body.amount) || 20, // Default amount per page is 20
       };
-
-      const filteredProducts = await ProductService.getFilteredProducts(
-        filterOptions
-      );
+  
+      const filteredProducts = await ProductService.getFilteredProducts(filterOptions);
       res.json(filteredProducts);
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
   },
+  
+  
 };
 
 export default ProductController;

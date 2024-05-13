@@ -21,9 +21,9 @@ router.delete(
   uploadCloud.array("[product]"),
   ProductController.delete
 );
-router.get("/products/list", ProductController.getListByIds);
+router.post("/products/list", ProductController.getListByIds);
 router.get("/products/top-selling", ProductController.getTopSelling);
-router.get("/products/filter", ProductController.getFilteredProducts);
+router.post("/products/filter", ProductController.getFilteredProducts);
 
 export default router;
 
@@ -136,8 +136,9 @@ export default router;
 /**
  * @swagger
  * /products/list:
- *   get:
+ *   post:
  *     summary: Get list of products by list of IDs
+ *     description: Retrieve a list of products based on a list of IDs.
  *     requestBody:
  *       required: true
  *       content:
@@ -158,7 +159,12 @@ export default router;
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Product'
+ *       400:
+ *         description: Bad Request - Invalid request body.
+ *       500:
+ *         description: Internal Server Error.
  */
+
 
 /**
  * @swagger
@@ -188,7 +194,7 @@ export default router;
 /**
  * @swagger
  * /products/filter:
- *   get:
+ *   post:
  *     summary: Get filtered products
  *     description: Retrieve the list of products based on filter criteria.
  *     parameters:
