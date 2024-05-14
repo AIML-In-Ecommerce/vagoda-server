@@ -132,9 +132,17 @@ const ProductController = {
         index: parseInt(req.body.index) || 0,
         amount: parseInt(req.body.amount) || 20, // Default amount per page is 20
       };
-  
-      const filteredProducts = await ProductService.getFilteredProducts(filterOptions);
-      res.json(filteredProducts);
+      console.log(filterOptions.amount)
+      const {filteredProducts, total} = await ProductService.getFilteredProducts(filterOptions); 
+      const totalPages = Math.ceil(total / filterOptions.amount);
+      console.log(filteredProducts.length ,total, totalPages)
+      res.json({
+        message: "Get filter " + model + " list successfully",
+        status: 200,
+        data: filteredProducts,
+        total: total,
+        totalPages: totalPages
+    });
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }

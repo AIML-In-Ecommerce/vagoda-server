@@ -46,17 +46,19 @@ const ProductService = {
     }
   },
   getFilteredProducts: async (filterOptions) => {
-    const { keyword, shopId, price, category, subCategory, rating, sortBy, index, amount } = filterOptions;
+    const { keyword, shopId, price, category, subCategory, subCategoryTypes, rating, sortBy, index, amount } = filterOptions;
     const query = {};
-
+  
     // Apply filters
     if (keyword) query.$text = { $search: keyword };
     if (shopId) query.shop = shopId;
     if (price.length === 2) query.originalPrice = { $gte: price[0], $lte: price[1] };
-    if (category) query.category = category;
-    if (subCategory) query.subCategory = subCategory;
+    if (category.length > 0) query.category = { $in: category };
+    if (subCategory.length > 0) query.subCategory = { $in: subCategory };
+    if (subCategoryTypes.length > 0) query.subCategoryTypes = { $in: subCategoryTypes };
     if (rating.length === 2) query.avgRating = { $gte: rating[0], $lte: rating[1] };
-
+    console.log(query);
+    const total = await Product.countDocuments(query);
     // Sort products
     let sortOption = {};
     switch (sortBy) {
@@ -78,14 +80,15 @@ const ProductService = {
       default:
         break;
     }
-
+    //console.log(sortOption)
     const filteredProducts = await Product.find(query)
       .sort(sortOption)
       .skip(index * amount)
       .limit(amount);
-
-    return filteredProducts;
+    console.log(filteredProducts)
+    return {filteredProducts, total};
   },
+  
 };
 
 export default ProductService;
