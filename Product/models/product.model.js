@@ -47,7 +47,7 @@
     subCategoryType:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "SubCategoryType",
-        //autopopulate: true,
+        autopopulate: true,
       },
     shop: {
       type: mongoose.Schema.Types.ObjectId,
