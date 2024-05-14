@@ -1,6 +1,8 @@
   import mongoose from "mongoose";
   import { ProductStatus } from "../shared/enums.js";
   import Category from "./category.model.js";
+  import SubCategory from "./subCategory.model.js";
+  import SubCategoryType from "./subCategoryType.model.js";
   import mongooseAutoPopulate from "mongoose-autopopulate";
   const Schema = mongoose.Schema;
   const ProductSchema = new Schema({
@@ -45,7 +47,7 @@
     subCategoryType:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "SubCategoryType",
-        autopopulate: true,
+        //autopopulate: true,
       },
     shop: {
       type: mongoose.Schema.Types.ObjectId,
