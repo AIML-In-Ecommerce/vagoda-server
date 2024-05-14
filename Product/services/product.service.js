@@ -10,7 +10,7 @@ const ProductService = {
 
   async getById(id) {
     const rawProductInfo = await Product.findById(id);
-    
+    return rawProductInfo
   },
 
   async create(objectData) {
@@ -27,7 +27,9 @@ const ProductService = {
   },
 
   async getListByIds(ids) {
-    return await Product.find({ _id: { $in: ids } });
+    const rawProductList = await Product.find({ _id: { $in: ids } });
+
+    return rawProductList;
   },
 
   async getTopSelling(limit) {

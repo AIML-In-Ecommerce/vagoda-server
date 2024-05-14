@@ -35,7 +35,8 @@ const UserSchema = new Schema({
       }
     },
     label: {
-      enum: ["HOME", "OFFICE"],
+      type: String,
+      default: "HOME"
     },
     isDefault: {
       type: Boolean,

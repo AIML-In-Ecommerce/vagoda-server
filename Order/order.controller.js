@@ -58,6 +58,13 @@ const OrderController = {
     }
   },
 
+  /**
+   * req.body = 
+   * {
+   *  
+   * }
+   * 
+   */
   create: async (req, res, next) => {
     try {
       const data = req.body;
@@ -137,9 +144,9 @@ const OrderController = {
     }
   },
 
-  //Seller center
+  
 
-  getShopOrders
+  //Seller center
 };
 
 export default OrderController;

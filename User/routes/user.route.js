@@ -1,16 +1,19 @@
 import express from 'express';
-import UserController from '../controllers/user.controller.js';
+import UserController from '../controllers/user.controller.js'
 import AccountController from '../controllers/account.controller.js';
 import uploadCloud from '../shared/uploader.js';
 
 const router = express.Router();
 
 router.get('/users', UserController.getAll);
-router.get('/user/:id', UserController.getById);
+router.get('/user/info', UserController.getById);
 router.post('/user', uploadCloud.array('avatar'), UserController.create);
-router.put('/user/:id', uploadCloud.array('avatar'), UserController.update);
+router.put('/user/info', uploadCloud.array('avatar'), UserController.update);
 router.delete('/user/:id', uploadCloud.array('avatar'), UserController.delete);
 router.post('/user/register', UserController.register);
+router.get("/user/shipping_address", UserController.getShippingAddress)
+router.post('/user/shipping_address', UserController.insertShippingAddress)
+router.put("/user/shipping_address", UserController.updateShippingAddress)
 
 export default router;
 
