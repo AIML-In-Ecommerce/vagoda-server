@@ -21,7 +21,9 @@ const WidgetController = {
   },
   getById: async (req, res, next) => {
     try {
+      console.log("test")
       const { id } = req.params;
+      console.log(id)
       const object = await WidgetService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));

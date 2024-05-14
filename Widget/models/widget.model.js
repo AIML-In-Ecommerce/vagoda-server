@@ -62,20 +62,20 @@ const PromotionElementSchema = new Schema({
   },
 });
 
-const ElementSchema = new Schema(
-  {
-    type: {
-      type: String,
-      enum: ["BannerElement", "ProductElement", "CategoryElement", "PromotionElement"],
-      required: true,
-    },
-    data: {
-      type: Schema.Types.Mixed,
-      required: true,
-    },
-  },
-  { _id: false }
-);
+// const ElementSchema = new Schema(
+//   {
+//     type: {
+//       type: String,
+//       enum: ["BannerElement", "ProductElement", "CategoryElement", "PromotionElement"],
+//       required: true,
+//     },
+//     data: {
+//       type: Schema.Types.Mixed,
+//       required: true,
+//     },
+//   },
+//   { _id: false }
+// );
 
 const WidgetSchema = new Schema({
   type: {
@@ -91,7 +91,9 @@ const WidgetSchema = new Schema({
     type: Boolean,
     required: true,
   },
-  element: ElementSchema,
+  element: {
+    type: Schema.Types.Mixed,
+  }
 });
 
 const Widget = mongoose.model("Widget", WidgetSchema);

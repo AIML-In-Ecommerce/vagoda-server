@@ -22,6 +22,7 @@ const CollectionTypeController = {
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
+      console.log("cc")
       const object = await CollectionTypeService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
@@ -32,6 +33,7 @@ const CollectionTypeController = {
         data: object,
       });
     } catch (error) {
+      console.log(error)
       next(createError.InternalServerError(error.message));
     }
   },

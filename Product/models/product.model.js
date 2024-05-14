@@ -9,6 +9,7 @@
     name: {
       type: String,
       required: true,
+      text: true,
     },
   //   attributes: [
   //     attribute: {

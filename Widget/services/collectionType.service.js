@@ -9,7 +9,7 @@ const CollectionTypeService = {
   // },
 
   async getById(id) {
-    return await AccoCollectionTypeunt.findById(id);
+    return await CollectionType.findById(id);
   },
 
   async create(objectData) {

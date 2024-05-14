@@ -46,27 +46,35 @@ const ProductService = {
     }
   },
   getFilteredProducts: async (filterOptions) => {
-    const { keyword, shopId, price, category, subCategory, subCategoryTypes, rating, sortBy, index, amount } = filterOptions;
+    const { keyword, shopId, minPrice, maxPrice, category, subCategory, subCategoryTypes, rating, sortBy, index, amount } = filterOptions;
     const query = {};
-  
+    if (typeof minPrice !== "number" || typeof maxPrice !== "number") {
+      throw new Error("Invalid price values. Please provide valid numbers for minPrice and maxPrice.");
+    }
     // Apply filters
-    if (keyword) query.$text = { $search: keyword };
+    //if (keyword) query.$text = { $search: keyword };
     if (shopId) query.shop = shopId;
-    if (price.length === 2) query.originalPrice = { $gte: price[0], $lte: price[1] };
+    // if (minPrice !== 0 && maxPrice !== Number.MAX_VALUE) {
+    //   query.originalPrice = {
+    //     $gte: minPrice,  // Greater than or equal to minPrice
+    //     $lte: maxPrice,  // Less than or equal to maxPrice
+    //   }
+    // }
     if (category.length > 0) query.category = { $in: category };
     if (subCategory.length > 0) query.subCategory = { $in: subCategory };
     if (subCategoryTypes.length > 0) query.subCategoryTypes = { $in: subCategoryTypes };
     if (rating.length === 2) query.avgRating = { $gte: rating[0], $lte: rating[1] };
     console.log(query);
+
     const total = await Product.countDocuments(query);
     // Sort products
     let sortOption = {};
     switch (sortBy) {
       case 'ascending price':
-        sortOption = { originalPrice: 1 };
+        sortOption = { finalPrice: 1 };
         break;
       case 'descending price':
-        sortOption = { originalPrice: -1 };
+        sortOption = { finalPrice: -1 };
         break;
       case 'top sale':
         sortOption = { soldQuantity: -1 };

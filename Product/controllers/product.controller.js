@@ -123,7 +123,8 @@ const ProductController = {
       const filterOptions = {
         keyword: req.body.keyword || "",
         shopId: req.body.shopId || "",
-        price: req.body.price ? req.body.price.split(",").map(Number) : [],
+        minPrice: parseFloat(req.body.minPrice) || 0,
+        maxPrice: parseFloat(req.body.maxPrice) || Number.MAX_VALUE,
         category: req.body.category ? req.body.category.split(",") : [],
         subCategory: req.body.subCategory ? req.body.subCategory.split(",") : [],
         subCategoryTypes: req.body.subCategoryTypes ? req.body.subCategoryTypes.split(",") : [],
@@ -132,7 +133,6 @@ const ProductController = {
         index: parseInt(req.body.index) || 0,
         amount: parseInt(req.body.amount) || 20, // Default amount per page is 20
       };
-      console.log(filterOptions.amount)
       const {filteredProducts, total} = await ProductService.getFilteredProducts(filterOptions); 
       const totalPages = Math.ceil(total / filterOptions.amount);
       console.log(filteredProducts.length ,total, totalPages)
