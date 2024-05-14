@@ -18,6 +18,8 @@ app.use(
 );
 dotenv.config();
 const port = process.env.PRODUCT_PORT;
+// const port = 3006
+
 db();
 
 const initializeExpress = (app) => {

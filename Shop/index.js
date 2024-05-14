@@ -13,6 +13,8 @@ const app = express();
 
 dotenv.config();
 const port = process.env.SHOP_PORT;
+// const port = 3004
+
 db();
 
 const initializeExpress = (app) => {

@@ -1,5 +1,5 @@
 import createError from "http-errors";
-import CartService from "./cart.service.js";
+import CartService from "./cart.service.js"
 const model = "cart";
 const Model = "Cart";
 const CartController = {
@@ -86,6 +86,84 @@ const CartController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+  getCartByUserId: async (req, res, next) =>
+  {
+    try
+    {
+      const userId = req.params.id
+
+      //check userId in accessToken and userId in req.params.id
+      //if khac nhau ==> next(createError.Forbidden)
+
+      const cart = await CartService.getByUserId(userId)
+      if(cart == null)
+      {
+        return next(createError.NotFound())
+      }
+
+      return res.json(
+        {
+          message: "Get cart successully",
+          data: cart,
+        }
+      )
+    }
+    catch(error)
+    {
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  /**
+   * req.body = 
+   * {
+   *  products:
+   *  [
+   *    productId: string,
+   *    quantity: number
+   *  ]
+   * }
+   */
+  updateProducts: async (req, res, next) =>
+  {
+    try
+    {
+      const userId = req.params.id
+      const requestBody = req.body
+  
+      if(!requestBody || !userId)
+      {
+        return next(createError.BadRequest("Bad request to cart service"))
+      }
+  
+      //check userId in accessToken and userId in req.params.id
+      //if khac nhau ==> next(createError.Forbidden)
+  
+      const result = await CartService.updateProducts(userId, requestBody.products)
+  
+      if(result == true)
+      {
+        return res.json(
+          {
+            message: "Update cart successfully",
+          }
+        )
+      }
+      else
+      {
+        return next(createError.MethodNotAllowed("Cannot update the document"))
+      }
+      
+    }
+    catch(error)
+    {
+      console.log(error)
+
+      return next(createError.InternalServerError(error.message))
+    }
+  }
+
 };
 
 export default CartController;

@@ -19,6 +19,36 @@ const ShopController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+  
+  getShopByIdList: async (req, res, next) =>
+  {
+    try
+    {
+      const requestBody = req.body
+      const shopIds = requestBody.ids
+
+      const listOfShops = await ShopService.getByIds(shopIds)
+
+      if(!listOfShops)
+      {
+        return next(createError.BadRequest(Model + " list not found"));
+      }
+
+      res.json(
+        {
+          message: "Get list of shops successfully",
+          data: listOfShops
+        }
+      )
+    }
+    catch(err)
+    {
+      return next(createError.InternalServerError(err.message))
+    }
+  },
+
+
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;

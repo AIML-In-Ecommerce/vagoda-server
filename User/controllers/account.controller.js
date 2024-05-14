@@ -1,5 +1,6 @@
 import createError from "http-errors";
 import AccountService from "../services/account.service.js";
+
 const model = "account";
 const Model = "Account";
 const AccountController = {
@@ -99,6 +100,8 @@ const AccountController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+
 };
 
 export default AccountController;
