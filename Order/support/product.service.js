@@ -1,6 +1,6 @@
 
-// const publicUserAPI = "http://14.225.218.109:3008/"
-const publicAPIURL = "http://localhost:3006/"
+const publicAPIURL = "http://14.225.218.109:3006/"
+// const publicAPIURL = "http://localhost:3006/"
 
 const ProductService = 
 {

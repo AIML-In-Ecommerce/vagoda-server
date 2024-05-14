@@ -16,8 +16,8 @@ app.use(cors({
   origin: '*'
 }));
 dotenv.config();
-// const port = process.env.PRODUCT_PORT;
-const port = 3006
+const port = process.env.PRODUCT_PORT;
+// const port = 3006
 
 db();
 

@@ -1,13 +1,13 @@
 
 
-// const publicUserAPI = "http://14.225.218.109:3002/"
-const publicUserAPI = "http://localhost:3002/"
+const publicAPIURL = "http://14.225.218.109:3002/"
+// const publicAPIURL = "http://localhost:3002/"
 
 const UserService = 
 {
     async getUserInfo(userId)
     {
-        const url = publicUserAPI + "user/info?userId=" + userId
+        const url = publicAPIURL + "user/info?userId=" + userId
 
         try
         {

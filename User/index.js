@@ -13,8 +13,8 @@ import accountRoute from "./routes/account.route.js";
 const app = express();
 
 dotenv.config();
-// const port = process.env.USER_PORT;
-const port = 3002;
+const port = process.env.USER_PORT;
+// const port = 3002;
 
 db();
 

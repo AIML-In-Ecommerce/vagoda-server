@@ -15,8 +15,8 @@ app.use(cors({
   origin: '*'
 }));
 dotenv.config();
-// const port = process.env.ORDER_PORT;
-const port = 3009;
+const port = process.env.ORDER_PORT;
+// const port = 3009;
 db();
 
 const initializeExpress = (app) => {
