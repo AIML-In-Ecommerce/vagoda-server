@@ -61,7 +61,8 @@ const UserController = {
     try {
       const id = req.query.userId;
       const object = await UserService.getById(id);
-      if (!object) {
+
+      if (object == null) {
         return next(createError.BadRequest(Model + " not found"));
       }
       res.json({

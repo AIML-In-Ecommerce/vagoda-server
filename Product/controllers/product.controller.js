@@ -6,6 +6,7 @@ const Model = "Product";
 
 const ProductController = {
   getAll: async (req, res, next) => {
+    console.log("inside GetALL")
     try {
       const filter = req.query;
       const list = await ProductService.getAll(filter, "")
@@ -91,10 +92,10 @@ const ProductController = {
     }
   },
   getListByIds: async (req, res, next) => {
-    console.log("test")
+
     try {
       const { ids } = req.body;
-      console.log(ids)
+
       const productList = await ProductService.getListByIds(ids);
       if (!productList) {
         return next(createError.BadRequest("Products not found"));

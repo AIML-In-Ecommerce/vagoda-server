@@ -1,3 +1,4 @@
+import axios from "axios"
 
 
 
@@ -13,14 +14,15 @@ const ShopService =
 
         try
         {
-            const response = await fetch(url, 
+            const response = await axios.get(url, 
                 {
                     method: "GET"
                 }
             )
+
             if(response.status == 200)
             {
-                const data = await response.json()
+                const data = await response.data
 
                 return data.data
             }

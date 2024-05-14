@@ -28,7 +28,7 @@ const ProductService = {
 
   async getListByIds(ids) {
     const rawProductList = await Product.find({ _id: { $in: ids } });
-
+  
     return rawProductList;
   },
 

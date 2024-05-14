@@ -1,3 +1,4 @@
+import axios from "axios"
 
 const publicAPIURL = "http://14.225.218.109:3006/"
 // const publicAPIURL = "http://localhost:3006/"
@@ -10,22 +11,20 @@ const ProductService =
         const url = publicAPIURL + "products/list"
         try
         {
-            const stringifyString = JSON.stringify({ids: ids})
+            const requestBody = 
+            {
+                ids: ids
+            }
 
-            const response = await fetch(url,
+            const response = await axios.post(url, requestBody,
                 {
-                    method: "POST",
-                    body: stringifyString,
-                    headers:
-                    {
-                        "Content-Type": "application/json"
-                    }
+                    method: "POST"
                 }
             )
 
             if(response.status == 200)
             {
-                const data = await response.json()
+                const data = response.data
                 return data.data
             }
             else

@@ -97,9 +97,10 @@ const CartController = {
       //if khac nhau ==> next(createError.Forbidden)
 
       const cart = await CartService.getByUserId(userId)
+
       if(cart == null)
       {
-        return next(createError.NotFound())
+        return next(createError.NotFound("Cart not found"))
       }
 
       return res.json(

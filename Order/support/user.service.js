@@ -1,3 +1,4 @@
+import axios from "axios"
 
 
 const publicAPIURL = "http://14.225.218.109:3002/"
@@ -11,15 +12,13 @@ const UserService =
 
         try
         {
-            const response = await fetch(url,
-                {
-                    method: "GET",
-                }
-            )
+            const response = await axios.get(url, {
+                method: "GET"
+            })
 
             if(response.status == 200)
             {
-                const data = await response.json()
+                const data = await response.data
                 return data.data
             }
             else

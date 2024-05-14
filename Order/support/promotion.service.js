@@ -1,3 +1,4 @@
+import axios from "axios"
 
 const publicAPIURL = "http://14.225.218.109:3008/"
 // const publicAPIURL = "http://localhost:3008/"
@@ -10,19 +11,21 @@ const PromotionService =
         const url = publicAPIURL + "promotions"
         try
         {
-            const stringifyString = JSON.stringify(ids)
+            const requestBody = 
+            {
+                ids: ids
+            }
 
-            const response = await fetch(url,
+            const response = await axios.post(url, requestBody,
                 {
-                    method: "POST",
-                    body: stringifyString
+                    method: "POST"
                 }
             )
 
             if(response.status == 200)
             {
-                const data = await response.json().data
-                return data
+                const data = await response.data
+                return data.data
             }
             else
             {
