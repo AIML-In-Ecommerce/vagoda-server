@@ -11,6 +11,11 @@ const ShopService = {
     return await Shop.findById(id);
   },
 
+  async getByIds(listOfIds)
+  {
+    return await Shop.find({_id: {$in: listOfIds}})
+  },
+
   async create(objectData) {
     const newObject = new Shop(objectData);
     return await newObject.save();

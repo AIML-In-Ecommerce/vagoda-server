@@ -19,6 +19,34 @@ const PromotionController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+  getByIds: async (req, res, next) =>
+  {
+    try
+    {
+      const requestBody = req.body
+
+      const listOfPromotion = await PromotionService.getByIds(requestBody)
+      if(!listOfPromotion)
+      {
+        return next(createError.BadRequest(Model + " list not found"));
+      }
+
+      return res.json(
+        {
+          message: "Get list of promotions successfully",
+          data: listOfPromotion,
+        }
+      )
+
+    }
+    catch(error)
+    {
+
+      next(createError.InternalServerError(error.message));
+    }
+  },
+
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;

@@ -13,6 +13,8 @@ const app = express();
 
 dotenv.config();
 const port = process.env.PROMOTION_PORT;
+// const port = 3008;
+
 db();
 
 const initializeExpress = (app) => {

@@ -2,14 +2,15 @@ import { Product } from "../models/product.model.js";
 
 const ProductService = {
   async getAll(filter, projection) {
-    return await Product.find(filter).select(projection);
+    return await Product.find(filter).select(projection)
   },
   // async getAll() {
   //   return await AuthorizeRequest.find();
   // },
 
   async getById(id) {
-    return await Product.findById(id);
+    const rawProductInfo = await Product.findById(id);
+    return rawProductInfo
   },
 
   async create(objectData) {
@@ -26,7 +27,9 @@ const ProductService = {
   },
 
   async getListByIds(ids) {
-    return await Product.find({ _id: { $in: ids } });
+    const rawProductList = await Product.find({ _id: { $in: ids } });
+  
+    return rawProductList;
   },
 
   async getTopSelling(limit) {
@@ -99,4 +102,4 @@ const ProductService = {
   
 };
 
-export default ProductService;
+export default ProductService

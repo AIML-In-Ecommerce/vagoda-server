@@ -14,6 +14,8 @@ const app = express();
 
 dotenv.config();
 const port = process.env.USER_PORT;
+// const port = 3002;
+
 db();
 
 const initializeExpress = (app) => {

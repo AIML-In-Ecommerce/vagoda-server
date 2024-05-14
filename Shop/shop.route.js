@@ -4,6 +4,7 @@ import ShopController from "./shop.controller.js";
 const router = express.Router();
 
 router.get("/shops", ShopController.getAll);
+router.post("/shops", ShopController.getShopByIdList)
 router.get("/shop/:id", ShopController.getById);
 router.post("/shop", ShopController.create);
 router.put("/shop/:id", ShopController.update);

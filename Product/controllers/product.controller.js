@@ -1,12 +1,15 @@
 import createError from "http-errors";
-import ProductService from "../services/product.service.js";
+import ProductService from '../services/product.service.js'
+
 const model = "product";
 const Model = "Product";
+
 const ProductController = {
   getAll: async (req, res, next) => {
+    console.log("inside GetALL")
     try {
       const filter = req.query;
-      const list = await ProductService.getAll(filter, "");
+      const list = await ProductService.getAll(filter, "")
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
@@ -20,6 +23,7 @@ const ProductController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -88,10 +92,10 @@ const ProductController = {
     }
   },
   getListByIds: async (req, res, next) => {
-    console.log("test")
+
     try {
       const { ids } = req.body;
-      console.log(ids)
+
       const productList = await ProductService.getListByIds(ids);
       if (!productList) {
         return next(createError.BadRequest("Products not found"));
