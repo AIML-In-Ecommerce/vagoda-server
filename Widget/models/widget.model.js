@@ -62,6 +62,19 @@ const PromotionElementSchema = new Schema({
   },
 });
 
+const CollectionElementSchema = new Schema({
+  pattern: {
+    type: String,
+    enum: ["CAROUSEL", "GRID"],
+    required: true,
+  },
+  collectionIdList: {
+    type: [Schema.Types.ObjectId], // Thêm CollectionElement cho element của Widget
+    ref: "CollectionType",
+    required: true,
+  },
+});
+
 // const ElementSchema = new Schema(
 //   {
 //     type: {

@@ -2,6 +2,22 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
+const CommentSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const ReviewSchema = new Schema({
   product: {
     type: Schema.Types.ObjectId, 
@@ -9,7 +25,7 @@ const ReviewSchema = new Schema({
     required: true,
   },
   user: {
-    type: Schema.Types.ObjectId, // Sử dụng Schema.Types.ObjectId
+    type: Schema.Types.ObjectId, 
     ref: "User",
     required: true,
   },
@@ -27,20 +43,7 @@ const ReviewSchema = new Schema({
     type: Date, 
     default: Date.now, 
   },
-  conversation: [
-    {
-      user: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-      content: {
-        type: String,
-      },
-      asset: {
-        type: String,
-      },
-    },
-  ],
+  cconversation: [CommentSchema],
   like: {
     type: [Schema.Types.ObjectId], // Sử dụng mảng của ObjectId
     ref: "User",

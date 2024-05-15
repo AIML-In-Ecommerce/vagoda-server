@@ -7,10 +7,6 @@ const ShopInfoDesignSchema = new Schema({
     type: String,
     required: true,
   },
-  name: {
-    type: String,
-    required: true,
-  },
   avatarUrl: {
     type: String,
     required: true,
@@ -38,17 +34,11 @@ const ShopDetailSchema = new Schema({
     type: Number,
     required: true,
   },
-  description: {
-    type: String,
-  },
   rating: {
     type: Number,
   },
   replyPercentage: {
     type: Number,
-  },
-  address: {
-    type: String,
   },
 });
 
