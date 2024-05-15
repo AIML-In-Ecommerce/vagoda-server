@@ -92,11 +92,12 @@ const ProductService = {
         break;
     }
     //console.log(sortOption)
+    console.log(index, amount)
     const filteredProducts = await Product.find(query)
       .sort(sortOption)
-      .skip(index * amount)
+      .skip((index-1) * amount)
       .limit(amount);
-    console.log(filteredProducts)
+    //console.log(filteredProducts)
     return {filteredProducts, total};
   },
   

@@ -134,9 +134,10 @@ const ProductController = {
         subCategoryTypes: req.body.subCategoryTypes ? req.body.subCategoryTypes.split(",") : [],
         rating: req.body.rating ? req.body.rating.split(",").map(Number) : [],
         sortBy: req.body.sortBy || "",
-        index: parseInt(req.body.index) || 0,
+        index: parseInt(req.body.index) || 1,
         amount: parseInt(req.body.amount) || 20, // Default amount per page is 20
       };
+      if(filterOptions.index<1) filterOptions.index=1
       const {filteredProducts, total} = await ProductService.getFilteredProducts(filterOptions); 
       const totalPages = Math.ceil(total / filterOptions.amount);
       console.log(filteredProducts.length ,total, totalPages)
