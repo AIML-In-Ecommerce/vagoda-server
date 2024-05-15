@@ -88,6 +88,23 @@ const CollectionTypeController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  getByShopId: async (req, res, next) => {
+    try {
+      const { shopId } = req.params;
+      const filter = { shop: shopId };
+      const list = await CollectionTypeService.getAll(filter, "");
+      if (!list) {
+        return next(createError.BadRequest(Model + " list not found"));
+      }
+      res.json({
+        message: "Get " + model + " list by shopId successfully",
+        status: 200,
+        data: list,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
 };
 
 export default CollectionTypeController;
