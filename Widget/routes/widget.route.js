@@ -9,6 +9,8 @@ router.get('/widget/:id', WidgetController.getById);
 router.post('/widget', uploadCloud.array('avatar'), WidgetController.create);
 router.put('/widget/:id', uploadCloud.array('avatar'), WidgetController.update);
 router.delete('/widget/:id', WidgetController.delete);
+router.post("/widgets/list", WidgetController.getListByIds);
+
 
 export default router;
 
