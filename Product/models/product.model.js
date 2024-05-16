@@ -64,7 +64,7 @@
       enum: Object.values(ProductStatus),
       default: ProductStatus.AVAILABLE,
     },
-    image: {
+    images: {
       type: [String],
     },
     avgRating: {
