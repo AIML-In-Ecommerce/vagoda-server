@@ -93,7 +93,7 @@ const CollectionElementSchema = new Schema({
 const WidgetSchema = new Schema({
   type: {
     type: String,
-    enum: ["BANNER", "PRODUCT", "CATEGORY", "PROMOTION"],
+    enum: ["BANNER", "PRODUCT", "CATEGORY", "PROMOTION", "COLLECTION"],
     required: true,
   },
   order: {
