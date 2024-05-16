@@ -39,6 +39,7 @@ const ProductAttributeController = {
   create: async (req, res, next) => {
     try {
       const data = req.body;
+      console.log(data)
       const object = await ProductAttributeService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));

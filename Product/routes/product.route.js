@@ -8,7 +8,7 @@ router.get("/products", ProductController.getAll);
 router.get("/product/:id", ProductController.getById);
 router.post(
   "/product",
-  uploadCloud.array("[product]"),
+  uploadCloud.array("image"),
   ProductController.create
 );
 router.put(

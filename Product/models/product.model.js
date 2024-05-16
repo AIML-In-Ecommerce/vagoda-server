@@ -56,7 +56,7 @@
       required: true,
     },
     platformFee:{
-      type: Number,
+      type: Number, 
       required: true,
     },
     status: {
