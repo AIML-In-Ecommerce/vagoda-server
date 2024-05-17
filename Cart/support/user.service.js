@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-const publicAPIURL = "http://14.225.218.109:3002/"
-// const publicAPIURL = "http://localhost:3002/"
+// const publicAPIURL = "http://14.225.218.109:3002/"
+const publicAPIURL = "http://localhost:3002/"
 
 const UserService = 
 {

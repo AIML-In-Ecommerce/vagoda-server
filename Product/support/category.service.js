@@ -1,6 +1,6 @@
 
-const publicAPIURL = "http://14.225.218.109:3005/"
-// const publicAPIURL = "http://localhost:3005/"
+// const publicAPIURL = "http://14.225.218.109:3005/"
+const publicAPIURL = "http://localhost:3005/"
 
 const CategoryService = 
 {

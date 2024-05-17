@@ -55,14 +55,14 @@ const ProductService = {
       throw new Error("Invalid price values. Please provide valid numbers for minPrice and maxPrice.");
     }
     // Apply filters
-    //if (keyword) query.$text = { $search: keyword };
+    if (keyword) query.$text = { $search: keyword };
     if (shopId) query.shop = shopId;
-    // if (minPrice !== 0 && maxPrice !== Number.MAX_VALUE) {
-    //   query.originalPrice = {
-    //     $gte: minPrice,  // Greater than or equal to minPrice
-    //     $lte: maxPrice,  // Less than or equal to maxPrice
-    //   }
-    // }
+    if (minPrice != 0 && maxPrice != Number.MAX_VALUE) {
+      query.originalPrice = {
+        $gte: minPrice,  // Greater than or equal to minPriced
+        $lte: maxPrice,  // Less than or equal to maxPrice
+      }
+    }
     if (category.length > 0) query.category = { $in: category };
     if (subCategory.length > 0) query.subCategory = { $in: subCategory };
     if (subCategoryTypes.length > 0) query.subCategoryTypes = { $in: subCategoryTypes };

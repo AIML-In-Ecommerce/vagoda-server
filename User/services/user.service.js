@@ -12,9 +12,15 @@ const UserService = {
     return await User.findById(id);
   },
 
+  async getByAccountId(id)
+  {
+    return await User.findOne({account: id});
+  },
+
   async create(objectData) {
     const newObject = new User(objectData);
-    return await newObject.save();
+    const userInfo = await newObject.save();
+    return userInfo._id.toString()
   },
 
   async update(id, updateData) {
@@ -40,7 +46,7 @@ const UserService = {
 
     rawUserInfo.address = clonedAddress
 
-    rawUserInfo.save()
+    await rawUserInfo.save()
 
     return rawUserInfo.address;
   },
@@ -108,10 +114,48 @@ const UserService = {
 
     rawUserInfo.address[targetIndex] = newShippingAddress
 
-    rawUserInfo.save()
+    await rawUserInfo.save()
 
     return rawUserInfo.address
-  }
+  },
+
+  async deleteShippingAddress(userId, documentId)
+  {
+    const rawUserInfo = await User.findById(userId)
+    if(rawUserInfo == null)
+    {
+      return null
+    }
+    if(rawUserInfo.address.length == 0)
+    {
+      return rawUserInfo.address
+    }
+
+    let targetIndex = -1
+
+    for(let i = 0; i < rawUserInfo.address.length; i++)
+    {
+      const itemId = rawUserInfo.address[i]._id.toString()
+      if(itemId == documentId)
+      {
+        targetIndex = i
+        break
+      }
+    }
+
+    if(targetIndex == -1)
+    {
+      return null
+    }
+
+    let newAddress = rawUserInfo.address.slice(0, targetIndex)
+    newAddress = newAddress.concat(rawUserInfo.address.slice(targetIndex + 1, rawUserInfo.address.length))    
+
+    rawUserInfo.address = newAddress
+
+    await rawUserInfo.save()
+    return rawUserInfo.address
+  },
 
 
 };

@@ -139,7 +139,7 @@ const ProductController = {
       };
       const {filteredProducts, total} = await ProductService.getFilteredProducts(filterOptions); 
       const totalPages = Math.ceil(total / filterOptions.amount);
-      console.log(filteredProducts.length ,total, totalPages)
+      // console.log(filteredProducts.length ,total, totalPages)
       res.json({
         message: "Get filter " + model + " list successfully",
         status: 200,

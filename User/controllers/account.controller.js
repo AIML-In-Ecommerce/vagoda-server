@@ -20,15 +20,23 @@ const AccountController = {
       next(createError.InternalServerError(error.message));
     }
   },
-  check: async (req, res, next) => {
+  
+  getByEmail: async (req, res, next) => {
     try {
-      const {email, password} = req.body;
-      const account = await AccountService.check(email, password);
-      if (!account) {
-        return next(createError.BadRequest("Email or password was wrong!"));
+      const {email} = req.body;
+      const account = await AccountService.getByEmail(email)
+      if(account == null)
+      {
+        return next(createError.NotFound("Account not found"))
       }
-      
-      res.json(account);
+  
+      return res.json(
+        {
+          message: "Get account successfully",
+          data: account
+        }
+      )
+
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
@@ -58,7 +66,7 @@ const AccountController = {
         return next(createError.BadRequest("Bad request!"));
       }
       res.json({
-        message: "Create" + model + "successfully",
+        message: "Create " + model + " successfully",
         status: 200,
         data: object,
       });
@@ -87,14 +95,15 @@ const AccountController = {
   delete: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const object = await AccountService.delete(id);
-      if (!object) {
+      const deletedAccountId = await AccountService.delete(id);
+      if (!deletedAccountId) {
         return next(createError.BadRequest(Model + " not found"));
       }
+      console.log("Deleted " + id)
       res.json({
-        message: "Delete" + model + "successfully",
+        message: "Delete " + model + " successfully",
         status: 200,
-        data: object,
+        data: deletedAccountId,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));

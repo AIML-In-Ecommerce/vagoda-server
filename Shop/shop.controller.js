@@ -27,8 +27,10 @@ const ShopController = {
     {
       const requestBody = req.body
       const shopIds = requestBody.ids
+      const useDesign = requestBody.useDesign
+      const useShopDetail = requestBody.useShopDetail
 
-      const listOfShops = await ShopService.getByIds(shopIds)
+      const listOfShops = await ShopService.getByIds(shopIds, useShopDetail, useDesign)
 
       if(!listOfShops)
       {
@@ -51,8 +53,11 @@ const ShopController = {
 
   getById: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const object = await ShopService.getById(id);
+      const shopId = req.query.id
+      const useShopDetail = req.query.useShopDetail == "true"
+      const useDesign = req.query.useDesign == "true"
+
+      const object = await ShopService.getById(shopId, useShopDetail, useDesign);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -69,14 +74,14 @@ const ShopController = {
   create: async (req, res, next) => {
     try {
       const data = req.body;
-      const object = await ShopService.create(data);
-      if (!object) {
+      const newShopId = await ShopService.create(data);
+      if (!newShopId) {
         return next(createError.BadRequest("Bad request!"));
       }
       res.json({
         message: "Create " + model + " successfully",
         status: 200,
-        data: object,
+        data: newShopId,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));
@@ -116,6 +121,34 @@ const ShopController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+  getByAccountId: async(req, res, next) =>
+  {
+    try
+    {
+      const accountId = req.query.accountId
+      const useDesign = req.query.useDesign == "true"
+      const useShopDetail = req.query.useShopDetail == "true"
+      
+      const shopInfo = await ShopService.getByAccountId(accountId, useShopDetail, useDesign)
+      if(shopInfo == null)
+      {
+        return next(createError.NotFound("Shop info not found"))
+      }
+
+      return res.json({
+        message: "Get shop info successfully",
+        data: shopInfo
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+
 };
 
 export default ShopController;
