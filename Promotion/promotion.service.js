@@ -35,6 +35,11 @@ const PromotionService = {
   async delete(id) {
     return await Promotion.findByIdAndDelete(id);
   },
+  
+  async getListByIds(ids) {
+    const list = await Category.find({ _id: { $in: ids } });
+    return list;
+  },
 };
 
 export default PromotionService;

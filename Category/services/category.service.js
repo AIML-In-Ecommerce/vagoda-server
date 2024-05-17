@@ -24,6 +24,11 @@ const CategoryService = {
   async delete(id) {
     return await Category.findByIdAndDelete(id);
   },
+
+  async getListByIds(ids) {
+    const list = await Category.find({ _id: { $in: ids } });
+    return list;
+  },
 };
 
 export default CategoryService;

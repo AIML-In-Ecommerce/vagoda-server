@@ -21,6 +21,7 @@ router.delete(
   uploadCloud.single("category"),
   CategoryController.delete
 );
+router.post("/categories/list", CategoryController.getListByIds)
 
 export default router;
 

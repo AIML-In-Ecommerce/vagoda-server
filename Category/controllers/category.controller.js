@@ -108,6 +108,24 @@ const CategoryController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  getListByIds: async (req, res, next) => {
+
+    try {
+      const { ids } = req.body;
+
+      const list = await CategoryService.getListByIds(ids);
+      if (!list) {
+        return next(createError.BadRequest("Categories not found"));
+      }
+      res.json({
+        message: "Get list of category successfully",
+        status: 200,
+        data: list,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
 };
 
 export default CategoryController;
