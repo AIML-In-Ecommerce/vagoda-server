@@ -19,6 +19,13 @@ const UserController = {
         registerType: AccountRegisterType.STANDARD
       }
 
+      //ensure unique email for each account
+      const existedAccount = await AccountService.getByEmail(email)
+      if(existedAccount != null)
+      {
+        return next(createError.Conflict("Conflict when creating account"))
+      }
+
       const newAccountId = await AccountService.create(objectData)
 
       const userData = {

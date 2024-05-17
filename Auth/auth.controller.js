@@ -1,6 +1,7 @@
 import createError from "http-errors";
 import dotenv from "dotenv";
 import AuthService from "./auth.service.js";
+import AccountService from "./support/account.service.js";
 dotenv.config();
 
 const AuthController = {
@@ -90,6 +91,12 @@ const AuthController = {
         return next(createError.BadRequest("Missing necessary credentials"))
       }
 
+      const existedAccount = await AccountService.getAccountByEmail(email)
+      if(existedAccount != null)
+      {
+        return next(createError.Conflict("Email conflict"))
+      }
+
       const hashedPassword = await AuthService.hashPassword(password)
 
       const registerData = 
@@ -138,6 +145,12 @@ const AuthController = {
       else if(email == undefined || password == undefined)
       {
         return next(createError.BadRequest("Missing necessary credentials"))
+      }
+
+      const existedAccount = await AccountService.getAccountByEmail(email)
+      if(existedAccount != null)
+      {
+        return next(createError.Conflict("Email conflict"))
       }
 
       const hashedPassword = await AuthService.hashPassword(password)
