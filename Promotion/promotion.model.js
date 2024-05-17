@@ -32,11 +32,11 @@ const PromotionSchema = new Schema({
     type: Number
   },
   activeDate: {
-    type: Date,
+    type: Number,
     required: true
   },
   expiredDate: {
-    type: Date,
+    type: Number,
     required: true
   },
   // saleCategory: [{
@@ -44,7 +44,7 @@ const PromotionSchema = new Schema({
   //   ref: "Category"
   // }],
   createdAt: {
-    type: Date,
+    type: Number,
     default: Date.now
   },
   code: {

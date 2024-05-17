@@ -1,30 +1,43 @@
 import createError from "http-errors";
 import UserService from "../services/user.service.js";
 import AccountService from "../services/account.service.js";
+import { AccountRegisterType } from "../shared/enums.js";
 const model = "user";
 const Model = "User";
+
+
 const UserController = {
   register: async (req, res, next) => {
     try {
-      const {email, password, fullName, accountType} = req.body;
-      const account = await AccountService.create({email, password, accountType});
+      const {email, password, fullName, accountType} = req.body
+
+      const objectData = 
+      {
+        email: email,
+        password: password,
+        accountType: accountType,
+        registerType: AccountRegisterType.STANDARD
+      }
+
+      const newAccountId = await AccountService.create(objectData)
+
       const userData = {
-        fullName,
-        account: account._id,
+        fullName: fullName,
+        account: newAccountId,
       }
-      const object = await UserService.create(userData);
-      if (!object) {
-        return next(createError.BadRequest("Bad request!"));
-      }
+      const newUserId = await UserService.create(userData);
+
+      console.log("register user and account successfully")
+      console.log(newUserId)
       res.json({
-        message: "Create" + model + "successfully",
-        status: 200,
-        data: object,
+        message: "Create " + model + " successfully",
+          data: {accountId: newAccountId, userId: newUserId},
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
   },
+
   getAll: async (req, res, next) => {
     try {
       const filter = req.body;
@@ -41,26 +54,21 @@ const UserController = {
       next(createError.InternalServerError(error.message));
     }
   },
-  getAll: async (req, res, next) => {
-    try {
-      const filter = req.body;
-      const list = await UserService.getAll(filter, "");
-      if (!list) {
-        return next(createError.BadRequest(Model + " list not found"));
-      }
-      res.json({
-        message: "Get " + model + " list successfully",
-        status: 200,
-        data: list,
-      });
-    } catch (error) {
-      next(createError.InternalServerError(error.message));
-    }
-  },
+
   getById: async (req, res, next) => {
     try {
       const id = req.query.userId;
-      const object = await UserService.getById(id);
+      const accountId = req.query.accountId
+
+      let object = {}
+      if(id != undefined)
+      {
+        object = await UserService.getById(id);
+      }
+      else if(accountId != undefined)
+      {
+        object = await UserService.getByAccountId(accountId)
+      }
 
       if (object == null) {
         return next(createError.BadRequest(Model + " not found"));
@@ -111,11 +119,13 @@ const UserController = {
 
   delete: async (req, res, next) => {
     try {
-      const { id } = req.params;
+      const { id } = req.query;
       const object = await UserService.delete(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
+
+      console.log("Deteled " + id)
       res.json({
         message: "Delete" + model + "successfully",
         status: 200,
@@ -260,6 +270,38 @@ const UserController = {
       return next(createError.InternalServerError(error.message))
     }
 
+  },
+
+  deleteShippingAddress: async(req, res, next) =>
+  {
+    try
+    {
+      const userId = req.query.userId
+      const documentId = req.query.targetId
+
+      if(userId == null || documentId == null)
+      {
+        return next(createError.BadRequest("Bad request to user service"))
+      }
+
+      const shippingAddress = await UserService.deleteShippingAddress(userId, documentId)
+      if(shippingAddress == null)
+      {
+        return next(createError.MethodNotAllowed("Cannot delete the document"))
+      }
+
+      return res.json(
+        {
+          message: "Delete shipping address successfully",
+          data: shippingAddress
+        }
+      )
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
   }
 
 };

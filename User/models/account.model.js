@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { AccountStatus, AccountType } from "../shared/enums.js";
+import { AccountRegisterType, AccountStatus, AccountType } from "../shared/enums.js";
 
 const Schema = mongoose.Schema;
 
@@ -14,17 +14,24 @@ const AccountSchema = new Schema({
   },
   phoneNumber: {
     type: String,
+    default: ""
   },
   registerType: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
+    required: true,
+    enum: Object.values(AccountRegisterType),
+    default: AccountRegisterType.STANDARD,
   },
   type: {
     type: String,
+    required: true,
     enum: Object.values(AccountType),
   },
   status: {
     type: String,
+    required: true,
     enum: Object.values(AccountStatus),
+    default: AccountStatus.INACTIVE,
   },
   createAt: {
     type: Date,

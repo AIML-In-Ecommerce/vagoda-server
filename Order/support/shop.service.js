@@ -2,21 +2,27 @@ import axios from "axios"
 
 
 
-const publicAPIURL = "http://14.225.218.109:3004/"
-// const publicAPIURL = "http://localhost:3004/"
+// const publicAPIURL = "http://14.225.218.109:3004/"
+const publicAPIURL = "http://localhost:3004/"
 
 const ShopService = 
 {
 
     async getShopInfo(shopId)
     {
-        const url = publicAPIURL + "shop/" + shopId
+        const url = publicAPIURL + "shop"
 
         try
         {
             const response = await axios.get(url, 
                 {
-                    method: "GET"
+                    method: "GET",
+                    params: 
+                    {
+                        id: shopId,
+                        useShopDetail: false,
+                        useDesign: false
+                    }
                 }
             )
 
@@ -46,6 +52,8 @@ const ShopService =
         const requestBody = 
         {
             ids: shopInfos,
+            useShopDetail: false,
+            useDesign: false
         }
 
         const stringifiedRequestBody = JSON.stringify(requestBody)

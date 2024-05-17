@@ -9,7 +9,7 @@ router.get("/account/:id", AccountController.getById);
 router.post("/account", AccountController.create);
 router.put("/account/:id", AccountController.update);
 router.delete("/account/:id", AccountController.delete);
-router.post("/account/login", AccountController.check)
+router.post("/account/email", AccountController.getByEmail)
 
 export default router;
 

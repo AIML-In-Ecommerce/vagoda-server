@@ -4,13 +4,13 @@ import OrderController from "./order.controller.js";
 const router = express.Router();
 
 //customer
-router.get("/c/orders", OrderController.getAllCustomerOrders);
-router.get("/c/order", OrderController.getCustomerOrderById);
-router.post("/c/order/create", OrderController.create);
-router.put("/c/order/:id", OrderController.update);
-router.delete("/c/order/:id", OrderController.delete);
-router.put("/c/order/cancel/:id", OrderController.delete);
-router.get("/c/order/statuses", OrderController.getStatus);
+router.get("/buyer/orders", OrderController.getAllCustomerOrders);
+router.get("/buyer/order", OrderController.getCustomerOrderById);
+router.post("/buyer/order/create", OrderController.create);
+router.put("/order/:id", OrderController.update);
+router.delete("/order/:id", OrderController.delete);
+router.put("/order/cancel/:id", OrderController.delete);
+router.get("/order/statuses", OrderController.getStatus);
 
 
 //seller center
