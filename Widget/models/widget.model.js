@@ -57,7 +57,7 @@ const PromotionElementSchema = new Schema({
     required: true,
   },
   promotionIdList: {
-    type: [Schema.Types.ObjectId], 
+    type: [Schema.Types.ObjectId],
     ref: "Promotion",
   },
 });
@@ -66,12 +66,34 @@ const ElementSchema = new Schema(
   {
     type: {
       type: String,
-      enum: ["BannerElement", "ProductElement", "CategoryElement", "PromotionElement"],
+      enum: [
+        "BannerElement",
+        "ProductElement",
+        "CategoryElement",
+        "PromotionElement",
+      ],
       required: true,
     },
     data: {
       type: Schema.Types.Mixed,
-      required: true,
+      validate: {
+        validator: function (value) {
+          switch (this.type) {
+            case "BannerElement":
+              return BannerElementSchema.validate(value);
+              case "ProductElement":
+                return ProductElementSchema.validate(value);
+              case "CategoryElement":
+                return CategoryElementSchema.validate(value);
+              case "PromotionElement":
+                return PromotionElementSchema.validate(value);
+            default:
+              return false;
+          }
+        },
+        message: (props) =>
+          `${props.path} is not a valid element for the specified type.`,
+      },
     },
   },
   { _id: false }
