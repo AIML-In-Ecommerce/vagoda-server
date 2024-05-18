@@ -18,33 +18,33 @@
                     // Bước này để cài đặt các dependencies của Node.js
                     script {
                         sh 'npm install'
-                        dir('Auth') {
-                            sh 'npm install'
-                        }
-                        dir('Cart') {
-                            sh 'npm install'
-                        }
-                        dir('Category') {
-                            sh 'npm install'
-                        }
-                        dir('Order') {
-                            sh 'npm install'
-                        }
-                        dir('Product') {
-                            sh 'npm install'
-                        }
-                        dir('Promotion') {
-                            sh 'npm install'
-                        }
-                        dir('Review') {
-                            sh 'npm install'
-                        }
-                        dir('Shop') {
-                            sh 'npm install'
-                        }
-                        dir('User') {
-                            sh 'npm install'
-                        }
+                        // dir('Auth') {
+                        //     sh 'npm install'
+                        // }
+                        // dir('Cart') {
+                        //     sh 'npm install'
+                        // }
+                        // dir('Category') {
+                        //     sh 'npm install'
+                        // }
+                        // dir('Order') {
+                        //     sh 'npm install'
+                        // }
+                        // dir('Product') {
+                        //     sh 'npm install'
+                        // }
+                        // dir('Promotion') {
+                        //     sh 'npm install'
+                        // }
+                        // dir('Review') {
+                        //     sh 'npm install'
+                        // }
+                        // dir('Shop') {
+                        //     sh 'npm install'
+                        // }
+                        // dir('User') {
+                        //     sh 'npm install'
+                        // }
 
                     }
                 }
