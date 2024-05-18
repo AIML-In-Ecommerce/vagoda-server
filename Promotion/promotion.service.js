@@ -8,15 +8,10 @@ const PromotionService = {
   //   return await AuthorizeRequest.find();
   // },
 
-  async getByIds(listOfIds)
-  {
-
-    return await Promotion.find(
-      {
-        _id: {$in: listOfIds}
-      }
-    )
-
+  async getByIds(listOfIds) {
+    return await Promotion.find({
+      _id: { $in: listOfIds },
+    });
   },
 
   async getById(id) {
@@ -35,9 +30,9 @@ const PromotionService = {
   async delete(id) {
     return await Promotion.findByIdAndDelete(id);
   },
-  
+
   async getListByIds(ids) {
-    const list = await Category.find({ _id: { $in: ids } });
+    const list = await Promotion.find({ _id: { $in: ids } });
     return list;
   },
 };
