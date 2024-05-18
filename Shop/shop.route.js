@@ -5,11 +5,12 @@ const router = express.Router();
 
 router.get("/shops", ShopController.getAll);
 router.post("/shops", ShopController.getShopByIdList)
-router.get("/shop", ShopController.getById);
+router.get("/shop/:id", ShopController.getById);
 router.post("/shop", ShopController.create);
 router.put("/shop/:id", ShopController.update);
 router.delete("/shop/:id", ShopController.delete);
-router.get("/shop/account", ShopController.getByAccountId)
+
+router.get("/shop_info", ShopController.getShopBySelection)
 
 export default router;
 

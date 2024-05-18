@@ -9,7 +9,7 @@ const UserService =
 {
     async getUserInfo(userId)
     {
-        const url = publicAPIURL + "/user/info"
+        const url = publicAPIURL + "/user_info"
 
         try
         {

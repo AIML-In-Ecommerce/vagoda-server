@@ -2,6 +2,7 @@ import createError from "http-errors";
 import dotenv from "dotenv";
 import AuthService from "./auth.service.js";
 import AccountService from "./support/account.service.js";
+import { AccountType } from "./shared/enums.js";
 dotenv.config();
 
 const AuthController = {
@@ -71,6 +72,8 @@ const AuthController = {
   //   }
   // },
 
+
+  
   registerSeller: async (req, res, next) =>
   {
     try
@@ -189,10 +192,6 @@ const AuthController = {
   {
     try
     {
-      if(req.body == undefined)
-      {
-        return next(createError.BadRequest("Bad request to auth service"))
-      }
       const {email, password} = req.body
 
       if(email == undefined || password == undefined)
@@ -220,10 +219,6 @@ const AuthController = {
   {
     try
     {
-      if(req.body == undefined)
-      {
-        return next(createError.BadRequest("Bad request to auth service"))
-      }
       const {email, password} = req.body
 
       if(email == undefined || password == undefined)
@@ -246,6 +241,42 @@ const AuthController = {
       return next(createError.InternalServerError(error.message))
     }
   },
+
+  
+
+  register: async (req, res, next) =>
+  {
+    const type = req.body.type
+    if(type == AccountType.BUYER)
+    {
+      return await AuthController.registerBuyer(req, res, next)
+    }
+    else if(type == AccountType.SHOP)
+    {
+      return await AuthController.registerSeller(req, res, next)
+    }
+    else
+    {
+      return next(createError.BadRequest("Type not found"))
+    }
+  },
+
+  login: async (req, res, next) =>
+  {
+    const type = req.body.type
+    if(type == AccountType.SHOP)
+    {
+      return await AuthController.loginBySeller(req, res, next)
+    }
+    else if(type == AccountType.BUYER)
+    {
+      return await AuthController.loginByBuyer(req, res, next)
+    }
+    else
+    {
+      return next(createError.BadRequest("Type not found"))
+    }
+  }
 
 
 };
