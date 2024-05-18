@@ -133,7 +133,7 @@ const CartController = {
       const userId = req.params.id
       const requestBody = req.body
   
-      if(!requestBody || !userId)
+      if(requestBody == undefined || userId == undefined)
       {
         return next(createError.BadRequest("Bad request to cart service"))
       }
@@ -142,12 +142,13 @@ const CartController = {
       //if khac nhau ==> next(createError.Forbidden)
   
       const result = await CartService.updateProducts(userId, requestBody.products)
-  
-      if(result == true)
+
+      if(result != null)
       {
         return res.json(
           {
             message: "Update cart successfully",
+            data: result
           }
         )
       }

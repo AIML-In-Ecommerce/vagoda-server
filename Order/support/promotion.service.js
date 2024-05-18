@@ -1,14 +1,15 @@
 import axios from "axios"
 
-// const publicAPIURL = "http://14.225.218.109:3008/"
-const publicAPIURL = "http://localhost:3008/"
+const PORT = process.env.PROMOTION_PORT
+const BASE_PATH = process.env.BASE_PATH
+const publicAPIURL = `${BASE_PATH}:${PORT}`
 
 const PromotionService = 
 {
 
     async getPromotionByIds(ids)
     {
-        const url = publicAPIURL + "promotions"
+        const url = publicAPIURL + "/promotions"
         try
         {
             const requestBody = 

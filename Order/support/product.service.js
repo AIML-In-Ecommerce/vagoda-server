@@ -1,14 +1,15 @@
 import axios from "axios"
 
-// const publicAPIURL = "http://14.225.218.109:3006/"
-const publicAPIURL = "http://localhost:3006/"
+const PORT = process.env.PRODUCT_PORT
+const BASE_PATH = process.env.BASE_PATH
+const publicAPIURL = `${BASE_PATH}:${PORT}`
 
 const ProductService = 
 {
 
     async getProductByIds(ids)
     {
-        const url = publicAPIURL + "products/list"
+        const url = publicAPIURL + "/products/list"
         try
         {
             const requestBody = 
