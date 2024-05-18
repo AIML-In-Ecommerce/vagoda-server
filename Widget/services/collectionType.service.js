@@ -9,7 +9,7 @@ const CollectionTypeService = {
   // },
 
   async getById(id) {
-    return await AccoCollectionTypeunt.findById(id);
+    return await CollectionType.findById(id);
   },
 
   async create(objectData) {
@@ -23,6 +23,11 @@ const CollectionTypeService = {
 
   async delete(id) {
     return await CollectionType.findByIdAndDelete(id);
+  },
+
+  async getListByIds(ids) {
+    const list = await CollectionType.find({ _id: { $in: ids } });
+    return list;
   },
 };
 

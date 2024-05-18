@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   fullName: {
     type: String,
+    required: true,
   },
   dob: {
     type: String
@@ -34,7 +35,9 @@ const UserSchema = new Schema({
       }
     },
     label: {
+      type: String,
       enum: ["HOME", "OFFICE"],
+      default: "HOME"
     },
     isDefault: {
       type: Boolean,
@@ -43,6 +46,7 @@ const UserSchema = new Schema({
   }],
   account: {
     type: mongoose.Schema.Types.ObjectId,
+    required: true,
     ref: "Account"
   },
   createAt: {

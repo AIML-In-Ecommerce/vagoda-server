@@ -4,10 +4,12 @@ import ShopController from "./shop.controller.js";
 const router = express.Router();
 
 router.get("/shops", ShopController.getAll);
-router.get("/shop/:id", ShopController.getById);
+router.post("/shops", ShopController.getShopByIdList)
+router.get("/shop", ShopController.getById);
 router.post("/shop", ShopController.create);
 router.put("/shop/:id", ShopController.update);
 router.delete("/shop/:id", ShopController.delete);
+router.get("/shop/account", ShopController.getByAccountId)
 
 export default router;
 

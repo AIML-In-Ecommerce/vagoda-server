@@ -10,6 +10,13 @@ const AccountStatus = {
   BANNED: "BANNED",
 };
 
+const AccountRegisterType = 
+{
+  STANDARD: "STANDARD",
+  GOOGLE: "GOOGLE",
+  FACEBOOK: "FACEBOOK"
+}
+
 const AccountType = {
   SHOP: "SHOP",
   BUYER: "BUYER",
@@ -29,4 +36,4 @@ const DiscountType = {
   DIRECT_PRICE: "DIRECT_PRICE",
 };
 
-export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType };
+export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType, AccountRegisterType };

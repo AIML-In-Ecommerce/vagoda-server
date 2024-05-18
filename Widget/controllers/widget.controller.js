@@ -21,7 +21,9 @@ const WidgetController = {
   },
   getById: async (req, res, next) => {
     try {
+      console.log("test")
       const { id } = req.params;
+      console.log(id)
       const object = await WidgetService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
@@ -81,6 +83,24 @@ const WidgetController = {
         message: "Delete" + model + "successfully",
         status: 200,
         data: object,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  getListByIds: async (req, res, next) => {
+
+    try {
+      const { ids } = req.body;
+
+      const list = await WidgetService.getListByIds(ids);
+      if (!list) {
+        return next(createError.BadRequest("Widgets not found"));
+      }
+      res.json({
+        message: "Get list of widget successfully",
+        status: 200,
+        data: list,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));

@@ -1,12 +1,15 @@
 import createError from "http-errors";
-import ProductService from "../services/product.service.js";
+import ProductService from '../services/product.service.js'
+
 const model = "product";
 const Model = "Product";
+
 const ProductController = {
   getAll: async (req, res, next) => {
+    console.log("inside GetALL")
     try {
       const filter = req.query;
-      const list = await ProductService.getAll(filter, "");
+      const list = await ProductService.getAll(filter, "")
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
@@ -20,6 +23,7 @@ const ProductController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -40,6 +44,13 @@ const ProductController = {
   create: async (req, res, next) => {
     try {
       const data = req.body;
+      if (!req.files || req.files.length === 0) {
+        return next(new Error('No file uploaded!'));
+    }
+    
+    const imageUrls = req.files.map(file => file.path);
+    data.image = imageUrls;
+      console.log(data)
       const object = await ProductService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
@@ -88,8 +99,10 @@ const ProductController = {
     }
   },
   getListByIds: async (req, res, next) => {
+
     try {
       const { ids } = req.body;
+
       const productList = await ProductService.getListByIds(ids);
       if (!productList) {
         return next(createError.BadRequest("Products not found"));
@@ -119,25 +132,35 @@ const ProductController = {
   getFilteredProducts: async (req, res, next) => {
     try {
       const filterOptions = {
-        keyword: req.query.keyword || "",
-        shopId: req.query.shopId || "",
-        price: req.query.price ? req.query.price.split(",").map(Number) : [],
-        category: req.query.category || "",
-        subCategory: req.query.subCategory || "",
-        rating: req.query.rating ? req.query.rating.split(",").map(Number) : [],
-        sortBy: req.query.sortBy || "",
-        index: parseInt(req.query.index) || 0,
-        amount: parseInt(req.query.amount) || 10, // Default amount per page is 10
+        keyword: req.body.keyword || "",
+        shopId: req.body.shopId || "",
+        minPrice: parseFloat(req.body.minPrice) || 0,
+        maxPrice: parseFloat(req.body.maxPrice) || Number.MAX_VALUE,
+        category: req.body.category ? req.body.category.split(",") : [],
+        subCategory: req.body.subCategory ? req.body.subCategory.split(",") : [],
+        subCategoryTypes: req.body.subCategoryTypes ? req.body.subCategoryTypes.split(",") : [],
+        rating: req.body.rating ? req.body.rating.split(",").map(Number) : [],
+        sortBy: req.body.sortBy || "",
+        index: parseInt(req.body.index) || 1,
+        amount: parseInt(req.body.amount) || 20, // Default amount per page is 20
       };
-
-      const filteredProducts = await ProductService.getFilteredProducts(
-        filterOptions
-      );
-      res.json(filteredProducts);
+      if(filterOptions.index<1) filterOptions.index=1
+      const {filteredProducts, total} = await ProductService.getFilteredProducts(filterOptions); 
+      const totalPages = Math.ceil(total / filterOptions.amount);
+      // console.log(filteredProducts.length ,total, totalPages)
+      res.json({
+        message: "Get filter " + model + " list successfully",
+        status: 200,
+        data: filteredProducts,
+        total: total,
+        totalPages: totalPages
+    });
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
   },
+  
+  
 };
 
 export default ProductController;

@@ -62,47 +62,38 @@ const PromotionElementSchema = new Schema({
   },
 });
 
-const ElementSchema = new Schema(
-  {
-    type: {
-      type: String,
-      enum: [
-        "BannerElement",
-        "ProductElement",
-        "CategoryElement",
-        "PromotionElement",
-      ],
-      required: true,
-    },
-    data: {
-      type: Schema.Types.Mixed,
-      validate: {
-        validator: function (value) {
-          switch (this.type) {
-            case "BannerElement":
-              return BannerElementSchema.validate(value);
-              case "ProductElement":
-                return ProductElementSchema.validate(value);
-              case "CategoryElement":
-                return CategoryElementSchema.validate(value);
-              case "PromotionElement":
-                return PromotionElementSchema.validate(value);
-            default:
-              return false;
-          }
-        },
-        message: (props) =>
-          `${props.path} is not a valid element for the specified type.`,
-      },
-    },
+const CollectionElementSchema = new Schema({
+  pattern: {
+    type: String,
+    enum: ["CAROUSEL", "GRID"],
+    required: true,
   },
-  { _id: false }
-);
+  collectionIdList: {
+    type: [Schema.Types.ObjectId], // Thêm CollectionElement cho element của Widget
+    ref: "CollectionType",
+    required: true,
+  },
+});
+
+// const ElementSchema = new Schema(
+//   {
+//     type: {
+//       type: String,
+//       enum: ["BannerElement", "ProductElement", "CategoryElement", "PromotionElement"],
+//       required: true,
+//     },
+//     data: {
+//       type: Schema.Types.Mixed,
+//       required: true,
+//     },
+//   },
+//   { _id: false }
+// );
 
 const WidgetSchema = new Schema({
   type: {
     type: String,
-    enum: ["BANNER", "PRODUCT", "CATEGORY", "PROMOTION"],
+    enum: ["BANNER", "PRODUCT", "CATEGORY", "PROMOTION", "COLLECTION"],
     required: true,
   },
   order: {
@@ -113,7 +104,9 @@ const WidgetSchema = new Schema({
     type: Boolean,
     required: true,
   },
-  element: ElementSchema,
+  element: {
+    type: Schema.Types.Mixed,
+  }
 });
 
 const Widget = mongoose.model("Widget", WidgetSchema);

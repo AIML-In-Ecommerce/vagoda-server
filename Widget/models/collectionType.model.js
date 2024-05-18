@@ -11,6 +11,10 @@ const CollectionTypeSchema = new Schema({
     type: String,
     required: true,
   },
+  shop: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Shop",
+  },
   productIdList: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Product",

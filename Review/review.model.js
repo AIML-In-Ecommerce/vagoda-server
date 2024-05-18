@@ -2,14 +2,30 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
+const CommentSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const ReviewSchema = new Schema({
   product: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId, 
     ref: "Product",
     required: true,
   },
   user: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId, 
     ref: "User",
     required: true,
   },
@@ -24,30 +40,13 @@ const ReviewSchema = new Schema({
     type: [String],
   },
   createdAt: {
-    type: Date,
-    default: Date.now,
+    type: Date, 
+    default: Date.now, 
   },
-  conversation: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      content: {
-        type: String,
-      },
-      asset: {
-        type: String,
-      },
-    },
-  ],
+  cconversation: [CommentSchema],
   like: {
-    users: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    type: [Schema.Types.ObjectId], // Sử dụng mảng của ObjectId
+    ref: "User",
   },
 });
 

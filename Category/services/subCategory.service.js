@@ -1015,8 +1015,18 @@ const SubCategoryService = {
         "Đồ Lót Nữ": ["Áo lót", "Quần lót"],
         "Đồ Thể Thao Nữ": ["Bộ Thể Thao", "Áo Thun Thể Thao", "Quần Thể Thao"],
         "Giày Nữ - Dép Nữ": ["Giày Thể Thao", "Giày Cao Gót", "Sandal", "Dép kẹp"],
-        // Add subcategory types for other subcategories similarly
-      };
+        "Áo Nam": ["Áo Polo", "Áo Thun", "Áo Chống Nắng", "Áo Sơ Mi", "Áo Khoác", "Áo Nỉ", "Áo Giữ Nhiệt", "Áo Len"],
+        "Quần Nam": ["Quần Âu", "Quần Kaki", "Quần Jeans", "Quần Short"],
+        "Đồ Thể Thao Nam": ["Bộ thể thao", "Áo Thun Thể Thao", "Quần Thể Thao"],
+        "Đồ Lót Nam": ["Quần Lót"],
+        "Giày Nam - Dép Nam": ["Giày Thể Thao", "Giày Da", "Sandal"],
+        "Phụ Kiện Nam": ["Thắt lưng", "Tất Chân", "Găng Tay"],
+        "Áo Trẻ Em": ["Áo Polo", "Áo Thun", "Áo Khoác", "Áo Nỉ", "Áo Giữ Nhiệt", "Áo Len"],
+        "Quần Trẻ Em": ["Quần Jeans", "Quần Kaki", "Quần Short", "Quần Nỉ", "Quần Legging"],
+        "Giày Dép Trẻ Em": ["Giày Thể Thao", "Giày Da", "Sandal"],
+        "Phụ Kiện Trẻ Em": ["Kẹp Tóc", "Nơ", "Tất Chân"]
+    };
+    
       for (const [subcategoryName, subcategoryTypeNames] of Object.entries(subcategoryTypes)) {
         const subcategory = await SubCategory.findOne({ name: subcategoryName });
         if (subcategory) {

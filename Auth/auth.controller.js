@@ -1,78 +1,253 @@
 import createError from "http-errors";
-import axios from "axios";
 import dotenv from "dotenv";
-import { generateAccessToken, generateRefreshToken } from "./utils/jwt.js";
+import AuthService from "./auth.service.js";
+import AccountService from "./support/account.service.js";
 dotenv.config();
 
 const AuthController = {
-  register: async (req, res, next) => {
-    try {
-      let { fullName, shopName, email, password, accountType} = req.body;
-      if(!fullName) {
-        fullName = "";
-      }
-      if(!shopName) {
-        shopName = "";
-      }
-      const accountResponse = await axios.post("http://localhost:3002/user/register", {
-        fullName,
-        shopName,
-        email,
-        password,
-      });
-      console.log(accountResponse)
-      const data = accountResponse.data;
-      if(accountType === "SHOP"){
-        const shopResponse = await axios.post("http://localhost:3002/shop",{
-        shopName,
-        account: accountResponse.data._id,
-      });
-      }
+  // register: async (req, res, next) => {
+  //   try {
+  //     let { fullName, shopName, email, password, accountType} = req.body;
+  //     if(req.body == undefined)
+  //     {
+  //       return next(createError.BadRequest("Missing request body"))
+  //     }
+  //     if(fullName == undefined) {
+  //       return next(createError.BadRequest("Missing full name"))
+  //     }
+  //     if(shopName == undefined && accountType == "SHOP") {
+  //       return next(createError.BadGateway("Missing shop name"))
+  //     }
+
+  //     const userServiceResponse = await UserService.registerAccountAndUserInfo({
+  //       email: email,
+  //       password: password,
+  //       fullName: fullName,
+  //       accountType: accountType
+  //     })
+
+  //     if(userServiceResponse == null)
+  //     {
+  //       return next(createError.MethodNotAllowed("Cannot create a new account"))
+  //     }
+
+  //     const newAccountId = userServiceResponse.accountId
+  //     const newUserInfoId = userServiceResponse.userId
+  //     console.log("account: "+ newAccountId)
+  //     console.log("user: "+ newUserInfoId)
+
+  //     if(accountType == "SHOP")
+  //     {
+  //       const newShopId = await ShopService.createShopInfo(shopName, newAccountId)
+  //       if(newShopId == null)
+  //       {
+  //         await UserService.deleteUserInfo(newUserInfoId)
+  //         await AccountService.deleteAccount(newAccountId)
+
+  //         return next(createError.MethodNotAllowed("Your register was failed"))
+  //       }
+
+  //       return res.json(
+  //         {
+  //           message: "Register successfully",
+  //           data: {
+  //             accountId: newAccountId,
+  //             shopId: newShopId
+  //           }
+  //         }
+  //       )
+  //     }
       
-      // Trả về kết quả từ /account/register
-      res.json({
-        message:  "Register successfully",
-        status: 200,
-        data: data,
-      });
-    } catch (error) {
+  //     res.json({
+  //       message:  "Register successfully",
+  //       data: {
+  //         accountId: newAccountId,
+  //         userId: newUserInfoId
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.log(error)
+  //     next(createError.InternalServerError(error.message));
+  //   }
+  // },
+
+  registerSeller: async (req, res, next) =>
+  {
+    try
+    {
+      const {shopName, fullName, email, password} = req.body
+      if(req.body == undefined)
+      {
+        return next(createError.BadRequest("Missing request body"))
+      }
+      else if(fullName == undefined) {
+        return next(createError.BadRequest("Missing full name"))
+      }
+      else if(shopName == undefined) {
+        return next(createError.BadGateway("Missing shop name"))
+      }
+      else if(email == undefined || password == undefined)
+      {
+        return next(createError.BadRequest("Missing necessary credentials"))
+      }
+
+      const existedAccount = await AccountService.getAccountByEmail(email)
+      if(existedAccount != null)
+      {
+        return next(createError.Conflict("Email conflict"))
+      }
+
+      const hashedPassword = await AuthService.hashPassword(password)
+
+      const registerData = 
+      {
+        email: email,
+        password: hashedPassword,
+        shopName: shopName,
+        fullName: fullName
+      }
+      const response = await AuthService.registerSellerAccount(registerData)
+      if(response == null)
+      {
+        return next(createError.BadRequest("Cannot create the new account"))
+      }
+
+      return res.json(
+        {
+          message: "Create seller account successfully",
+          data: {
+            shopId: response.shopId,
+            accountId: response.accountId
+          }
+        }
+      )
+
+    }
+    catch(error)
+    {
       console.log(error)
-      next(createError.InternalServerError(error.message));
+      return next(createError.InternalServerError(error.message))
     }
   },
 
-  login: async (req, res, next) => {
-    try {
-      // Lấy thông tin đăng nhập từ request body
-      const { email, password } = req.body;
-      
-      // Gọi HTTP tới /account/login để xác thực đăng nhập
-      const account = await axios.post("http://localhost:3002/account/login", {
-        email,
-        password,
-      });
-      console.log("thien")
-      if(!account) {
-        return next(createError.BadRequest("Email or password was wrong!"));
+  registerBuyer: async (req, res, next) =>
+  {
+    try
+    {
+      const {fullName, email, password} = req.body
+      if(req.body == undefined)
+      {
+        return next(createError.BadRequest("Missing request body"))
+      }
+      else if(fullName == undefined) {
+        return next(createError.BadRequest("Missing full name"))
+      }
+      else if(email == undefined || password == undefined)
+      {
+        return next(createError.BadRequest("Missing necessary credentials"))
       }
 
-      const accessToken = generateAccessToken(account._id, account.accountType)
-      const { refreshToken, expireDate } = generateRefreshToken(
-        account._id,
-        account.accountType
-      );
-      
-      // Trả về kết quả từ /account/login
-      res.json({
-        message: "Login successfully",
-        status: 200,
-        data: {accessToken, refreshToken},
-      });
-    } catch (error) {
-      // console.log(error);
-      next(createError.InternalServerError(error.message));
+      const existedAccount = await AccountService.getAccountByEmail(email)
+      if(existedAccount != null)
+      {
+        return next(createError.Conflict("Email conflict"))
+      }
+
+      const hashedPassword = await AuthService.hashPassword(password)
+
+      const registerData = 
+      {
+        email: email,
+        password: hashedPassword,
+        fullName: fullName
+      }
+      const response = await AuthService.registerBuyerAccount(registerData)
+      if(response == null)
+      {
+        return next(createError.BadRequest("Cannot create the new account"))
+      }
+
+      return res.json(
+        {
+          message: "Create buyer account successfully",
+          data: {
+            userId: response.userId,
+            accountId: response.accountId
+          }
+        }
+      )
+
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
     }
   },
+
+  loginByBuyer: async (req, res, next) =>
+  {
+    try
+    {
+      if(req.body == undefined)
+      {
+        return next(createError.BadRequest("Bad request to auth service"))
+      }
+      const {email, password} = req.body
+
+      if(email == undefined || password == undefined)
+      {
+        return next(createError.BadRequest("Missing credentials"))
+      }
+
+      const response = await AuthService.loginByBuyer(email, password)
+      if(response == null)
+      {
+        return next(createError.Unauthorized("Unauthorized"))
+      }
+
+
+      return res.json(response)
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  loginBySeller: async (req, res, next) =>
+  {
+    try
+    {
+      if(req.body == undefined)
+      {
+        return next(createError.BadRequest("Bad request to auth service"))
+      }
+      const {email, password} = req.body
+
+      if(email == undefined || password == undefined)
+      {
+        return next(createError.BadRequest("Missing credentials"))
+      }
+
+      const response = await AuthService.loginBySeller(email, password)
+      if(response == null)
+      {
+        return next(createError.Unauthorized("Unauthorized"))
+      }
+
+
+      return res.json(response)
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+
 };
 
 export default AuthController;

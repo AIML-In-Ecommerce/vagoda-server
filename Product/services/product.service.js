@@ -2,14 +2,15 @@ import { Product } from "../models/product.model.js";
 
 const ProductService = {
   async getAll(filter, projection) {
-    return await Product.find(filter).select(projection);
+    return await Product.find(filter).select(projection)
   },
   // async getAll() {
   //   return await AuthorizeRequest.find();
   // },
 
   async getById(id) {
-    return await Product.findById(id);
+    const rawProductInfo = await Product.findById(id);
+    return rawProductInfo
   },
 
   async create(objectData) {
@@ -26,7 +27,9 @@ const ProductService = {
   },
 
   async getListByIds(ids) {
-    return await Product.find({ _id: { $in: ids } });
+    const rawProductList = await Product.find({ _id: { $in: ids } });
+  
+    return rawProductList;
   },
 
   async getTopSelling(limit) {
@@ -46,25 +49,35 @@ const ProductService = {
     }
   },
   getFilteredProducts: async (filterOptions) => {
-    const { keyword, shopId, price, category, subCategory, rating, sortBy, index, amount } = filterOptions;
+    const { keyword, shopId, minPrice, maxPrice, category, subCategory, subCategoryTypes, rating, sortBy, index, amount } = filterOptions;
     const query = {};
-
+    if (typeof minPrice !== "number" || typeof maxPrice !== "number") {
+      throw new Error("Invalid price values. Please provide valid numbers for minPrice and maxPrice.");
+    }
     // Apply filters
     if (keyword) query.$text = { $search: keyword };
     if (shopId) query.shop = shopId;
-    if (price.length === 2) query.originalPrice = { $gte: price[0], $lte: price[1] };
-    if (category) query.category = category;
-    if (subCategory) query.subCategory = subCategory;
+    
+    query.finalPrice = {
+      $gte: minPrice,  // Greater than or equal to minPrice
+      $lte: maxPrice,  // Less than or equal to maxPrice
+    }
+    
+    if (category.length > 0) query.category = { $in: category };
+    if (subCategory.length > 0) query.subCategory = { $in: subCategory };
+    if (subCategoryTypes.length > 0) query.subCategoryTypes = { $in: subCategoryTypes };
     if (rating.length === 2) query.avgRating = { $gte: rating[0], $lte: rating[1] };
+    console.log(query);
 
+    const total = await Product.countDocuments(query);
     // Sort products
     let sortOption = {};
     switch (sortBy) {
       case 'ascending price':
-        sortOption = { originalPrice: 1 };
+        sortOption = { finalPrice: 1 };
         break;
       case 'descending price':
-        sortOption = { originalPrice: -1 };
+        sortOption = { finalPrice: -1 };
         break;
       case 'top sale':
         sortOption = { soldQuantity: -1 };
@@ -78,14 +91,16 @@ const ProductService = {
       default:
         break;
     }
-
+    //console.log(sortOption)
+    console.log(index, amount)
     const filteredProducts = await Product.find(query)
       .sort(sortOption)
-      .skip(index * amount)
+      .skip((index-1) * amount)
       .limit(amount);
-
-    return filteredProducts;
+    //console.log(filteredProducts)
+    return {filteredProducts, total};
   },
+  
 };
 
-export default ProductService;
+export default ProductService

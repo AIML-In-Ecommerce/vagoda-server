@@ -22,6 +22,7 @@ const CollectionTypeController = {
   getById: async (req, res, next) => {
     try {
       const { id } = req.params;
+      console.log("cc")
       const object = await CollectionTypeService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
@@ -32,6 +33,7 @@ const CollectionTypeController = {
         data: object,
       });
     } catch (error) {
+      console.log(error)
       next(createError.InternalServerError(error.message));
     }
   },
@@ -81,6 +83,41 @@ const CollectionTypeController = {
         message: "Delete" + model + "successfully",
         status: 200,
         data: object,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  getByShopId: async (req, res, next) => {
+    try {
+      const { shopId } = req.params;
+      const filter = { shop: shopId };
+      const list = await CollectionTypeService.getAll(filter, "");
+      if (!list) {
+        return next(createError.BadRequest(Model + " list not found"));
+      }
+      res.json({
+        message: "Get " + model + " list by shopId successfully",
+        status: 200,
+        data: list,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  getListByIds: async (req, res, next) => {
+
+    try {
+      const { ids } = req.body;
+
+      const list = await CollectionTypeService.getListByIds(ids);
+      if (!list) {
+        return next(createError.BadRequest("Products not found"));
+      }
+      res.json({
+        message: "Get list of collectionType successfully",
+        status: 200,
+        data: list,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));

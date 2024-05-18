@@ -9,6 +9,9 @@ router.post("/collectionType", CollectionTypeController.create);
 router.put("/collectionType/:id", CollectionTypeController.update);
 router.delete("/collectionType/:id", CollectionTypeController.delete);
 
+router.get("/collectionTypes/shop/:shopId", CollectionTypeController.getByShopId);
+router.post("/collectionTypes/list", CollectionTypeController.getListByIds)
+
 export default router;
 
 /**
