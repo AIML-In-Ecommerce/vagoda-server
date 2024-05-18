@@ -43,7 +43,7 @@ const ShopService =
 
     async getShopInfoByAccountId(accountId)
     {
-        const url = publicAPIURL + "/shop/account"
+        const url = publicAPIURL + "/shop_info"
         try
         {
             const response = await axios.get(url, 

@@ -6,15 +6,17 @@ import uploadCloud from '../shared/uploader.js';
 const router = express.Router();
 
 router.get('/users', UserController.getAll);
-router.get('/user/info', UserController.getById);
+router.get('/user/:id', UserController.getById);
 router.post('/user', uploadCloud.array('avatar'), UserController.create);
-router.put('/user/info', uploadCloud.array('avatar'), UserController.update);
-router.delete('/user/info', uploadCloud.array('avatar'), UserController.delete);
+router.put('/user/:id', uploadCloud.array('avatar'), UserController.update);
+router.delete('/user/:id', uploadCloud.array('avatar'), UserController.delete);
 router.post('/user/register', UserController.register);
-router.get("/user/shipping_address", UserController.getShippingAddress)
-router.post('/user/shipping_address', UserController.insertShippingAddress)
-router.put("/user/shipping_address", UserController.updateShippingAddress)
-router.delete("/user/shipping_address", UserController.deleteShippingAddress)
+
+router.get("/user_info", UserController.getUserInfo)
+router.get("/user_info/shipping_address", UserController.getShippingAddress)
+router.post('/user_info/shipping_address', UserController.insertShippingAddress)
+router.put("/user_info/shipping_address", UserController.updateShippingAddress)
+router.delete("/user_info/shipping_address", UserController.deleteShippingAddress)
 
 export default router;
 

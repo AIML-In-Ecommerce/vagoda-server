@@ -3,13 +3,14 @@ import AuthController from "./auth.controller.js";
 
 const router = express.Router();
 
-router.post("/seller/register", AuthController.registerSeller);
-router.post("/buyer/register", AuthController.registerBuyer)
-router.post("/seller/login", AuthController.loginBySeller);
-router.post("/buyer/login", AuthController.loginByBuyer);
+// router.post("/seller/register", AuthController.registerSeller);
+// router.post("/buyer/register", AuthController.registerBuyer)
+// router.post("/seller/login", AuthController.loginBySeller);
+// router.post("/buyer/login", AuthController.loginByBuyer);
 
 
-
+router.post("/auth/login", AuthController.login)
+router.post("/auth/register/", AuthController.register)
 
 
 export default router;

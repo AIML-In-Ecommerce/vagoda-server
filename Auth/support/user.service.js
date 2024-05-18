@@ -52,17 +52,10 @@ const UserService =
 
     async deleteUserInfo(targetUserId)
     {
-        const url = publicAPIURL + "/user/info"
+        const url = publicAPIURL + `/user/${targetUserId}`
         try
         {
-            const response = await axios.delete(url, 
-                {
-                    params:
-                    {
-                        id: targetUserId
-                    }
-                }
-            )
+            const response = await axios.delete(url)
 
             if(response.status == 200 || response.status == 201)
             {
@@ -84,7 +77,7 @@ const UserService =
 
     async getUserInfoByAccountId(accountId)
     {
-        const url = publicAPIURL + "/user/info"
+        const url = publicAPIURL + "/user_info"
         try
         {
             const response = await axios.get(url,

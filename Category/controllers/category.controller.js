@@ -66,7 +66,7 @@ const CategoryController = {
         return next(createError.BadRequest("Bad request!"));
       }
       res.json({
-        message: "Create" + model + "successfully",
+        message: "Create " + model + " successfully",
         status: 200,
         data: object,
       });
