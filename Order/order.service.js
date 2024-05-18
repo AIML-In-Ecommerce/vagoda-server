@@ -125,7 +125,7 @@ const OrderService = {
           {
             _id: targetProduct._id,
             name: targetProduct.name,
-            image: targetProduct.image[0],
+            image: targetProduct.images[0],
             originalPrice: targetProduct.originalPrice,
             purchasedPrice: product.purchasedPrice,
             quantity: product.quantity
@@ -225,7 +225,7 @@ const OrderService = {
             _id: targetProduct._id,
             name: targetProduct.name,
             originalPrice: targetProduct.originalPrice,
-            image: targetProduct.image[0],
+            image: targetProduct.images[0],
             purchasedPrice: value.purchasedPrice,
             quantity: value.quantity
           }

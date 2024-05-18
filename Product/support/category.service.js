@@ -1,6 +1,7 @@
 
-// const publicAPIURL = "http://14.225.218.109:3005/"
-const publicAPIURL = "http://localhost:3005/"
+const PORT = process.env.CATEGORY_PORT
+const BASE_PATH = process.env.BASE_PATH
+const publicAPIURL = `${BASE_PATH}:${PORT}`
 
 const CategoryService = 
 {

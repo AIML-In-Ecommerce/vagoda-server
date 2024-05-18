@@ -73,7 +73,7 @@ const CartService = {
         name: targetProduct.name,
         originalPrice: targetProduct.originalPrice,
         finalPrice: targetProduct.finalPrice,
-        image: targetProduct.image[0],
+        image: targetProduct.images[0],
         category: targetProduct.category,
         subCategory: targetProduct.subCategory,
         shop: targetProduct.shop,
@@ -102,12 +102,12 @@ const CartService = {
   {
     if(!productList)
     {
-      return false
+      return null
     }
 
     const rawCart = await Cart.findOne({user: userId})
 
-    if(!rawCart)
+    if(rawCart == null)
     {
       return null
     }
@@ -157,7 +157,7 @@ const CartService = {
 
     rawCart.save()
 
-    return true;
+    return rawCart.products;
   }
 
 };

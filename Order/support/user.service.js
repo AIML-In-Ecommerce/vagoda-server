@@ -1,19 +1,24 @@
 import axios from "axios"
 
 
-// const publicAPIURL = "http://14.225.218.109:3002/"
-const publicAPIURL = "http://localhost:3002/"
+const PORT = process.env.USER_PORT
+const BASE_PATH = process.env.BASE_PATH
+const publicAPIURL = `${BASE_PATH}:${PORT}`
 
 const UserService = 
 {
     async getUserInfo(userId)
     {
-        const url = publicAPIURL + "user/info?userId=" + userId
+        const url = publicAPIURL + "/user/info"
 
         try
         {
             const response = await axios.get(url, {
-                method: "GET"
+                method: "GET",
+                params:
+                {
+                    userId: userId
+                }
             })
 
             if(response.status == 200)
