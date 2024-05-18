@@ -11,7 +11,7 @@ const ShopService =
 
     async getShopInfo(shopId)
     {
-        const url = publicAPIURL + "/shop"
+        const url = publicAPIURL + "/shop_info"
 
         try
         {
@@ -20,7 +20,7 @@ const ShopService =
                     method: "GET",
                     params: 
                     {
-                        id: shopId,
+                        shopId: shopId,
                         useShopDetail: false,
                         useDesign: false
                     }
