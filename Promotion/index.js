@@ -2,10 +2,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
-import bodyParser from 'body-parser';
+import bodyParser from "body-parser";
 
-import { specs, swaggerUi } from './configs/swagger.js';
-import { errorHandler, notFound } from './shared/helper/errorHandler.js';
+import { specs, swaggerUi } from "./configs/swagger.js";
+import { errorHandler, notFound } from "./shared/helper/errorHandler.js";
 import db from "./configs/db.js";
 
 import promotionRoute from "./promotion.route.js";
@@ -19,7 +19,7 @@ db();
 
 const initializeExpress = (app) => {
   //app.use(express.static(path.join(__dirname, "public")));
-  //app.use(cors(corsOptions));
+  app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   //app.use(morgan("combined", { stream: logger.stream }));
