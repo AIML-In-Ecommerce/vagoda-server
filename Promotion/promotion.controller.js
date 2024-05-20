@@ -133,6 +133,23 @@ const PromotionController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  getByShopId: async (req, res, next) => {
+    try {
+      const { shopId } = req.params;
+      const list = await PromotionService.getByShopId(shopId);
+      if (!list) {
+        return next(createError.BadRequest("Shop id" + " not found"));
+      }
+      res.json({
+        message: "Get" + model + "list successfully",
+        status: 200,
+        data: list,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+
 };
 
 export default PromotionController;

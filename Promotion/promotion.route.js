@@ -11,6 +11,7 @@ router.put("/promotion/:id", PromotionController.update);
 router.delete("/promotion/:id", PromotionController.delete);
 
 router.post("/promotions/list", PromotionController.getListByIds);
+router.get("/prototions/shop/:id", PromotionController.getByShopId);
 
 export default router;
 

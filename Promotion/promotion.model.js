@@ -8,6 +8,11 @@ const PromotionSchema = new Schema({
     type: String,
     required: true
   },
+  shop: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Shop",
+    required: true
+  },
   description: {
     type: String
   },
