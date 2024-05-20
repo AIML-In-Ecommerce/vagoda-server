@@ -37,7 +37,7 @@ const PromotionService = {
   },
   
   async getListByIds(ids) {
-    const list = await Category.find({ _id: { $in: ids } });
+    const list = await Promotion.find({ _id: { $in: ids } });
     return list;
   },
 };

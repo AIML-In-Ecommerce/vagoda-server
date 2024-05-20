@@ -138,12 +138,13 @@ const ProductController = {
         maxPrice: parseFloat(req.body.maxPrice) || Number.MAX_VALUE,
         category: req.body.category ? req.body.category.split(",") : [],
         subCategory: req.body.subCategory ? req.body.subCategory.split(",") : [],
-        subCategoryTypes: req.body.subCategoryTypes ? req.body.subCategoryTypes.split(",") : [],
-        rating: req.body.rating ? req.body.rating.split(",").map(Number) : [],
+        subCategoryTypes: req.body.subCategoryTypes ? req .body.subCategoryTypes.split(",") : [],
+        avgRating: req.body.avgRating || null,
         sortBy: req.body.sortBy || "",
         index: parseInt(req.body.index) || 1,
         amount: parseInt(req.body.amount) || 20, // Default amount per page is 20
       };
+      console.log(req.body)
       if(filterOptions.index<1) filterOptions.index=1
       const {filteredProducts, total} = await ProductService.getFilteredProducts(filterOptions); 
       const totalPages = Math.ceil(total / filterOptions.amount);
@@ -156,6 +157,7 @@ const ProductController = {
         totalPages: totalPages
     });
     } catch (error) {
+      console.log(error)
       next(createError.InternalServerError(error.message));
     }
   },
