@@ -15,9 +15,18 @@ dotenv.config();
 const port = process.env.AUTH_PORT;
 db();
 
+
+// const CorsOptions =
+// {
+//   credentials: true, 
+//   origin: "*", 
+//   exposedHeaders: ["Access-Control-Allow-Origin"], 
+//   preflightContinue: true,
+// }  
+
 const initializeExpress = (app) => {
   //app.use(express.static(path.join(__dirname, "public")));
-  //app.use(cors(corsOptions));
+  app.use(cors({}));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   //app.use(morgan("combined", { stream: logger.stream }));
@@ -31,6 +40,7 @@ app.use(authRoute);
 
 app.use(notFound);
 app.use(errorHandler);
+
 app.listen(port, () => {
   console.log(`Your app is running at http://localhost:${port}`);
 });

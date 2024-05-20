@@ -114,6 +114,25 @@ const PromotionController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+  getListByIds: async (req, res, next) => {
+
+    try {
+      const { ids } = req.body;
+
+      const list = await PromotionService.getListByIds(ids);
+      if (!list) {
+        return next(createError.BadRequest("Products not found"));
+      }
+      res.json({
+        message: "Get list of collectionType successfully",
+        status: 200,
+        data: list,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
 };
 
 export default PromotionController;

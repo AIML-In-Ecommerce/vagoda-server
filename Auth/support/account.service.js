@@ -1,15 +1,15 @@
 import axios from "axios"
 
-
-// const publicAPIURL = "http://14.225.218.109:3002/"
-const publicAPIURL = "http://localhost:3002/"
+const PORT = process.env.USER_PORT
+const BASE_PATH = process.env.BASE_PATH
+const publicAPIURL = `${BASE_PATH}:${PORT}`
 
 
 const AccountService = 
 {
     async deleteAccount(targetAccountId)
     {
-        const url = publicAPIURL + `account/${targetAccountId}`
+        const url = publicAPIURL + `/account/${targetAccountId}`
 
         try
         {
@@ -37,7 +37,7 @@ const AccountService =
 
     async getAccountByEmail(email)
     {
-        const url = publicAPIURL + "account/email"
+        const url = publicAPIURL + "/account/email"
         const requestBody = 
         {
             email: email,

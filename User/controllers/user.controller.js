@@ -64,19 +64,10 @@ const UserController = {
 
   getById: async (req, res, next) => {
     try {
-      const id = req.query.userId;
-      const accountId = req.query.accountId
 
-      let object = {}
-      if(id != undefined)
-      {
-        object = await UserService.getById(id);
-      }
-      else if(accountId != undefined)
-      {
-        object = await UserService.getByAccountId(accountId)
-      }
-
+      const id = req.params.id
+      
+      const object = await UserService.getById(id);
       if (object == null) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -308,6 +299,39 @@ const UserController = {
     {
       console.log(error)
       return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  getUserInfo: async (req, res, next) =>
+  {
+    try {
+
+      let object = null
+      const userId = req.query.userId
+      const accountId = req.query.accountId
+      if(userId != undefined)
+      {
+        object = await UserService.getById(userId)
+      }
+      else if(accountId != undefined)
+      {
+        object = await UserService.getByAccountId(accountId)
+      }
+      else
+      {
+        return next(createError.BadRequest("Missing parameters"))
+      }
+
+      if (object == null) {
+        return next(createError.BadRequest(Model + " not found"));
+      }
+      res.json({
+        message: "Get " + model + " successfully",
+        status: 200,
+        data: object,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
     }
   }
 

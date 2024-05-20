@@ -57,7 +57,7 @@ const PromotionElementSchema = new Schema({
     required: true,
   },
   promotionIdList: {
-    type: [Schema.Types.ObjectId], 
+    type: [Schema.Types.ObjectId],
     ref: "Promotion",
   },
 });

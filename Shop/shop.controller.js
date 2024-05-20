@@ -50,14 +50,12 @@ const ShopController = {
     }
   },
 
-
   getById: async (req, res, next) => {
     try {
-      const shopId = req.query.id
-      const useShopDetail = req.query.useShopDetail == "true"
-      const useDesign = req.query.useDesign == "true"
 
-      const object = await ShopService.getById(shopId, useShopDetail, useDesign);
+      const id = req.params.id
+
+      const object = await ShopService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -148,6 +146,37 @@ const ShopController = {
     }
   },
 
+  getShopBySelection: async (req, res, next) => {
+    try {
+
+      const shopId = req.query.shopId
+      const accountId = req.query.accountId
+      const useDesign = req.query.useDesign == "true"
+      const useShopDetail = req.query.useShopDetail == "true"
+
+      let object = null
+      if(shopId != null)
+      {
+        object = await ShopService.getById(shopId, useShopDetail, useDesign)
+      }
+      else if(accountId != null)
+      {
+        object = await ShopService.getByAccountId(accountId, useShopDetail, useDesign)
+      }
+
+      if (object == null) 
+      {
+        return next(createError.BadRequest(Model + " not found"));
+      }
+      res.json({
+        message: "Get" + model + "successfully",
+        status: 200,
+        data: object,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
 
 };
 

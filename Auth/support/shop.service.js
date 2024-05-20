@@ -1,7 +1,8 @@
 import axios from "axios"
 
-// const publicAPIURL = "http://14.225.218.109:3004/"
-const publicAPIURL = "http://localhost:3004/"
+const PORT = process.env.SHOP_PORT
+const BASE_PATH = process.env.BASE_PATH
+const publicAPIURL = `${BASE_PATH}:${PORT}`
 
 const ShopService = 
 {
@@ -12,7 +13,7 @@ const ShopService =
      */
     async createShopInfo(shopName, accountId)
     {
-        const url = publicAPIURL + "shop"
+        const url = publicAPIURL + "/shop"
         try
         {
             const requestBody =
@@ -42,7 +43,7 @@ const ShopService =
 
     async getShopInfoByAccountId(accountId)
     {
-        const url = publicAPIURL + "shop/account"
+        const url = publicAPIURL + "/shop_info"
         try
         {
             const response = await axios.get(url, 

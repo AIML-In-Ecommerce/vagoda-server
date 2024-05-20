@@ -1,0 +1,279 @@
+[33mcommit 48b7cbc950bb42a1d4b6cc803f623e1ff4939567[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Merge: 4b17e70 d55bdcb
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Sat May 18 15:16:32 2024 +0700
+
+    ok
+
+[33mcommit 4b17e70aaec2874e1d294c3fc95673196190d179[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Sat May 18 15:14:23 2024 +0700
+
+    ok
+
+[33mcommit d55bdcb4d3605ade95bdef993d81d4fcae81c5b5[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 92e8c3d 03a6171
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Sat May 18 12:00:03 2024 +0700
+
+    Merge branch 'phl'
+
+[33mcommit 03a6171f82fc13b2300ccb36e98b4294521afba4[m[33m ([m[1;31morigin/phl[m[33m)[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Sat May 18 11:59:09 2024 +0700
+
+    fix: support services connect to incorrect server url
+
+[33mcommit 92e8c3dee6c7803c8b1081bfdbfb1ff7f776b256[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Sat May 18 01:37:42 2024 +0700
+
+    add get by ids
+
+[33mcommit 73456693cdb7ab231b04c3d580a031023fdd924a[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Fri May 17 22:32:41 2024 +0700
+
+    update: ensure unique account registered by an email
+
+[33mcommit 4bbe0953e85882aa155e195dfbd2461e8d7ef596[m
+Merge: 6e16ed5 892dc3c
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Fri May 17 22:12:33 2024 +0700
+
+    merge: from order_api branch into main
+
+[33mcommit 892dc3c4e41c69310a84e2b2b7f21c10009a007a[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Fri May 17 21:50:40 2024 +0700
+
+    update: upadte register API, login API. update: update Account's Model, User Model, Shop Model
+
+[33mcommit 6e16ed5e7519df73ea7909a2c910429d4d44f868[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Thu May 16 15:41:54 2024 +0700
+
+    image -> images
+
+[33mcommit 83d38f25cb36a3c1311f1cc6286996562f66152d[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Thu May 16 15:39:09 2024 +0700
+
+    product upload file
+
+[33mcommit 0dbd9de0cd26c8af3006c17d3a9c1f10ef62ee7e[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Thu May 16 14:47:23 2024 +0700
+
+    add type widget
+
+[33mcommit d75fad1a5423a295bed46b84671893a707224be1[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Wed May 15 20:00:19 2024 +0700
+
+    fix min max
+
+[33mcommit 35911c89577b882e0787f2e48215afc5d2a6a5af[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Wed May 15 18:30:47 2024 +0700
+
+    ok
+
+[33mcommit 45888643601ff9eb8790dbbca224d7cd6c8390b5[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Wed May 15 16:28:39 2024 +0700
+
+    fix index
+
+[33mcommit 8aec4146e8697e08e861efdda3eeea9f26676c0e[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Wed May 15 16:12:17 2024 +0700
+
+    max min price
+
+[33mcommit 9722dc16d7440d7c18840595e9f42b86e8ea736c[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Wed May 15 12:02:24 2024 +0700
+
+    get list widget by ids
+
+[33mcommit 2468ccc8c882889e85f8184c42087dcb5488d388[m
+Merge: 6f20537 f520f01
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Wed May 15 10:03:15 2024 +0700
+
+    Merge branch 'feature/order'
+
+[33mcommit f520f01c0594e65a2fadc6a3d86ccbf044114e54[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Wed May 15 10:02:16 2024 +0700
+
+    fix: missing axios module
+
+[33mcommit 6f205379be4b9110fb45952be59f4d1524badfcc[m
+Merge: fa4cedc 05ff113
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Wed May 15 00:20:27 2024 +0700
+
+    Merge branch 'main' of github.com:AIML-In-Ecommerce/techzone-server
+
+[33mcommit fa4cedc1c53bf2629698f3d5d06950095fee18c6[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Wed May 15 00:10:46 2024 +0700
+
+    fix
+
+[33mcommit 05ff113029134f58740261c70148c52fe1d7a598[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Tue May 14 22:55:52 2024 +0700
+
+    fix: fix fetch is undefined error
+
+[33mcommit 43b8d9601732b97693d5065e87d267d212fabb84[m
+Merge: 3a115cd 8345639
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Tue May 14 17:43:59 2024 +0700
+
+    feat: add Cart API, add Shipping-address API, add Get-orders API
+
+[33mcommit 8345639f035b7b16794edf26cd7c395f686cfa07[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Tue May 14 17:34:26 2024 +0700
+
+    update: change base url in api function
+
+[33mcommit 2ddfd1205a2397c6507a04713826d10b9ee9089f[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Tue May 14 17:26:08 2024 +0700
+
+    update: shipping address API, Cart API
+
+[33mcommit 3a115cdc09010d2dbc31c4521e4055393f3b4661[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Tue May 14 13:38:53 2024 +0700
+
+    fix populate subcategorytype ltt
+
+[33mcommit 5da570c6a9e792168635410f14b58a2a1eb9267e[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Tue May 14 13:27:55 2024 +0700
+
+    fix populate
+
+[33mcommit 50e32af569996e61c2444d8f14ecbb2fa40241ab[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Tue May 14 11:42:50 2024 +0700
+
+    populate and fix filter
+
+[33mcommit 0b1b2a6c53c6acc7ec93a903b15b191e8694e229[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Mon May 13 23:33:36 2024 +0700
+
+    product fix filter and list
+
+[33mcommit c62b0b50c81bcaf0a250e3d1d13eeb00298b2a1a[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Mon May 13 18:14:18 2024 +0700
+
+    fix cors and get product list by ids
+
+[33mcommit eb89aca3bbe01e0f8ee92482a5428c2a3014f015[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Mon May 13 15:35:13 2024 +0700
+
+    feature: init cart API
+
+[33mcommit 2cdf719a3303d281158bc7c630c5a365557b0a8b[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Sun May 12 12:23:53 2024 +0700
+
+    ok
+
+[33mcommit 96135e7525f3ae1befffcbbf0e15ad866163ef1a[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Sun May 12 11:51:07 2024 +0700
+
+    ok
+
+[33mcommit ad01cf73468328f6f7a4af0c25d9e7bd93162904[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Sat May 11 16:19:04 2024 +0700
+
+    fix cate
+
+[33mcommit ed5ae1762fec47ccfd7d59ca1f15c8df05e47d54[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Sat May 11 16:05:31 2024 +0700
+
+    ok
+
+[33mcommit bf15fffe2b47b43ce79ffa54374d604e4c8a8d49[m
+Author: PHoaiLe <lehoaiphuong13042002@gmail.com>
+Date:   Sat May 11 09:18:25 2024 +0700
+
+    update: getAllCustomerOrders API
+
+[33mcommit 4524fb3a8fd716e27fba5aef253fa630c869cb0c[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Fri May 10 17:52:22 2024 +0700
+
+    swagger fixed
+
+[33mcommit f370fd74314e082351d1ab2cfc21742376af0e14[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Fri May 10 17:42:14 2024 +0700
+
+    fix product
+
+[33mcommit 64b3a30f1e2d5fe7b828736693df524bc57c28fc[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Fri May 10 17:31:19 2024 +0700
+
+    okk
+
+[33mcommit 76b997a17de8404318492dfc41e8d664803f4fdf[m
+Author: thienhk15 <vanthien061102@gmail.com>
+Date:   Fri May 10 17:01:41 2024 +0700
+
+    add data
+
+[33mcommit a5cdf63ce4bc07ecd2e9f983cb922e6b4e09e536[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Fri May 10 08:22:20 2024 +0700
+
+    50%
+
+[33mcommit cd7d055399d34853dd762e530e01595e8c2c92c7[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Thu May 9 23:24:33 2024 +0700
+
+    add
+
+[33mcommit 075a427205efeab777e1a7a12b55f4537a820dd8[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Tue May 7 18:50:23 2024 +0700
+
+    auth
+
+[33mcommit 600d14bf2f220b8e6da6b49ca5c775f82823691d[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Sun Apr 28 23:05:38 2024 +0700
+
+    ok
+
+[33mcommit 461c88d03ad71e2d93525204b10ab341fb3c9f21[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Wed Apr 17 20:33:31 2024 +0700
+
+    cre
+
+[33mcommit 312f4280490f92e013b9b80edfc7f8bd7efe0676[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+Date:   Wed Apr 17 20:17:51 2024 +0700
+
+    swagger
+
+[33mcommit 95e399fb61945777d90b39478e060db76aefc3e2[m
+Author: thien <79550249+thienhk15@users.noreply.github.com>
+D

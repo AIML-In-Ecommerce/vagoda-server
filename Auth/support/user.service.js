@@ -2,8 +2,9 @@ import axios from "axios"
 
 
 
-// const publicAPIURL = "http://14.225.218.109:3002/"
-const publicAPIURL = "http://localhost:3002/"
+const PORT = process.env.USER_PORT
+const BASE_PATH = process.env.BASE_PATH
+const publicAPIURL = `${BASE_PATH}:${PORT}`
 
 const UserService = 
 {
@@ -21,7 +22,7 @@ const UserService =
     {
         try
         {
-            const url = publicAPIURL + "user/register"
+            const url = publicAPIURL + "/user/register"
             const requestBody = 
             {
                 email: registerObject.email,
@@ -51,17 +52,10 @@ const UserService =
 
     async deleteUserInfo(targetUserId)
     {
-        const url = publicAPIURL + "user/info"
+        const url = publicAPIURL + `/user/${targetUserId}`
         try
         {
-            const response = await axios.delete(url, 
-                {
-                    params:
-                    {
-                        id: targetUserId
-                    }
-                }
-            )
+            const response = await axios.delete(url)
 
             if(response.status == 200 || response.status == 201)
             {
@@ -83,7 +77,7 @@ const UserService =
 
     async getUserInfoByAccountId(accountId)
     {
-        const url = publicAPIURL + "user/info"
+        const url = publicAPIURL + "/user_info"
         try
         {
             const response = await axios.get(url,
