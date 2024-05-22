@@ -8,13 +8,42 @@ const UserService = {
   //   return await AuthorizeRequest.find();
   // },
 
-  async getById(id) {
-    return await User.findById(id);
+  async getById(id, useAddress = undefined) {
+    
+    if(useAddress == undefined)
+    {
+      return await User.findById(id);
+    }
+    else
+    {
+      if(useAddress == false)
+      {
+        return await User.findById(id).select("_id fullName avatar dob phoneNumber account createAt __v")
+      }
+      else
+      {
+        return await User.findById(id);
+      }
+    }
   },
 
-  async getByAccountId(id)
+  async getByAccountId(id, useAddress = undefined)
   {
-    return await User.findOne({account: id});
+    if(useAddress == undefined)
+      {
+        return await User.findOne({account: id});
+      }
+      else
+      {
+        if(useAddress == false)
+        {
+          return await User.findOne({account: id}).select("_id fullName avatar dob phoneNumber account createAt __v")
+        }
+        else
+        {
+          return await User.findOne({account: id});
+        }
+      }
   },
 
   async create(objectData) {
@@ -88,7 +117,7 @@ const UserService = {
       return null
     }
 
-    if(newShippingAddress.receiverName == undefined || newShippingAddress.address == undefined
+    if(newShippingAddress.receiverName == undefined
       || newShippingAddress.phoneNumber == undefined || newShippingAddress.coordinate == undefined
       || newShippingAddress.label == undefined || newShippingAddress.isDefault == undefined
     )

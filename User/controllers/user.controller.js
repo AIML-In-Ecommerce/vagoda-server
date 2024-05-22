@@ -137,14 +137,28 @@ const UserController = {
   
   /**
    * req.body = 
-   * {
-   * 	"receiverName": "Lưu Hoàng Minh",
-      "address": "227 Đ.Nguyễn Văn Cừ, phường 3, quận 5, TP Hồ Chí Minh",
-      "phoneNumber": "0122446793",
-      "coordinate": null | {lng: number, lat: number},
-      "label": "OFFICE",
-      "isDefault": false
-      }
+    {
+      street: {type: String, required: true},
+      idProvince: {type: String, required: true},
+      idDistrict: {type: String, required: true},
+      idCommune: {type: String, required: true},
+      country: {type: String, required: true, default: "Việt Nam"},
+      receiverName: {type: String, default: ""},
+      phoneNumber: {type: String, required: true},
+      coordinate: {
+        lng: {type: Number},
+        lat: {type: Number},
+      },
+      label: {
+        type: String,
+        enum: ["HOME", "OFFICE"],
+        default: "HOME"
+      },
+      isDefault: {
+        type: Boolean,
+        default: false
+      },
+    }
    */
   insertShippingAddress: async (req, res, next) =>
   {
@@ -157,7 +171,7 @@ const UserController = {
       {
         return next(createError.BadRequest("Bad request to User service"))
       }
-      else if(newShippingAddressObject.receiverName === undefined || newShippingAddressObject.address === undefined
+      else if(newShippingAddressObject.receiverName === undefined
         || newShippingAddressObject.phoneNumber === undefined || newShippingAddressObject.coordinate === undefined
         || newShippingAddressObject.label === undefined || newShippingAddressObject.isDefault === undefined)
       {
@@ -195,7 +209,7 @@ const UserController = {
       const userId = req.query.userId
 
       //check userId in accessToken and the above userId
-      console.log(userId)
+
       const shippingAddress = await UserService.getShippingAddress(userId)
       if(shippingAddress == null)
       {
@@ -221,17 +235,27 @@ const UserController = {
    * 
    * @param {*} userId: string 
    * @param {
-    *  receiverName: string,
-    *  address: string,
-    *  phoneNumber: string,
-    *  coordinate: 
-    *  {
-    *    lng: number,
-    *    lat: number,
-    *  },
-    *  label: ["HOME", "OFFICE"],
-    *  isDefault: boolean
-    * } newShippingAddress 
+      street: {type: String, required: true},
+      idProvince: {type: String, required: true},
+      idDistrict: {type: String, required: true},
+      idCommune: {type: String, required: true},
+      country: {type: String, required: true, default: "Việt Nam"},
+      receiverName: {type: String, default: ""},
+      phoneNumber: {type: String, required: true},
+      coordinate: {
+        lng: {type: Number},
+        lat: {type: Number},
+      },
+      label: {
+        type: String,
+        enum: ["HOME", "OFFICE"],
+        default: "HOME"
+      },
+      isDefault: {
+        type: Boolean,
+        default: false
+      },
+      } newShippingAddress 
     */
   updateShippingAddress: async (req, res, next) =>
   {
@@ -309,13 +333,14 @@ const UserController = {
       let object = null
       const userId = req.query.userId
       const accountId = req.query.accountId
+      const useAddress = req.query.useAddress == "true"
       if(userId != undefined)
       {
-        object = await UserService.getById(userId)
+        object = await UserService.getById(userId, useAddress)
       }
       else if(accountId != undefined)
       {
-        object = await UserService.getByAccountId(accountId)
+        object = await UserService.getByAccountId(accountId, useAddress)
       }
       else
       {

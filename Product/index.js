@@ -11,11 +11,11 @@ import db from "./configs/db.js";
 import productRoute from "./routes/product.route.js";
 const app = express();
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+// app.use(
+//   cors({
+//     origin: "*",
+//   })
+// );
 dotenv.config();
 const port = process.env.PRODUCT_PORT;
 // const port = 3006
@@ -24,7 +24,7 @@ db();
 
 const initializeExpress = (app) => {
   //app.use(express.static(path.join(__dirname, "public")));
-  app.use(cors());
+  app.use(cors({}));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   //app.use(morgan("combined", { stream: logger.stream }));
