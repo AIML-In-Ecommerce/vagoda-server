@@ -206,7 +206,11 @@ const AuthController = {
       }
 
 
-      return res.json(response)
+
+      return res.json({
+        message: "Login successfully",
+        data: response
+      })
     }
     catch(error)
     {
@@ -233,7 +237,10 @@ const AuthController = {
       }
 
 
-      return res.json(response)
+      return res.json({
+        message: "Login successfully",
+        data: response
+      })
     }
     catch(error)
     {
