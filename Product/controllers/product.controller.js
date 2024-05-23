@@ -9,10 +9,14 @@ const ProductController = {
     console.log("inside GetALL")
     try {
       const filter = req.query;
-      const list = await ProductService.getAll(filter, "")
+      let list = await ProductService.getAll(filter, "")
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
+      list = list.map(product => {
+        product.profit = product.finalPrice - product.platformFee;
+        return product;
+      });
       res.json({
         message: "Get " + model + " list successfully",
         status: 200,

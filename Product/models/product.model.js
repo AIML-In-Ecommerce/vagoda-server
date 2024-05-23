@@ -58,20 +58,28 @@
     platformFee:{
       type: Number, 
       required: true,
+      default: 0
     },
     status: {
       type: String,
       enum: Object.values(ProductStatus),
       default: ProductStatus.AVAILABLE,
     },
-    images: {
-      type: [String],
-    },
+    images: [{
+      link: {
+        type: String,
+      },
+      color: {
+        label: {type: String},
+        value: {type: String},
+      },
+      type: Object.values("REQUIRE", "OPTIONAL")
+    }],
     avgRating: {
       type: Number,
-      default: 0
+      default: 0                                                                                    
     },
-    createdAt: {
+    createdAt: {                                                 
       type: Date,
       default: Date.now,
     },
@@ -82,6 +90,18 @@
       type: Number,
       default: 0,
     },
+    brand: {
+      type: String,
+      default: new String(""),
+    },
+    isFlashale: {
+      type: Boolean,
+      default: false,
+    },
+    inventoryAmount: {
+      type: Number,
+      default: 0,
+    }
   });
   ProductSchema.plugin(mongooseAutoPopulate);
   export const Product = mongoose.model("Product", ProductSchema);
