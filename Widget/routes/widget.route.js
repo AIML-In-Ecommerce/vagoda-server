@@ -1,16 +1,19 @@
-import express from 'express';
-import WidgetController from '../controllers/widget.controller.js';
-import uploadCloud from '../shared/uploader.js';
+import express from "express";
+import WidgetController from "../controllers/widget.controller.js";
+import uploadCloud from "../shared/uploader.js";
 
 const router = express.Router();
 
-router.get('/widgets', WidgetController.getAll);
-router.get('/widget/:id', WidgetController.getById);
-router.post('/widget', uploadCloud.array('avatar'), WidgetController.create);
-router.put('/widget/:id', uploadCloud.array('avatar'), WidgetController.update);
-router.delete('/widget/:id', WidgetController.delete);
+router.get("/widgets", WidgetController.getAll);
+router.get("/widget/:id", WidgetController.getById);
+router.post("/widget", uploadCloud.array("[images]"), WidgetController.create);
+router.put(
+  "/widget/:id",
+  uploadCloud.array("[images]"),
+  WidgetController.update
+);
+router.delete("/widget/:id", WidgetController.delete);
 router.post("/widgets/list", WidgetController.getListByIds);
-
 
 export default router;
 

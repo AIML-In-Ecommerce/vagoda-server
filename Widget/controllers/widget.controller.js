@@ -21,9 +21,9 @@ const WidgetController = {
   },
   getById: async (req, res, next) => {
     try {
-      console.log("test")
+      console.log("test");
       const { id } = req.params;
-      console.log(id)
+      console.log(id);
       const object = await WidgetService.getById(id);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
@@ -41,6 +41,16 @@ const WidgetController = {
   create: async (req, res, next) => {
     try {
       const data = req.body;
+      if (!req.files || req.files.length === 0) {
+        return next(new Error("No file uploaded!"));
+      }
+
+      const imageUrls = req.files.map((file) => file.path);
+      console.log(imageUrls);
+      if (data.type === "BANNER" && imageUrls.length > 1) {
+        data.image = imageUrls;
+      }
+      console.log(data);
       const object = await WidgetService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
@@ -58,6 +68,16 @@ const WidgetController = {
     try {
       const data = req.body;
       const { id } = req.params;
+      if (!req.files || req.files.length === 0) {
+        return next(new Error("No file uploaded!"));
+      }
+
+      const imageUrls = req.files.map((file) => file.path);
+      console.log(imageUrls);
+      if (data.type === "BANNER" && imageUrls.length > 1) {
+        data.image = imageUrls;
+      }
+      console.log(data);
       const object = await WidgetService.update(id, data);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
@@ -89,7 +109,6 @@ const WidgetController = {
     }
   },
   getListByIds: async (req, res, next) => {
-
     try {
       const { ids } = req.body;
 
