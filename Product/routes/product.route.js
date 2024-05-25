@@ -6,11 +6,7 @@ const router = express.Router();
 
 router.get("/products", ProductController.getAll);
 router.get("/product/:id", ProductController.getById);
-router.post(
-  "/product",
-  uploadCloud.array("image"),
-  ProductController.create
-);
+router.post("/product", uploadCloud.array("images"), ProductController.create);
 router.put(
   "/product/:id",
   uploadCloud.array("[product]"),
@@ -164,7 +160,6 @@ export default router;
  *       500:
  *         description: Internal Server Error.
  */
-
 
 /**
  * @swagger

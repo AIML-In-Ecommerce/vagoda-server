@@ -39,6 +39,7 @@ const WidgetController = {
   },
 
   create: async (req, res, next) => {
+    console.log("okkkkkkkkkkkkkkkkkk")
     try {
       const data = req.body;
       if (!req.files || req.files.length === 0) {
@@ -48,7 +49,7 @@ const WidgetController = {
       const imageUrls = req.files.map((file) => file.path);
       console.log(imageUrls);
       if (data.type === "BANNER" && imageUrls.length > 1) {
-        data.image = imageUrls;
+        data.element.images = imageUrls;
       }
       console.log(data);
       const object = await WidgetService.create(data);
@@ -75,7 +76,7 @@ const WidgetController = {
       const imageUrls = req.files.map((file) => file.path);
       console.log(imageUrls);
       if (data.type === "BANNER" && imageUrls.length > 1) {
-        data.image = imageUrls;
+        data.element.images = imageUrls;
       }
       console.log(data);
       const object = await WidgetService.update(id, data);

@@ -106,7 +106,7 @@ const WidgetSchema = new Schema({
   },
   element: {
     type: Schema.Types.Mixed,
-  }
+  },
 });
 
 const Widget = mongoose.model("Widget", WidgetSchema);

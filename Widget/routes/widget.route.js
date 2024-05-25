@@ -6,10 +6,14 @@ const router = express.Router();
 
 router.get("/widgets", WidgetController.getAll);
 router.get("/widget/:id", WidgetController.getById);
-router.post("/widget", uploadCloud.array("[images]"), WidgetController.create);
+router.post(
+  "/widget",
+  uploadCloud.array("element[images]", 10),
+  WidgetController.create
+);
 router.put(
   "/widget/:id",
-  uploadCloud.array("[images]"),
+  uploadCloud.array("element[images]", 10),
   WidgetController.update
 );
 router.delete("/widget/:id", WidgetController.delete);
