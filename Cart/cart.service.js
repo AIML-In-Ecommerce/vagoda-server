@@ -67,21 +67,24 @@ const CartService = {
     {
       const targetProduct = productInfos.get(item.product.toString())
 
-      const newProductValue = 
-      {
-        _id: targetProduct._id,
-        name: targetProduct.name,
-        originalPrice: targetProduct.originalPrice,
-        finalPrice: targetProduct.finalPrice,
-        image: targetProduct.images[0],
-        category: targetProduct.category,
-        subCategory: targetProduct.subCategory,
-        shop: targetProduct.shop,
-        status: targetProduct.status,
-        quantity: item.quantity,
-      }
+      // const newProductValue = 
+      // {
+      //   _id: targetProduct._id,
+      //   name: targetProduct.name,
+      //   originalPrice: targetProduct.originalPrice,
+      //   finalPrice: targetProduct.finalPrice,
+      //   image: targetProduct.images[0],
+      //   category: targetProduct.category,
+      //   subCategory: targetProduct.subCategory,
+      //   shop: targetProduct.shop,
+      //   status: targetProduct.status,
+      //   quantity: item.quantity,
+      // }
 
-      return newProductValue
+      targetProduct.quantity = item.quantity
+
+      // return newProductValue
+      return targetProduct
     })
 
     const finalResult = JSON.parse(JSON.stringify(rawCart))

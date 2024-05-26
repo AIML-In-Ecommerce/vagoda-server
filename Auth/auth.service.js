@@ -4,6 +4,7 @@ import ShopService from './support/shop.service.js'
 import AccountService from './support/account.service.js'
 import UserService from './support/user.service.js'
 import { generateAccessToken, generateRefreshToken } from './utils/jwt.js'
+import CartService from './support/cart.service.js'
 
 const SALT_ROUND = Number(process.env.SALT_ROUND)
 
@@ -84,6 +85,15 @@ const AuthService = {
     const userServiceResponse = await UserService.registerAccountAndUserInfo(registerObject)
     if(userServiceResponse == null)
     {
+      return null
+    }
+
+    //create cart
+    const cartInfo = await CartService.createCart(userServiceResponse.userId)
+    if(cartInfo == null)
+    {
+      await UserService.deleteUserInfo(userServiceResponse.userId)
+      await AccountService.deleteAccount(userServiceResponse.accountId)
       return null
     }
 

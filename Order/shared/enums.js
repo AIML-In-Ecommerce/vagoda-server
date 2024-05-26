@@ -17,10 +17,11 @@ const AccountType = {
 };
 
 const OrderStatus = {
-  PENDING: "PENDING",
-  PROCESSING: "PROCESSING",
-  SHIPPING: "SHIPPING",
-  COMPLETED: "COMPLETED",
+  WAITING_ONLINE_PAYMENT: "WAITING_ONLINE_PAYMENT", // đối với đơn hàng thanh toán trực tuyến như ZaloPay, đơn hàng đang đợi được thanh toán trước (giống Shopee)
+  PENDING: "PENDING", // đơn hàng đang chờ xác nhận bởi người bán
+  PROCESSING: "PROCESSING", // người bán đã xác nhận đơn hàng => chờ lấy hàng
+  SHIPPING: "SHIPPING", // đã chuẩn bị hàng xong và đã giao cho đơn vị vận chuyển
+  COMPLETED: "COMPLETED", // giao hàng thành công
   CANCELLED: "CANCELLED",
 };
 
@@ -29,4 +30,10 @@ const DiscountType = {
   DIRECT_PRICE: "DIRECT_PRICE",
 };
 
-export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType };
+const PaymentMethod = 
+{
+  COD: "COD",
+  ZALOPAY: "ZALOPAY"
+}
+
+export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType, PaymentMethod };

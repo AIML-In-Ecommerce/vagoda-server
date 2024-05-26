@@ -67,30 +67,38 @@ const OrderController = {
    */
   create: async (req, res, next) => {
     try {
+      const userId = req.query.userId
       const data = req.body;
-      const object = await OrderService.create(data);
-      if (!object) {
-        return next(createError.BadRequest("Bad request!"));
+      data.userId = userId
+      const newOrders = await OrderService.create(data);
+      if (newOrders == null) {
+        return next(createError.BadRequest("Cannot create the new order"));
       }
+
+      
+
       res.json({
         message: "Create" + model + "successfully",
-        data: object,
+        data: newOrders,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
   },
-  update: async (req, res, next) => {
+
+  cancelOrderByBuyer: async (req, res, next) => {
     try {
-      const data = req.body;
-      const { id } = req.params;
-      const object = await OrderService.update(id, data);
-      if (!object) {
-        return next(createError.BadRequest(Model + " not found"));
+      const orderId = req.query.orderId
+      const isSuccessfullyCancelled = await OrderService.update(orderId, data);
+      if (isSuccessfullyCancelled == false) {
+        return next(createError.MethodNotAllowed("Cannot cancel the order"));
       }
+
+      const updatedOrder = await OrderService.getById(orderId)
+
       res.json({
-        message: "Update" + model + "successfully",
-        data: object,
+        message: "Cancel order successfully",
+        data: updatedOrder,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));

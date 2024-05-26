@@ -71,6 +71,11 @@ const UserService = {
 
     const clonedAddress = JSON.parse(JSON.stringify(rawUserInfo.address))
 
+    if(newShippingAddress.coordinate == null)
+    {
+      newShippingAddress.coordinate = {}
+    }
+
     clonedAddress.push(newShippingAddress)
 
     rawUserInfo.address = clonedAddress
@@ -139,6 +144,11 @@ const UserService = {
     if(targetIndex == -1)
     {
       return rawUserInfo.address
+    }
+
+    if(newShippingAddress.coordinate == null)
+    {
+      newShippingAddress.coordinate = {}
     }
 
     rawUserInfo.address[targetIndex] = newShippingAddress

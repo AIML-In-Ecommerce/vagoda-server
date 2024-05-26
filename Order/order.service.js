@@ -1,10 +1,12 @@
 
 import Order from "./order.model.js";
+import orderGeneratorProvider from "./providers/order.generator.provider.js";
+import { OrderStatus } from "./shared/enums.js";
 import ProductService from "./support/product.service.js";
-import PromotionService from "./support/promotion.service.js";
 import ShopService from "./support/shop.service.js";
 import UserService from "./support/user.service.js";
 
+const ORDER_CANCELLED_STATUS_DEADLINE = Number(process.env.ORDER_CANCELLED_STATUS_DEADLINE)
 
 const OrderService = {
 
@@ -20,12 +22,7 @@ const OrderService = {
     }
 
     const listOfOrders = await Order.find(
-    {
-      filter:
-      {
-        user: userId
-      }
-    })
+    {user: userId})
     .exec()
 
     const shopInfos = new Map()
@@ -99,7 +96,7 @@ const OrderService = {
     })
 
 
-    const finalResutl = listOfOrders.map((value) =>
+    const finalResult = listOfOrders.map((value) =>
     {
       const item = JSON.parse(JSON.stringify(value))
       //map user to Item
@@ -120,17 +117,23 @@ const OrderService = {
 
       const products = item.products.map((product) =>
       {
-        const targetProduct = productsInfos.get(product.product.toString())
-        return(
-          {
-            _id: targetProduct._id,
-            name: targetProduct.name,
-            image: targetProduct.images[0],
-            originalPrice: targetProduct.originalPrice,
-            purchasedPrice: product.purchasedPrice,
-            quantity: product.quantity
-          }
-        )
+        const targetProduct = JSON.parse(JSON.stringify(productsInfos.get(product.product.toString())))
+
+        targetProduct.finalPrice = undefined
+        targetProduct.purchasedPrice = product.purchasedPrice
+        targetProduct.quantity = product.quantity
+
+        return targetProduct
+        // return(
+        //   {
+        //     _id: targetProduct._id,
+        //     name: targetProduct.name,
+        //     image: targetProduct.images[0],
+        //     originalPrice: targetProduct.originalPrice,
+        //     purchasedPrice: product.purchasedPrice,
+        //     quantity: product.quantity
+        //   }
+        // )
       })
 
       //construct promotion and paymemt method here, later
@@ -146,7 +149,7 @@ const OrderService = {
     })
 
 
-    return finalResutl
+    return finalResult
   },
 
   // async getAll() {
@@ -202,7 +205,7 @@ const OrderService = {
       })
   
   
-      const finalResutl = JSON.parse(JSON.stringify(rawOrder))
+      const finalResult = JSON.parse(JSON.stringify(rawOrder))
 
       const user = 
       {
@@ -219,7 +222,13 @@ const OrderService = {
 
       const products = rawOrder.products.map((value) =>
       {
-        const targetProduct = productInfos.get(value.product.toString())
+        const targetProduct = JSON.parse(JSON.stringify(productInfos.get(value.product.toString())))
+
+        targetProduct.finalPrice = undefined
+        targetProduct.purchasedPrice = value.purchasedPrice
+        targetProduct.quantity = value.quantity
+
+        return targetProduct
         return(
           {
             _id: targetProduct._id,
@@ -234,11 +243,11 @@ const OrderService = {
   
       //promotion and paymentMethod
 
-      finalResutl.user = user
-      finalResutl.shop = shop
-      finalResutl.products = products
+      finalResult.user = user
+      finalResult.shop = shop
+      finalResult.products = products
   
-      return finalResutl
+      return finalResult
     }
     catch(error)
     {
@@ -249,13 +258,63 @@ const OrderService = {
 
   },
 
-  async create(objectData) {
-    const newObject = new Order(objectData);
-    return await newObject.save();
+  /**
+   * 
+   * @param {object} requiredData 
+   * {
+   *  userId: string,
+   *  shippingAddressId: string,
+   *  promotionId: string
+   *  paymentMethodId: string
+   * }
+   */
+  async create(requiredData) 
+  {
+    const paymentMethodId = requiredData.paymentMethodId
+    const generator = orderGeneratorProvider.getGenerator(paymentMethodId)
+    if(generator == undefined)
+    {
+      return null
+    }
+
+    return generator(requiredData)
   },
 
   async update(id, updateData) {
     return await Order.findByIdAndUpdate(id, updateData, { new: true });
+  },
+
+  async cancelOrderByUser(orderId)
+  {
+    const rawOrder = await Order.findById(orderId)
+    if(rawOrder == null)
+    {
+      return false
+    }
+
+    currentStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+    if(currentStatus.status != OrderStatus.WAITING_ONLINE_PAYMENT && currentStatus.status != OrderStatus.PENDING)
+    {
+      return false
+    }
+
+    rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = new Date(Date.now())
+
+    const time = new Date(Date.now())
+    newTimeDeadline = new Date(time).setDate(time.getDate() + ORDER_CANCELLED_STATUS_DEADLINE)
+    const deadline = new Date(newTimeDeadline)
+
+    const newStatus = {
+      status: OrderStatus.CANCELLED,
+      time: time,
+      deadline: deadline,
+    }
+
+    rawOrder.orderStatus.push(newStatus)
+    
+    await rawOrder.save()
+
+    return true
   },
 
   async delete(id) {

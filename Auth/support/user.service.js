@@ -45,7 +45,8 @@ const UserService =
         }
         catch(error)
         {
-            console.log(error)
+            console.log("Axios error registerAccountAndUserInfo")
+
             return null
         }
     },
@@ -70,7 +71,8 @@ const UserService =
         }
         catch(error)
         {
-            console.log(error)
+            console.log("Axios error deleteUserInfo")
+
             return null
         }
     },

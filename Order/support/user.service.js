@@ -7,7 +7,7 @@ const publicAPIURL = `${BASE_PATH}:${PORT}`
 
 const UserService = 
 {
-    async getUserInfo(userId)
+    async getUserInfo(userId, useAddress)
     {
         const url = publicAPIURL + "/user_info"
 
@@ -17,7 +17,8 @@ const UserService =
                 method: "GET",
                 params:
                 {
-                    userId: userId
+                    userId: userId,
+                    useAddress: useAddress,
                 }
             })
 
