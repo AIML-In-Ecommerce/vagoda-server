@@ -18,6 +18,7 @@ router.put(
 );
 router.delete("/widget/:id", WidgetController.delete);
 router.post("/widgets/list", WidgetController.getListByIds);
+router.post("/upload", uploadCloud.single("image"), WidgetController.upload);
 
 export default router;
 

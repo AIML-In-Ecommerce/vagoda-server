@@ -39,11 +39,10 @@ const WidgetController = {
   },
 
   create: async (req, res, next) => {
-    console.log("okkkkkkkkkkkkkkkkkk")
     try {
       const data = req.body;
       if (!req.files || req.files.length === 0) {
-        return next(new Error("No file uploaded!"));
+        console.log("no file uploaded");
       }
 
       const imageUrls = req.files.map((file) => file.path);
@@ -70,7 +69,7 @@ const WidgetController = {
       const data = req.body;
       const { id } = req.params;
       if (!req.files || req.files.length === 0) {
-        return next(new Error("No file uploaded!"));
+        console.log("No file uploaded!");
       }
 
       const imageUrls = req.files.map((file) => file.path);
@@ -123,6 +122,35 @@ const WidgetController = {
         data: list,
       });
     } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  upload: async (req, res, next) => {
+    console.log("okkkkkkkkkkkkkkkkkk");
+    try {
+      // const data = req.body;
+      if (!req.files && !req.file) {
+        console.log("no file uploaded");
+        res.json({
+          message: "no file uploaded",
+          status: 200,
+          data: {
+            path: null,
+          },
+        });
+      } else {
+        res.json({
+          message: "upload file successfully",
+          status: 200,
+          data: {
+            path: req.file.path,
+          },
+        });
+      }
+
+      // console.log(req.file.path);
+    } catch (error) {
+      console.log(error);
       next(createError.InternalServerError(error.message));
     }
   },
