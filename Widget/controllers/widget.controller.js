@@ -44,7 +44,7 @@ const WidgetController = {
       if (!req.files || req.files.length === 0) {
         console.log("no file uploaded");
       }
-
+      console.log(req.files)
       const imageUrls = req.files.map((file) => file.path);
       console.log(imageUrls);
       if (data.type === "BANNER" && imageUrls.length > 1) {
@@ -61,6 +61,7 @@ const WidgetController = {
         data: object,
       });
     } catch (error) {
+      console.log(error)
       next(createError.InternalServerError(error.message));
     }
   },
