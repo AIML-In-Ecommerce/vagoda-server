@@ -94,14 +94,17 @@
       type: String,
       default: new String(""),
     },
-    isFlashale: {
+    isFlashSale: {
       type: Boolean,
       default: false,
     },
     inventoryAmount: {
       type: Number,
       default: 0,
-    }
+    },
+    profit: {
+      type: Number,
+    },
   });
   ProductSchema.plugin(mongooseAutoPopulate);
   export const Product = mongoose.model("Product", ProductSchema);
