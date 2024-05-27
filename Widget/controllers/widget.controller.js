@@ -43,14 +43,16 @@ const WidgetController = {
       const data = req.body;
       if (!req.files || req.files.length === 0) {
         console.log("no file uploaded");
-      }
-      console.log(req.files)
+      } else {
+        console.log(req.files)
       const imageUrls = req.files.map((file) => file.path);
       console.log(imageUrls);
       if (data.type === "BANNER" && imageUrls.length > 1) {
         data.element.images = imageUrls;
       }
       console.log(data);
+      }
+      
       const object = await WidgetService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
@@ -71,13 +73,15 @@ const WidgetController = {
       const { id } = req.params;
       if (!req.files || req.files.length === 0) {
         console.log("No file uploaded!");
-      }
-
-      const imageUrls = req.files.map((file) => file.path);
+      } else {
+        const imageUrls = req.files.map((file) => file.path);
       console.log(imageUrls);
       if (data.type === "BANNER" && imageUrls.length > 1) {
         data.element.images = imageUrls;
       }
+      }
+
+      
       console.log(data);
       const object = await WidgetService.update(id, data);
       if (!object) {
