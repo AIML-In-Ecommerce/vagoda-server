@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 import bodyParser from 'body-parser';
+import multer from "multer";
 
 import { specs, swaggerUi } from './configs/swagger.js';
 import { errorHandler, notFound } from './shared/helper/errorHandler.js';
@@ -20,8 +21,13 @@ const initializeExpress = (app) => {
   //app.use(express.static(path.join(__dirname, "public")));
   //app.use(cors(corsOptions));
   app.use(cors())
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({limit: '50mb'}));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
+  const upload = multer({
+    limits: { fileSize: 50 * 1024 * 1024 } // 50MB
+  });
+
+  app.use(upload.any());
   //app.use(morgan("combined", { stream: logger.stream }));
 };
 
