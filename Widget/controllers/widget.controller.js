@@ -127,10 +127,12 @@ const WidgetController = {
   },
   upload: async (req, res, next) => {
     console.log("okkkkkkkkkkkkkkkkkk");
+    console.log(req.body)
     try {
       // const data = req.body;
       if (!req.files && !req.file) {
         console.log("no file uploaded");
+        
         res.json({
           message: "no file uploaded",
           status: 200,
