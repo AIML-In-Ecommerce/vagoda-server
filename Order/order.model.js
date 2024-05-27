@@ -1,7 +1,28 @@
 import mongoose from "mongoose";
-import { OrderStatus } from "./shared/enums.js";
+import { OrderStatus, PaymentMethod } from "./shared/enums.js";
 
 const Schema = mongoose.Schema;
+
+
+//create discriminator
+//ref: https://mongoosejs.com/docs/discriminators.html#embedded-discriminators-in-arrays --> Single nested discriminator
+const CODPaymentSchema = new Schema({
+  name: {type: String, enum: Object.values(PaymentMethod), required: true},
+  isPaid: {type: Boolean, required: true, default: false},
+  paidAt: {type: Date, default: null}
+}, {_id: false})
+
+const ZaloPayPaymentSchema = new Schema({
+  name: {type: String, enum: Object.values(PaymentMethod), required: true},
+  zpTransId: {type: Number, default: null},
+  zpUserId: {type: String, default: null},
+  appTransId: {type: String, default: null},
+  isPaid: {type: Boolean, required: true, default: false},
+  paidAt: {type: Date, default: null}
+}, {_id: false})
+
+const PaymentMethodSchema = new Schema({
+}, {discriminatorKey: "kind", _id: false})
 
 const OrderSchema = new Schema({
   user: {
@@ -26,7 +47,7 @@ const OrderSchema = new Schema({
         type: Number,
         required: true,
       },
-      purchasePrice: {
+      purchasedPrice: {
         type: Number,
         required: true,
       },
@@ -35,12 +56,16 @@ const OrderSchema = new Schema({
   promotion: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Promotion",
+    default: null
   },
   paymentMethod: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: PaymentMethodSchema,
+    required: true,
+    default: () => ({})
   },
   shippingFee: {
     type: Number,
+    default: 0
   },
   totalPrice: {
     type: Number,
@@ -55,7 +80,19 @@ const OrderSchema = new Schema({
       receiverName: {
         type: String,
       },
-      address: {
+      street:{
+        type: String,
+      },
+      idProvince: {
+        type: String,
+      },
+      idDistrict: {
+        type: String,
+      },
+      idCommune: {
+        type: String,
+      },
+      country: {
         type: String,
       },
       phoneNumber: {
@@ -70,6 +107,7 @@ const OrderSchema = new Schema({
         },
       },
       label: {
+        type: String,
         enum: ["HOME", "OFFICE"],
       },
       isDefault: {
@@ -88,7 +126,7 @@ const OrderSchema = new Schema({
       },
       complete: {
         type: Date,
-        default: false,
+        default: null,
       },
       time: {
         type: Date,
@@ -96,11 +134,27 @@ const OrderSchema = new Schema({
       },
       deadline: {
         type: Date,
+        default: null
       },
     },
   ],
 });
 
+
+OrderSchema.path("paymentMethod").discriminator(PaymentMethod.COD, CODPaymentSchema)
+OrderSchema.path("paymentMethod").discriminator(PaymentMethod.ZALOPAY, ZaloPayPaymentSchema)
+
+
 const Order = mongoose.model("Order", OrderSchema);
+
+
+//TODO:
+/**
+ * Lưu thêm vào database:
+ * zp_trans_id: string,
+ * mac: string
+ * 
+ * để hoàn tiền nếu cần
+ */
 
 export default Order;

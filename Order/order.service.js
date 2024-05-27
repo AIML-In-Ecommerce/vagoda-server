@@ -1,7 +1,10 @@
 
 import Order from "./order.model.js";
+import initOrderStatusGeneratorProvider from "./providers/init.order.status.generator.provider.js";
+import orderGeneratorProvider from "./providers/order.generator.provider.js";
+import orderPaymentInfoProvider from "./providers/order.payment_info.provider.js";
+import orderStatusGeneratorProvider from "./providers/order.status.generator.provider.js";
 import ProductService from "./support/product.service.js";
-import PromotionService from "./support/promotion.service.js";
 import ShopService from "./support/shop.service.js";
 import UserService from "./support/user.service.js";
 
@@ -20,12 +23,7 @@ const OrderService = {
     }
 
     const listOfOrders = await Order.find(
-    {
-      filter:
-      {
-        user: userId
-      }
-    })
+    {user: userId})
     .exec()
 
     const shopInfos = new Map()
@@ -99,7 +97,7 @@ const OrderService = {
     })
 
 
-    const finalResutl = listOfOrders.map((value) =>
+    const finalResult = listOfOrders.map((value) =>
     {
       const item = JSON.parse(JSON.stringify(value))
       //map user to Item
@@ -120,17 +118,23 @@ const OrderService = {
 
       const products = item.products.map((product) =>
       {
-        const targetProduct = productsInfos.get(product.product.toString())
-        return(
-          {
-            _id: targetProduct._id,
-            name: targetProduct.name,
-            image: targetProduct.images[0],
-            originalPrice: targetProduct.originalPrice,
-            purchasedPrice: product.purchasedPrice,
-            quantity: product.quantity
-          }
-        )
+        const targetProduct = JSON.parse(JSON.stringify(productsInfos.get(product.product.toString())))
+
+        targetProduct.finalPrice = undefined
+        targetProduct.purchasedPrice = product.purchasedPrice
+        targetProduct.quantity = product.quantity
+
+        return targetProduct
+        // return(
+        //   {
+        //     _id: targetProduct._id,
+        //     name: targetProduct.name,
+        //     image: targetProduct.images[0],
+        //     originalPrice: targetProduct.originalPrice,
+        //     purchasedPrice: product.purchasedPrice,
+        //     quantity: product.quantity
+        //   }
+        // )
       })
 
       //construct promotion and paymemt method here, later
@@ -146,7 +150,7 @@ const OrderService = {
     })
 
 
-    return finalResutl
+    return finalResult
   },
 
   // async getAll() {
@@ -202,7 +206,7 @@ const OrderService = {
       })
   
   
-      const finalResutl = JSON.parse(JSON.stringify(rawOrder))
+      const finalResult = JSON.parse(JSON.stringify(rawOrder))
 
       const user = 
       {
@@ -219,7 +223,13 @@ const OrderService = {
 
       const products = rawOrder.products.map((value) =>
       {
-        const targetProduct = productInfos.get(value.product.toString())
+        const targetProduct = JSON.parse(JSON.stringify(productInfos.get(value.product.toString())))
+
+        targetProduct.finalPrice = undefined
+        targetProduct.purchasedPrice = value.purchasedPrice
+        targetProduct.quantity = value.quantity
+
+        return targetProduct
         return(
           {
             _id: targetProduct._id,
@@ -234,11 +244,11 @@ const OrderService = {
   
       //promotion and paymentMethod
 
-      finalResutl.user = user
-      finalResutl.shop = shop
-      finalResutl.products = products
+      finalResult.user = user
+      finalResult.shop = shop
+      finalResult.products = products
   
-      return finalResutl
+      return finalResult
     }
     catch(error)
     {
@@ -249,18 +259,193 @@ const OrderService = {
 
   },
 
-  async create(objectData) {
-    const newObject = new Order(objectData);
-    return await newObject.save();
+  /**
+   * 
+   * @param {object} requiredData 
+   * {
+   *  userId: string,
+   *  shippingAddressId: string,
+   *  promotionId: string
+   *  paymentMethodId: string
+   * }
+   */
+  async create(requiredData) 
+  {
+    const paymentMethodId = requiredData.paymentMethodId
+    const generator = orderGeneratorProvider.getGenerator(paymentMethodId)
+    if(generator == undefined)
+    {
+      return null
+    }
+
+    return generator(requiredData)
   },
 
-  async update(id, updateData) {
-    return await Order.findByIdAndUpdate(id, updateData, { new: true });
+  async updateOrderStatus(orderId, shopId = undefined, userId = undefined, specStatusCode = undefined)
+  {
+    const completeTime = new Date(Date.now())
+
+    let rawOrder = null
+
+    if(shopId != undefined)
+    {
+      rawOrder = await Order.findOne({_id: orderId, shop: shopId})
+    }
+    else if(userId != undefined)
+    {
+      rawOrder = await Order.findOne({_id: orderId, user: userId})
+    }
+
+    if(rawOrder == null)
+    {
+      return false
+    }
+
+    const currentOrderStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+    let newStatus = null
+    if(specStatusCode == undefined)
+    {
+      newStatus = orderStatusGeneratorProvider.getStatusSequently(currentOrderStatus.status)
+    }
+    else
+    {
+      newStatus = orderStatusGeneratorProvider.getStatus(specStatusCode)
+    }
+    if(newStatus == null)
+    {
+      return false
+    }
+
+    rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
+    rawOrder.orderStatus.push(newStatus)
+    await rawOrder.save()
+
+    return true
   },
 
-  async delete(id) {
-    return await Order.findByIdAndDelete(id);
+  // async cancelOrderByUser(orderId)
+  // {
+  //   const rawOrder = await Order.findById(orderId)
+  //   if(rawOrder == null)
+  //   {
+  //     return false
+  //   }
+
+  //   const currentStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+  //   if(currentStatus.status != OrderStatus.WAITING_ONLINE_PAYMENT && currentStatus.status != OrderStatus.PENDING)
+  //   {
+  //     return false
+  //   }
+
+  //   rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = new Date(Date.now())
+
+  //   const cancelledStatus = orderStatusGeneratorProvider.getStatus(OrderStatus.CANCELLED)
+
+  //   rawOrder.orderStatus.push(cancelledStatus)
+    
+  //   await rawOrder.save()
+
+  //   return true
+  // },
+
+  async updateManyOrderStatus(orderIds, shopId = undefined, userId = undefined, specStatusCode = undefined)
+  {
+    const completeTime = new Date(Date.now())
+
+    let rawOrders = null
+    if(shopId != undefined)
+    {
+      rawOrders = await Order.find({_id: {$in: orderIds}, shop: shopId})
+    }
+    else if(userId != undefined)
+    {
+      rawOrders = await Order.find({_id: {$in: orderIds}, user: userId})
+    }
+
+    if(rawOrders == null)
+    {
+      return []
+    }
+
+    const successfulUpdatedList = []
+
+    rawOrders.forEach(async (rawOrder) =>
+    {
+      const currentOrderStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+      let newStatus = null
+      if(specStatusCode == undefined)
+      {
+        newStatus = orderStatusGeneratorProvider.getStatusSequently(currentOrderStatus.status)
+      }
+      else
+      {
+        newStatus = orderStatusGeneratorProvider.getStatus(specStatusCode)
+      }
+
+      if(newStatus != null)
+      {
+        rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
+        rawOrder.orderStatus.push(newStatus)
+        await rawOrder.save()
+        successfulUpdatedList.push(rawOrder._id.toString())
+      }
+    })
+    
+    return successfulUpdatedList
   },
+  
+  async updateOnePaymentInfo(orderId, paymentMethodCode, newPaymentInfo, userId = undefined, shopId = undefined)
+  {
+    let rawOrder = null
+    if(shopId != undefined)
+    {
+      rawOrder = await Order.findOne({_id: orderId, shop: shopId})
+    }
+    else if(userId != undefined)
+    {
+      rawOrder = await Order.findOne({_id: orderId, user: userId})
+    }
+
+    if(rawOrder == null)
+    {
+      return false
+    }
+
+    const newPaymentInfoGenerated = orderPaymentInfoProvider.getUpdatedPaymentInfoSchema(paymentMethodCode, newPaymentInfo)
+
+    rawOrder.paymentMethod = newPaymentInfoGenerated
+
+    await rawOrder.save()
+    return true
+  },
+
+  async updateManyPaymentInfo(orderIds, paymentMethodCode, newPaymentInfo, userId = undefined, shopId = undefined)
+  {
+    let rawOrders = null
+    if(shopId != undefined)
+    {
+      rawOrders = await Order.find({_id: {$in: orderIds}, shop: shopId})
+    }
+    else if(userId != undefined)
+    {
+      rawOrders = await Order.find({_id: {$in: orderIds}, user: userId})
+    }
+    const successfulUpdatedList = []
+
+    rawOrders.forEach(async (rawOrder) =>
+    {
+      const newPaymentInfoGenerated = orderPaymentInfoProvider.getUpdatedPaymentInfoSchema(paymentMethodCode, newPaymentInfo)
+
+      rawOrder.paymentMethod = newPaymentInfoGenerated
+      
+      await rawOrder.save()
+      successfulUpdatedList.push(rawOrder._id.toString())
+    })
+
+    return successfulUpdatedList
+  },
+
+
 };
 
 export default OrderService;

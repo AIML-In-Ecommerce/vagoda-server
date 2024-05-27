@@ -23,7 +23,7 @@ const ShopService =
             }
 
             const response = await axios.post(url, requestBody)
-            console.log(response.data)
+
             if(response.status == 200 || response.status == 201)
             {
                 return response.data.data
@@ -36,7 +36,8 @@ const ShopService =
         }
         catch(error)
         {
-            console.log(error)
+            console.log("Axios error createShopInfo")
+
             return null
         }
     },
@@ -66,7 +67,8 @@ const ShopService =
         }
         catch(error)
         {
-            console.log(error)
+            console.log("Axios error at getShopInfoByAccountId")
+
             return null
         }
     },

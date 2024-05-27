@@ -334,6 +334,7 @@ const UserController = {
       const userId = req.query.userId
       const accountId = req.query.accountId
       const useAddress = req.query.useAddress == "true"
+      
       if(userId != undefined)
       {
         object = await UserService.getById(userId, useAddress)

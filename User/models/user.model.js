@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const CoordinateSchema = new Schema({
-  lng: {type: Number, required: true},
-  lat: {type: Number, required: true}
+  lng: {type: Number},
+  lat: {type: Number}
 })
 
 const UserSchema = new Schema({
@@ -35,7 +35,7 @@ const UserSchema = new Schema({
       phoneNumber: {type: String, required: true},
       coordinate: {
         type: CoordinateSchema,
-        default: null,
+        default: {},
       },
       label: {
         type: String,

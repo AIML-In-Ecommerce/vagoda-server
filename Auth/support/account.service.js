@@ -28,7 +28,7 @@ const AccountService =
         }
         catch(error)
         {
-            console.log(error)
+            console.log("Axios error at deleteAccount")
             return null
         }
 
@@ -57,7 +57,7 @@ const AccountService =
         }
         catch(error)
         {
-            console.log(error)
+            console.log("Axios error getAccountByEmail")
             return null;
         }
     }
