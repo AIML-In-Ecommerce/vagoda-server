@@ -9,6 +9,7 @@ const ValidatorService =
 
     validateSystemRole(req, res, next)
     {
+        console.log("System validator")
         next()
     }
 }

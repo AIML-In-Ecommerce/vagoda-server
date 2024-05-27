@@ -21,8 +21,8 @@ const PaymentService =
         try
         {
             const response = await axios.post(url, requestBody)
-            console.log(response.data)
-            return {}
+
+            return response.data
         }
         catch(error)
         {

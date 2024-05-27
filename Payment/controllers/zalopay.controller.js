@@ -3,8 +3,19 @@ import axios from "axios";
 import moment from "moment";
 import CryptoJS from "crypto-js";
 import qs from "qs";
+import OrderService from "../support/order.service.js";
 
 const ZaloPayController = {
+
+  greeting: (req, res, next) =>
+  {
+    return res.json(
+      {
+        message: "Welcome to payment service"
+      }
+    )
+  },
+
   /**
    * method: POST
    * Sandbox	POST	https://sb-openapi.zalopay.vn/v2/create
@@ -12,9 +23,10 @@ const ZaloPayController = {
    * description: Tạo đơn hàng, thanh toán
    */
   processPaymentRequest: async (req, res, next) => {
-    const { products, userId, amount } = req.body;
+    const { products, userId, amount, orderIds } = req.body;
     const embed_data = {
       //sau khi hoàn tất thanh toán sẽ đi vào link này (thường là link web thanh toán thành công của mình)
+      orderIds: orderIds,
       redirecturl: `${process.env.FRONTEND_PATH}/payment`,
     };
     const transID = Math.floor(Math.random() * 1000000);
@@ -29,7 +41,7 @@ const ZaloPayController = {
       amount: amount,
       //khi thanh toán xong, zalopay server sẽ POST đến url này để thông báo cho server của mình
       //Chú ý: cần dùng public url thì Zalopay Server mới call đến được (local thì dùng ngrok)
-    //   callback_url: `${process.env.NGROK_SERVER_PATH}/zalopay/callback`,
+      // callback_url: `${process.env.NGROK_SERVER_PATH}/zalopay/callback`,
       callback_url: `${process.env.BASE_PATH}:${process.env.PAYMENT_PORT}/zalopay/callback`,
       description: `Techzone - Payment for the order #${transID}`,
       bank_code: "",
@@ -70,9 +82,22 @@ const ZaloPayController = {
    * description: callback để Zalopay Server call đến khi thanh toán thành công.
    * Khi và chỉ khi ZaloPay đã thu tiền khách hàng thành công thì mới gọi API này để thông báo kết quả.
    */
-  callback: (req, res, next) => {
+  callback: async (req, res, next) => {
+
+    // zp_trans_id: Number,
+    // zp_user_id: String,
+    // app_trans_id: String,
+    // zp_user_id: String
+    // paidAt: Number | Date == app_time
     let result = {};
-    console.log(req.body);
+    let targetOrderIds = []
+    let targetZpTransId = -1
+    let targetUserId = ""
+    let targetPaidAt = null
+    let targetAppTransId
+    let targetZpUserId = ""
+
+
     try {
       let dataStr = req.body.data;
       let reqMac = req.body.mac;
@@ -97,6 +122,14 @@ const ZaloPayController = {
           dataJson["app_trans_id"]
         );
 
+        const embed_data = JSON.parse(dataJson.embed_data)
+        targetOrderIds = embed_data.orderIds //list of order's id
+        targetZpTransId = dataJson.zp_trans_id
+        targetUserId = dataJson.app_user
+        targetPaidAt = new Date(dataJson.app_time)
+        targetAppTransId = dataJson.app_trans_id
+        targetZpUserId = dataJson.zp_user_id
+
         result.return_code = 1;
         result.return_message = "success";
       }
@@ -106,6 +139,10 @@ const ZaloPayController = {
       result.return_message = ex.message;
     }
 
+    //gọi API update order status thành PENDING => đã thanh toán xong
+    await OrderService.updateWaitingPaymentStatus(targetUserId, targetOrderIds, 
+      targetZpTransId, targetPaidAt, targetAppTransId, targetZpUserId)
+    
     // thông báo kết quả cho ZaloPay server
     res.json(result);
   },

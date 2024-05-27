@@ -3,6 +3,27 @@ import { OrderStatus, PaymentMethod } from "./shared/enums.js";
 
 const Schema = mongoose.Schema;
 
+
+//create discriminator
+//ref: https://mongoosejs.com/docs/discriminators.html#embedded-discriminators-in-arrays --> Single nested discriminator
+const CODPaymentSchema = new Schema({
+  name: {type: String, enum: Object.values(PaymentMethod), required: true},
+  isPaid: {type: Boolean, required: true, default: false},
+  paidAt: {type: Date, default: null}
+}, {_id: false})
+
+const ZaloPayPaymentSchema = new Schema({
+  name: {type: String, enum: Object.values(PaymentMethod), required: true},
+  zpTransId: {type: Number, default: null},
+  zpUserId: {type: String, default: null},
+  appTransId: {type: String, default: null},
+  isPaid: {type: Boolean, required: true, default: false},
+  paidAt: {type: Date, default: null}
+}, {_id: false})
+
+const PaymentMethodSchema = new Schema({
+}, {discriminatorKey: "kind", _id: false})
+
 const OrderSchema = new Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -38,9 +59,9 @@ const OrderSchema = new Schema({
     default: null
   },
   paymentMethod: {
-    type: String,
-    enum: Object.values(PaymentMethod),
-    default: PaymentMethod.COD
+    type: PaymentMethodSchema,
+    required: true,
+    default: () => ({})
   },
   shippingFee: {
     type: Number,
@@ -118,6 +139,11 @@ const OrderSchema = new Schema({
     },
   ],
 });
+
+
+OrderSchema.path("paymentMethod").discriminator(PaymentMethod.COD, CODPaymentSchema)
+OrderSchema.path("paymentMethod").discriminator(PaymentMethod.ZALOPAY, ZaloPayPaymentSchema)
+
 
 const Order = mongoose.model("Order", OrderSchema);
 

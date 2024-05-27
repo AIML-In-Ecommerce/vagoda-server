@@ -1,8 +1,9 @@
-import orderStatusGeneratorProvider from "../providers/status.generator.provider.js"
+import orderStatusGeneratorProvider from "../providers/init.order.status.generator.provider.js"
 import PaymentService from "../support/payment.service.js"
 import UserService from "../support/user.service.js"
 import CartService from "../support/cart.service.js"
 import Order from "../order.model.js"
+import orderPaymentInfoProvider from "../providers/order.payment_info.provider.js"
 
 
 async function generateOrder(requiredData)
@@ -47,7 +48,7 @@ async function generateOrder(requiredData)
     })
 
     let promotionInfo = null
-    //fetch promotion
+    //TODO: fetch promotion
     if(requiredData.promotion != null)
     {
 
@@ -91,12 +92,13 @@ async function generateOrder(requiredData)
       totalPrice = totalPrice + shippingFee - promotionValue
       profit = profit + shippingFee - promotionValue
 
+      const initPaymentInfo = orderPaymentInfoProvider.getInitializedPaymentInfoSchema(requiredData.paymentMethodId)
       const newOrder = 
       {
         user: userId,
         shop: shopId,
         products: productInfosInOrder,
-        paymentMethod: requiredData.paymentMethodId, //we will update it later
+        paymentMethod: initPaymentInfo, //we will update it later
         shippingFee: shippingFee, // we will update it later
         totalPrice: totalPrice,
         profit: profit,
@@ -138,33 +140,47 @@ async function generateOrder(requiredData)
     return finalResult
 }
 
-export async function generateOrderWhenCOD(requiredData)
+const OrderGenerators = 
 {
-    return generateOrder(requiredData)   
-}
+  async generateOrderWhenCOD(requiredData)
+  {
+      return generateOrder(requiredData)   
+  },
 
-export async function generateOrderWhenZaloPay(requiredData)
-{
-    const newOrders = await generateOrder(requiredData)
-    //call to Payment service to ask for ZaloPay's payment url
 
-    let totalAmount = 0
-    let products = []
-    const orderIds = newOrders.map((order) =>
-    {
-      totalAmount = totalAmount + order.totalPrice
-      order.products.forEach((product) =>
+  async generateOrderWhenZaloPay(requiredData)
+  {
+      const newOrders = await generateOrder(requiredData)
+      //call to Payment service to ask for ZaloPay's payment url
+  
+      let totalAmount = 0
+      let products = []
+      const orderIds = newOrders.map((order) =>
       {
-        products.push(product)
+        totalAmount = totalAmount + order.totalPrice
+        order.products.forEach((product) =>
+        {
+          products.push(product)
+        })
+        return order._id
       })
-      return order._id
-    })
+  
+      const zalopayResponse = await PaymentService.getZaloPayURL(requiredData.userId, totalAmount, products, orderIds)
+  
+      if(zalopayResponse.order_url == undefined)
+      {
+        return null
+      }
+  
+      const finalResult = 
+      {
+        order_url: zalopayResponse.order_url
+      }
+  
+      return finalResult
+  },
 
-    const zalopayResponse = await PaymentService.getZaloPayURL(requiredData.userId, totalAmount, products, orderIds)
-
-    const finalResult = {
-
-    }
-
-    return finalResult
 }
+
+
+export default OrderGenerators

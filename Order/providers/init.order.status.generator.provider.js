@@ -1,14 +1,14 @@
 import { PaymentMethod } from "../shared/enums.js"
-import { generateStatusWhenCOD, generateStatusWhenWaitingZaloPay } from "../generators/status.generator.js"
+import InitOrderGenerators from '../generators/init.status.generator.js'
 
 const OrderStatusInitForPaymentMethods = 
 [
-    {paymentMethodCode: PaymentMethod.ZALOPAY, generator: generateStatusWhenWaitingZaloPay},
-    {paymentMethodCode: PaymentMethod.COD, generator: generateStatusWhenCOD},
+    {paymentMethodCode: PaymentMethod.ZALOPAY, generator: InitOrderGenerators.generateStatusWhenWaitingZaloPay},
+    {paymentMethodCode: PaymentMethod.COD, generator: InitOrderGenerators.generateStatusWhenCOD},
 
 ]
 
-class OrderStatusGeneratorProvider
+class InitOrderStatusGeneratorProvider
 {
     constructor()
     {
@@ -30,8 +30,8 @@ class OrderStatusGeneratorProvider
     }
 }
 
-const orderStatusGeneratorProvider = new OrderStatusGeneratorProvider()
+const initOrderStatusGeneratorProvider = new InitOrderStatusGeneratorProvider()
 
-orderStatusGeneratorProvider.initialize()
+initOrderStatusGeneratorProvider.initialize()
 
-export default orderStatusGeneratorProvider
+export default initOrderStatusGeneratorProvider

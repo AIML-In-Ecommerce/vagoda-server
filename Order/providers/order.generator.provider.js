@@ -1,11 +1,11 @@
-import { generateOrderWhenCOD, generateOrderWhenZaloPay } from "../generators/order.generator.js"
+import OrderGenerators from "../generators/order.generator.js"
 import { PaymentMethod } from "../shared/enums.js"
 
 
 const OrderGeneratorInitForPaymentMethod = 
 [
-    {paymentMethodCode: PaymentMethod.COD, generator: generateOrderWhenCOD},
-    {paymentMethodCode: PaymentMethod.ZALOPAY, generator: generateOrderWhenZaloPay}
+    {paymentMethodCode: PaymentMethod.COD, generator: OrderGenerators.generateOrderWhenCOD},
+    {paymentMethodCode: PaymentMethod.ZALOPAY, generator: OrderGenerators.generateOrderWhenZaloPay}
 ]
 
 

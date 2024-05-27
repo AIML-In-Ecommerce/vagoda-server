@@ -3,6 +3,7 @@ import ZaloPayController from "../controllers/zalopay.controller.js";
 
 const router = express.Router();
 
+router.get("/", ZaloPayController.greeting)
 router.post('/zalopay/payment', ZaloPayController.processPaymentRequest);
 router.post('/zalopay/callback', ZaloPayController.callback);
 router.post('/zalopay/check-status-order', ZaloPayController.checkStatusOrder);

@@ -82,7 +82,17 @@ const UserService = {
 
     await rawUserInfo.save()
 
-    return rawUserInfo.address;
+    const addresses = JSON.parse(JSON.stringify(rawUserInfo.address))
+
+    addresses.forEach((address) =>
+    {
+      if(address.coordinate != null && (address.coordinate.lng == undefined && address.coordinate.lat == undefined))
+      {
+        address.coordinate = null
+      }
+    })
+  
+    return addresses
   },
 
   async getShippingAddress(userId)
@@ -93,7 +103,17 @@ const UserService = {
       return null
     }
   
-    return rawUserInfo.address
+    const addresses = JSON.parse(JSON.stringify(rawUserInfo.address))
+
+    addresses.forEach((address) =>
+    {
+      if(address.coordinate != null && (address.coordinate.lng == undefined && address.coordinate.lat == undefined))
+      {
+        address.coordinate = null
+      }
+    })
+  
+    return addresses
   },
 
   /**
@@ -155,7 +175,17 @@ const UserService = {
 
     await rawUserInfo.save()
 
-    return rawUserInfo.address
+    const addresses = JSON.parse(JSON.stringify(rawUserInfo.address))
+
+    addresses.forEach((address) =>
+    {
+      if(address.coordinate != null && (address.coordinate.lng == undefined && address.coordinate.lat == undefined))
+      {
+        address.coordinate = null
+      }
+    })
+  
+    return addresses
   },
 
   async deleteShippingAddress(userId, documentId)
@@ -193,7 +223,18 @@ const UserService = {
     rawUserInfo.address = newAddress
 
     await rawUserInfo.save()
-    return rawUserInfo.address
+
+    const addresses = JSON.parse(JSON.stringify(rawUserInfo.address))
+
+    addresses.forEach((address) =>
+    {
+      if(address.coordinate != null && (address.coordinate.lng == undefined && address.coordinate.lat == undefined))
+      {
+        address.coordinate = null
+      }
+    })
+  
+    return addresses
   },
 
 

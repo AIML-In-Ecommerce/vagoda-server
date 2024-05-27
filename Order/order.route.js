@@ -4,22 +4,29 @@ import ValidatorService from "./validator.service.js";
 
 const router = express.Router();
 
-const buyerRouter = router.use(ValidatorService.validateBuyerRole)
+const buyerRouter = router.use(ValidatorService.validateSystemRole ,ValidatorService.validateBuyerRole)
+const systemRouter = router.use(ValidatorService.validateSystemRole)
 
 //customer
 buyerRouter.get("/buyer/orders", OrderController.getAllCustomerOrders);
 buyerRouter.get("/buyer/order", OrderController.getCustomerOrderById);
 buyerRouter.post("/buyer/order/create", OrderController.create);
 
-buyerRouter.put("/buyer/order/cancel", OrderController.cancelOrderByBuyer);
-buyerRouter.delete("/buyer/order/delete", OrderController.delete);
-buyerRouter.get("/buyer/order/statuses", OrderController.getStatus);
+buyerRouter.put("/buyer/order/status/cancel", OrderController.cancelOrderByBuyer);
+// buyerRouter.put("/buyer/order/status/update_many", OrderController.updateManyOrderStatus)
+// buyerRouter.put("buyer/order/status/update_one", OrderController.update)
+// buyerRouter.delete("/buyer/order/delete", OrderController.delete);
+
+
+buyerRouter.get("/order/statuses", OrderController.getStatus);
 
 
 //seller center
 // router.get("/s/orders", OrderController.getShopOrders)
 // router.get("/s/order",)
 
+
+systemRouter.post("/system/order/zalopay/update_callback", OrderController.updateOrderStatusWhenZaloPayCallback)
 
 export default router;
 

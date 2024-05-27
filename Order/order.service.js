@@ -1,12 +1,13 @@
 
 import Order from "./order.model.js";
+import initOrderStatusGeneratorProvider from "./providers/init.order.status.generator.provider.js";
 import orderGeneratorProvider from "./providers/order.generator.provider.js";
-import { OrderStatus } from "./shared/enums.js";
+import orderPaymentInfoProvider from "./providers/order.payment_info.provider.js";
+import orderStatusGeneratorProvider from "./providers/order.status.generator.provider.js";
 import ProductService from "./support/product.service.js";
 import ShopService from "./support/shop.service.js";
 import UserService from "./support/user.service.js";
 
-const ORDER_CANCELLED_STATUS_DEADLINE = Number(process.env.ORDER_CANCELLED_STATUS_DEADLINE)
 
 const OrderService = {
 
@@ -280,46 +281,171 @@ const OrderService = {
     return generator(requiredData)
   },
 
-  async update(id, updateData) {
-    return await Order.findByIdAndUpdate(id, updateData, { new: true });
-  },
-
-  async cancelOrderByUser(orderId)
+  async updateOrderStatus(orderId, shopId = undefined, userId = undefined, specStatusCode = undefined)
   {
-    const rawOrder = await Order.findById(orderId)
+    const completeTime = new Date(Date.now())
+
+    let rawOrder = null
+
+    if(shopId != undefined)
+    {
+      rawOrder = await Order.findOne({_id: orderId, shop: shopId})
+    }
+    else if(userId != undefined)
+    {
+      rawOrder = await Order.findOne({_id: orderId, user: userId})
+    }
+
     if(rawOrder == null)
     {
       return false
     }
 
-    currentStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
-    if(currentStatus.status != OrderStatus.WAITING_ONLINE_PAYMENT && currentStatus.status != OrderStatus.PENDING)
+    const currentOrderStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+    let newStatus = null
+    if(specStatusCode == undefined)
+    {
+      newStatus = orderStatusGeneratorProvider.getStatusSequently(currentOrderStatus.status)
+    }
+    else
+    {
+      newStatus = orderStatusGeneratorProvider.getStatus(specStatusCode)
+    }
+    if(newStatus == null)
     {
       return false
     }
 
-    rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = new Date(Date.now())
-
-    const time = new Date(Date.now())
-    newTimeDeadline = new Date(time).setDate(time.getDate() + ORDER_CANCELLED_STATUS_DEADLINE)
-    const deadline = new Date(newTimeDeadline)
-
-    const newStatus = {
-      status: OrderStatus.CANCELLED,
-      time: time,
-      deadline: deadline,
-    }
-
+    rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
     rawOrder.orderStatus.push(newStatus)
-    
     await rawOrder.save()
 
     return true
   },
 
-  async delete(id) {
-    return await Order.findByIdAndDelete(id);
+  // async cancelOrderByUser(orderId)
+  // {
+  //   const rawOrder = await Order.findById(orderId)
+  //   if(rawOrder == null)
+  //   {
+  //     return false
+  //   }
+
+  //   const currentStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+  //   if(currentStatus.status != OrderStatus.WAITING_ONLINE_PAYMENT && currentStatus.status != OrderStatus.PENDING)
+  //   {
+  //     return false
+  //   }
+
+  //   rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = new Date(Date.now())
+
+  //   const cancelledStatus = orderStatusGeneratorProvider.getStatus(OrderStatus.CANCELLED)
+
+  //   rawOrder.orderStatus.push(cancelledStatus)
+    
+  //   await rawOrder.save()
+
+  //   return true
+  // },
+
+  async updateManyOrderStatus(orderIds, shopId = undefined, userId = undefined, specStatusCode = undefined)
+  {
+    const completeTime = new Date(Date.now())
+
+    let rawOrders = null
+    if(shopId != undefined)
+    {
+      rawOrders = await Order.find({_id: {$in: orderIds}, shop: shopId})
+    }
+    else if(userId != undefined)
+    {
+      rawOrders = await Order.find({_id: {$in: orderIds}, user: userId})
+    }
+
+    if(rawOrders == null)
+    {
+      return []
+    }
+
+    const successfulUpdatedList = []
+
+    rawOrders.forEach(async (rawOrder) =>
+    {
+      const currentOrderStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+      let newStatus = null
+      if(specStatusCode == undefined)
+      {
+        newStatus = orderStatusGeneratorProvider.getStatusSequently(currentOrderStatus.status)
+      }
+      else
+      {
+        newStatus = orderStatusGeneratorProvider.getStatus(specStatusCode)
+      }
+
+      if(newStatus != null)
+      {
+        rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
+        rawOrder.orderStatus.push(newStatus)
+        await rawOrder.save()
+        successfulUpdatedList.push(rawOrder._id.toString())
+      }
+    })
+    
+    return successfulUpdatedList
   },
+  
+  async updateOnePaymentInfo(orderId, paymentMethodCode, newPaymentInfo, userId = undefined, shopId = undefined)
+  {
+    let rawOrder = null
+    if(shopId != undefined)
+    {
+      rawOrder = await Order.findOne({_id: orderId, shop: shopId})
+    }
+    else if(userId != undefined)
+    {
+      rawOrder = await Order.findOne({_id: orderId, user: userId})
+    }
+
+    if(rawOrder == null)
+    {
+      return false
+    }
+
+    const newPaymentInfoGenerated = orderPaymentInfoProvider.getUpdatedPaymentInfoSchema(paymentMethodCode, newPaymentInfo)
+
+    rawOrder.paymentMethod = newPaymentInfoGenerated
+
+    await rawOrder.save()
+    return true
+  },
+
+  async updateManyPaymentInfo(orderIds, paymentMethodCode, newPaymentInfo, userId = undefined, shopId = undefined)
+  {
+    let rawOrders = null
+    if(shopId != undefined)
+    {
+      rawOrders = await Order.find({_id: {$in: orderIds}, shop: shopId})
+    }
+    else if(userId != undefined)
+    {
+      rawOrders = await Order.find({_id: {$in: orderIds}, user: userId})
+    }
+    const successfulUpdatedList = []
+
+    rawOrders.forEach(async (rawOrder) =>
+    {
+      const newPaymentInfoGenerated = orderPaymentInfoProvider.getUpdatedPaymentInfoSchema(paymentMethodCode, newPaymentInfo)
+
+      rawOrder.paymentMethod = newPaymentInfoGenerated
+      
+      await rawOrder.save()
+      successfulUpdatedList.push(rawOrder._id.toString())
+    })
+
+    return successfulUpdatedList
+  },
+
+
 };
 
 export default OrderService;
