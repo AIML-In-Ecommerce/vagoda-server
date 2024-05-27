@@ -34,6 +34,7 @@ const ProductController = {
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
+      object.profit = product.finalPrice - product.platformFee;
       res.json({
         message: "Get" + model + "successfully",
         status: 200,
