@@ -18,16 +18,17 @@ const port = process.env.WIDGET_PORT;
 db();
 
 const initializeExpress = (app) => {
+  app.use(bodyParser());
   //app.use(express.static(path.join(__dirname, "public")));
   //app.use(cors(corsOptions));
   app.use(cors())
   app.use(express.json({limit: '50mb'}));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
-  const upload = multer({
-    limits: { fileSize: 50 * 1024 * 1024 } // 50MB
-  });
+  // const upload = multer({
+  //   limits: { fileSize: 50 * 1024 * 1024 } // 50MB
+  // });
 
-  app.use(upload.any());
+  // app.use(upload.any());
   //app.use(morgan("combined", { stream: logger.stream }));
 };
 
