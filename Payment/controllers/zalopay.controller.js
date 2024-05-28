@@ -83,7 +83,7 @@ const ZaloPayController = {
    * Khi và chỉ khi ZaloPay đã thu tiền khách hàng thành công thì mới gọi API này để thông báo kết quả.
    */
   callback: async (req, res, next) => {
-
+    console.log("callback zalopay")
     // zp_trans_id: Number,
     // zp_user_id: String,
     // app_trans_id: String,

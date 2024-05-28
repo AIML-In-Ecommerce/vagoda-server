@@ -165,6 +165,7 @@ const OrderController = {
         return next(createError.BadRequest("No target order's id to update documents"))
       }
       
+      console.log("update order when payment service request (ZaloPay)")
       const successfulUpdatedStatusList = await OrderService.updateManyOrderStatus(orderIds, undefined, userId, OrderStatus.PENDING)
       // if(successfulUpdatedStatusList.length == 0)
       // {
@@ -177,13 +178,13 @@ const OrderController = {
         appTransId: appTransId,
         isPaid: true,
         paidAt: paidAt
-    }
+      }
       const successfulUpdatedPaymentList = await OrderService.updateManyPaymentInfo(orderIds, PaymentMethod.ZALOPAY, newPaymentInfo, userId, undefined)
       // if(successfulUpdatedPaymentList.length == 0)
       // {
       //   return next(createError.MethodNotAllowed("Cannot find order list. Cannot update order's payment"))
       // }
-
+      console.log("update successfully")
       return res.json(
         {
           message: "Update status and payment's info successfully",
