@@ -46,7 +46,7 @@ const ZaloPayController = {
       description: `Techzone - Payment for the order #${transID}`,
       bank_code: "",
     };
-
+    console.log(order)
     // appid|app_trans_id|appuser|amount|apptime|embeddata|item
     const data =
       process.env.ZALOPAY_APP_ID +

@@ -92,7 +92,7 @@ const OrderController = {
       const orderId = req.body.orderId
       const userId = req.body.userId
 
-      const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, userId, OrderStatus.CANCELLED)
+      const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, undefined, userId, OrderStatus.CANCELLED)
       if (isSuccessfullyCancelled == false) {
         return next(createError.MethodNotAllowed("Cannot cancel the order"));
       }
