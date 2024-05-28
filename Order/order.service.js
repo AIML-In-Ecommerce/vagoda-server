@@ -11,20 +11,23 @@ import UserService from "./support/user.service.js";
 
 const OrderService = {
 
-  async getAllCustomerOrders(filter, projection) 
+  async getAllCustomerOrders(userId) 
   {
-    const userId = filter.userId
     //fetch user's data
     let userInfo = await UserService.getUserInfo(userId)
-
+    console.log("userInfo")
+    console.log(userInfo)
     if(userInfo == null)
     {
       return null
     }
 
-    const listOfOrders = await Order.find(
-    {user: userId})
-    .exec()
+    const listOfOrders = await Order.find({user: userId})
+    console.log(listOfOrders)
+    if(listOfOrders.length == 0)
+    {
+      return []
+    }
 
     const shopInfos = new Map()
     const productsInfos = new Map()

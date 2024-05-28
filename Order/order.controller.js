@@ -14,10 +14,11 @@ const OrderController = {
    */
   getAllCustomerOrders: async (req, res, next) => {
     try {
-      const filter = req.query;
-      const list = await OrderService.getAllCustomerOrders(filter, "");
-      if (!list) {
-        return next(createError.BadRequest(Model + " list not found"));
+      const userId = req.query.userId
+
+      const list = await OrderService.getAllCustomerOrders(userId)
+      if (list == null) {
+        return next(createError.BadRequest(Model + " list not found"))
       }
       res.json({
         message: "Get " + model + " list successfully",
