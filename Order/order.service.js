@@ -89,6 +89,7 @@ const OrderService = {
     })
 
     const fetchedProductInfos = await ProductService.getProductByIds(Array.from(productsInfos.keys()))
+    console.log(fetchedProductInfos)
     if(fetchedProductInfos == null)
     {
       return null

@@ -108,4 +108,15 @@ services:
     env_file:
       - .env
     # volumes:
-    #   - .:/usr/src/datn/order
+    #   - .:/usr/src/datn/widget
+  
+  payment:
+    build:
+      context: ./Payment
+      dockerfile: Dockerfile
+    ports:
+      - "3011:3011"
+    env_file:
+      - .env
+    # volumes:
+    #   - .:/usr/src/datn/payment
