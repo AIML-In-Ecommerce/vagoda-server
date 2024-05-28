@@ -1,6 +1,5 @@
 
 import Order from "./order.model.js";
-import initOrderStatusGeneratorProvider from "./providers/init.order.status.generator.provider.js";
 import orderGeneratorProvider from "./providers/order.generator.provider.js";
 import orderPaymentInfoProvider from "./providers/order.payment_info.provider.js";
 import orderStatusGeneratorProvider from "./providers/order.status.generator.provider.js";
@@ -15,15 +14,12 @@ const OrderService = {
   {
     //fetch user's data
     let userInfo = await UserService.getUserInfo(userId)
-    console.log("userInfo")
-    console.log(userInfo)
     if(userInfo == null)
     {
       return null
     }
 
     const listOfOrders = await Order.find({user: userId})
-    console.log(listOfOrders)
     if(listOfOrders.length == 0)
     {
       return []
@@ -89,7 +85,6 @@ const OrderService = {
     })
 
     const fetchedProductInfos = await ProductService.getProductByIds(Array.from(productsInfos.keys()))
-    console.log(fetchedProductInfos)
     if(fetchedProductInfos == null)
     {
       return null

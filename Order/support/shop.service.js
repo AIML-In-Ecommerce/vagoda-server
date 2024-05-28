@@ -40,6 +40,7 @@ const ShopService =
         }
         catch(err)
         {
+            console.log("Axios error at getShopInfos")
             return null
         }
 
@@ -57,23 +58,12 @@ const ShopService =
             useDesign: false
         }
 
-        const stringifiedRequestBody = JSON.stringify(requestBody)
-
         try
         {
-            const response = await fetch(url, 
-                {
-                    method: "POST",
-                    body: stringifiedRequestBody,
-                    headers:
-                    {
-                        "Content-Type": "application/json"
-                    }
-                }
-            )
-            if(response.status == 200)
+            const response = await axios.post(url, requestBody)
+            if(response.status == 200 || response.status == 201)
             {
-                const data = await response.json()
+                const data = response.data
 
                 return data.data
             }
@@ -84,6 +74,7 @@ const ShopService =
         }
         catch(err)
         {
+            console.log("Axios error at getShopInfos")
             return null
         }
     }

@@ -27,7 +27,7 @@ const ZaloPayController = {
     const embed_data = {
       //sau khi hoàn tất thanh toán sẽ đi vào link này (thường là link web thanh toán thành công của mình)
       orderIds: orderIds,
-      redirecturl: `${process.env.FRONTEND_PATH}/payment`,
+      // redirecturl: `${process.env.FRONTEND_PATH}/payment`, //khi front-end chưa lên production -> tạm comment lại
     };
     const transID = Math.floor(Math.random() * 1000000);
 
