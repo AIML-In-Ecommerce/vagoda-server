@@ -43,9 +43,9 @@ const ReviewSchema = new Schema({
     type: Date, 
     default: Date.now, 
   },
-  cconversation: [CommentSchema],
+  conversation: [CommentSchema],
   like: {
-    type: [Schema.Types.ObjectId], // Sử dụng mảng của ObjectId
+    type: [Schema.Types.ObjectId], 
     ref: "User",
   },
 });

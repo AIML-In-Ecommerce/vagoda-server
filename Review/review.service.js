@@ -12,6 +12,10 @@ const ReviewService = {
     return await Review.findById(id);
   },
 
+  async getByProductId(productId) {
+    return await Review.find({ product: productId });
+  },
+
   async create(objectData) {
     const newObject = new Review(objectData);
     return await newObject.save();

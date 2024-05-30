@@ -9,6 +9,8 @@ router.post('/review', ReviewController.create);
 router.put('/review/:id', ReviewController.update);
 router.delete('/review/:id', ReviewController.delete);
 
+router.get('/productReviews/:productId', ReviewController.getByProductId);
+
 export default router;
 
 /**
