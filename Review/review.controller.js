@@ -5,6 +5,7 @@ const Model = "Review";
 const ReviewController = {
   getAll: async (req, res, next) => {
     try {
+      console.log("review");
       const filter = req.query;
       const list = await ReviewService.getAll(filter, "");
       if (!list) {

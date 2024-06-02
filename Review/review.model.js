@@ -35,6 +35,7 @@ const ReviewSchema = new Schema({
   },
   content: {
     type: String,
+    required: true,
   },
   asset: {
     type: [String],

@@ -151,6 +151,7 @@ const ProductController = {
         sortBy: req.body.sortBy || "",
         index: parseInt(req.body.index) || 1,
         amount: parseInt(req.body.amount) || 20, // Default amount per page is 20
+        brand: req.body.brand || "",
       };
       console.log(req.body);
       if (filterOptions.index < 1) filterOptions.index = 1;
