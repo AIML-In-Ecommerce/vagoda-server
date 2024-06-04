@@ -2,6 +2,8 @@ const ProductStatus = {
   AVAILABLE: "AVAILABLE",
   SOLD_OUT: "SOLD_OUT",
   SALE: "SALE",
+  DRAFT: "DRAFT",
+  DISABLED: "DISABLED",
 };
 
 const AccountStatus = {

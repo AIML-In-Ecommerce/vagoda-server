@@ -62,6 +62,7 @@ const ProductService = {
       index,
       amount,
       brand,
+      status,
     } = filterOptions;
     const query = {};
     if (typeof minPrice !== "number" || typeof maxPrice !== "number") {
@@ -86,6 +87,7 @@ const ProductService = {
       query.avgRating = { $gte: avgRating - 1, $lte: avgRating };
     }
     if (brand !== "") query.brand = brand;
+    if (status !== "") query.status = status;
     console.log(query);
 
     const total = await Product.countDocuments(query);
