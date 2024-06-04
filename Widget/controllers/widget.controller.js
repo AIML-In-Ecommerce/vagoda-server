@@ -44,15 +44,15 @@ const WidgetController = {
       if (!req.files || req.files.length === 0) {
         console.log("no file uploaded");
       } else {
-        console.log(req.files)
-      const imageUrls = req.files.map((file) => file.path);
-      console.log(imageUrls);
-      if (data.type === "BANNER" && imageUrls.length > 1) {
-        data.element.images = imageUrls;
+        console.log(req.files);
+        const imageUrls = req.files.map((file) => file.path);
+        console.log(imageUrls);
+        if (data.type === "BANNER" && imageUrls.length > 1) {
+          data.element.images = imageUrls;
+        }
+        console.log(data);
       }
-      console.log(data);
-      }
-      
+
       const object = await WidgetService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
@@ -63,7 +63,7 @@ const WidgetController = {
         data: object,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       next(createError.InternalServerError(error.message));
     }
   },
@@ -75,13 +75,12 @@ const WidgetController = {
         console.log("No file uploaded!");
       } else {
         const imageUrls = req.files.map((file) => file.path);
-      console.log(imageUrls);
-      if (data.type === "BANNER" && imageUrls.length > 1) {
-        data.element.images = imageUrls;
-      }
+        console.log(imageUrls);
+        if (data.type === "BANNER" && imageUrls.length > 1) {
+          data.element.images = imageUrls;
+        }
       }
 
-      
       console.log(data);
       const object = await WidgetService.update(id, data);
       if (!object) {
@@ -132,12 +131,12 @@ const WidgetController = {
   },
   upload: async (req, res, next) => {
     console.log("okkkkkkkkkkkkkkkkkk");
-    console.log(req.body)
+    console.log(req.body);
     try {
       // const data = req.body;
       if (!req.files && !req.file) {
         console.log("no file uploaded");
-        
+
         res.json({
           message: "no file uploaded",
           status: 200,
