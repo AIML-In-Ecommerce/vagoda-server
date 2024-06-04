@@ -1,5 +1,6 @@
 import createError from "http-errors";
 import WidgetService from "../services/widget.service.js";
+import { deleteFileByUrl } from "../shared/uploader.js";
 const model = " widget ";
 const Model = " Widget ";
 const WidgetController = {
@@ -154,6 +155,29 @@ const WidgetController = {
           },
         });
       }
+
+      // console.log(req.file.path);
+    } catch (error) {
+      console.log(error);
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  deleteFile: async (req, res, next) => {
+    const url = req.body.url 
+    if(!url){
+      return next(createError.BadRequest("Url can not be empty"))
+    }
+    try {
+      // const data = req.body;
+      await deleteFileByUrl(url)
+      res.json({
+        message: "delete file successfully",
+        status: 200,
+        data: {
+          path: url,
+        },
+      })
+      
 
       // console.log(req.file.path);
     } catch (error) {
