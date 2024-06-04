@@ -49,13 +49,13 @@ const ProductController = {
     console.log("inside create");
     try {
       const data = req.body;
-      if (!req.files || req.files.length === 0) {
-        return next(new Error("No file uploaded!"));
-      }
+      // if (!req.files || req.files.length === 0) {
+      //   console.log("no file uploaded");
+      // }
 
-      const imageUrls = req.files.map((file) => file.path);
-      data.images = imageUrls;
-      console.log(data);
+      // const imageUrls = req.files.map((file) => file.path);
+      // data.images = imageUrls;
+      // console.log(data);
       const object = await ProductService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
