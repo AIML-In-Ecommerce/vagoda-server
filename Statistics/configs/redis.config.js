@@ -29,6 +29,6 @@ async function connect()
     console.log(welcomeMessage)
 }
 
-await connect()
+// await connect()
 
 export default redisClient

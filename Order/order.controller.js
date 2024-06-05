@@ -38,11 +38,11 @@ const OrderController = {
       if (object == null) {
         return next(createError.BadRequest(Model + " not found"));
       }
-
-      if(userId != object.user._id)
-      {
-        return next(createError.NotFound("No document found"))
-      }
+      // console.log(object)
+      // if(userId != object.user._id)
+      // {
+      //   return next(createError.NotFound("No document found"))
+      // }
 
       res.json({
         message: "Get" + model + "successfully",
