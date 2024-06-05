@@ -121,7 +121,7 @@ services:
     # volumes:
     #   - .:/usr/src/datn/payment
 
-  redis_cache:
+  redis-cache:
     image: redis:latest
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
