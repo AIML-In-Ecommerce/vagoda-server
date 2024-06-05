@@ -2,23 +2,21 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
-import bodyParser from "body-parser";
+import bodyParser from 'body-parser';
 
-import { specs, swaggerUi } from "./configs/swagger.js";
-import { errorHandler, notFound } from "./shared/helper/errorHandler.js";
+import { specs, swaggerUi } from './configs/swagger.js';
+import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
-
-import orderRoute from "./order.route.js";
+import redisConfig from "./configs/redis.config.js";
+import router from './routers/statistics.router.js'
 
 const app = express();
 
-// app.use(cors({
-//   origin: '*'
-// }));
 dotenv.config();
-const port = process.env.ORDER_PORT;
-// const port = 3009;
+const port = process.env.STATISTICS_PORT;
+
 db();
+// redisConfig()
 
 const initializeExpress = (app) => {
   //app.use(express.static(path.join(__dirname, "public")));
@@ -30,10 +28,7 @@ const initializeExpress = (app) => {
 
 initializeExpress(app);
 
-app.use(orderRoute.buyerRouter);
-app.use(orderRoute.sellerRouter);
-app.use(orderRoute.systemRouter);
-
+app.use("/statistics", router);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 

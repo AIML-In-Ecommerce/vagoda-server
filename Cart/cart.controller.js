@@ -40,16 +40,16 @@ const CartController = {
     try {
       const data = req.body;
       const object = await CartService.create(data);
-      if (!object) {
+      if (object == null) {
         return next(createError.BadRequest("Bad request!"));
       }
       res.json({
-        message: "Create" + model + "successfully",
-        status: 200,
+        message: "Create " + model + " successfully",
         data: object,
       });
     } catch (error) {
-      next(createError.InternalServerError(error.message));
+      console.log(error)
+      return next(createError.InternalServerError(error.message));
     }
   },
   update: async (req, res, next) => {

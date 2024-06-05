@@ -32,23 +32,17 @@ const OrderController = {
   getCustomerOrderById: async (req, res, next) => {
     try {
       const { orderId } = req.query;
+      const userId = req.query.userId
 
       const object = await OrderService.getById(orderId);
-      if (!object) {
+      if (object == null) {
         return next(createError.BadRequest(Model + " not found"));
       }
 
-      // const userInfo = await UserService.getUserInfo(userId)
-      // if(userInfo == null)
-      // {
-      //   return next(createError.BadRequest(Model + " not found"));
-      // }
-      
-      //check userId in AccessToken and userId in order
-      // if(userInfo._id != object.user._id)
-      // {
-      //   return next(createError.Forbidden("Forbidden to access this resource"));
-      // }
+      if(userId != object.user._id)
+      {
+        return next(createError.NotFound("No document found"))
+      }
 
       res.json({
         message: "Get" + model + "successfully",
@@ -284,9 +278,110 @@ const OrderController = {
     {
       return next(createError.InternalServerError(error.message))
     }
-  }
+  },
 
   //Seller center
+
+  getShopOrders: async (req, res, next) =>
+  {
+    try
+    {
+      const shopId = req.query.shopId
+      const targetOrderStatus = req.query.orderStatus
+
+      const orders = await OrderService.getAllSellerOrders(shopId, targetOrderStatus)
+      if(orders == null)
+      {
+        return next(createError.BadRequest("Cannot get orders"))
+      }
+
+      return res.json({
+        message: "Get list of order successfully",
+        data: orders
+      })
+    }
+    catch(error)
+    {
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  getSellerOrderById: async (req, res, next) => {
+    try {
+      const { orderId } = req.query;
+      const shopId = req.query.shopId
+
+      const object = await OrderService.getById(orderId);
+      if (object == null) {
+        return next(createError.BadRequest(Model + " not found"));
+      }
+
+      if(shopId != object.shop._id)
+      {
+        return next(createError.NotFound("No document found"))
+      }
+
+      res.json({
+        message: "Get" + model + "successfully",
+        data: object,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+
+  cancelOneOrderBySeller: async (req, res, next) =>
+  {
+    try
+    {
+      const shopId = req.body.shopId
+      const orderId = req.body.orderId
+      
+      const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, shopId, undefined, OrderStatus.CANCELLED)
+      if(isSuccessfullyCancelled == false)
+      {
+        return next(createError.MethodNotAllowed("Cannot cancel the order"))
+      }
+      
+      const updatedOrder = await OrderService.getById(orderId)
+
+      return res.json({
+        message: "Cancel order successfully",
+        data: updatedOrder
+      })
+
+    }
+    catch(error)
+    {
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  cancelManyOrderBySeller: async (req, res, next) =>
+  {
+    try
+    {
+      const shopId = req.body.shopId
+      const orderIds = req.body.orderIds
+      
+      const successfulUpdatedList = await OrderService.updateManyOrderStatus(orderIds, shopId, undefined, OrderStatus.CANCELLED)
+      if(successfulUpdatedList == null)
+      {
+        return next(createError.MethodNotAllowed("Cannot cancel the order"))
+      }
+      
+      return res.json({
+        message: "Cancel orders successfully",
+        data: successfulUpdatedList
+      })
+
+    }
+    catch(error)
+    {
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
 };
 
 export default OrderController;

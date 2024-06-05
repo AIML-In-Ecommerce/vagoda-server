@@ -39,14 +39,12 @@ const UserService =
             }
             else
             {
-                console.log(response.statusText)
                 return null
             }
         }
         catch(error)
         {
             console.log("Axios error registerAccountAndUserInfo")
-
             return null
         }
     },
@@ -60,12 +58,10 @@ const UserService =
 
             if(response.status == 200 || response.status == 201)
             {
-                console.log(response.data)
                 return response.data
             }
             else
             {
-                console.log(response.statusText)
                 return null
             }
         }
@@ -86,7 +82,8 @@ const UserService =
                 {
                     params:
                     {
-                        accountId: accountId
+                        accountId: accountId,
+                        useAddress: false
                     }
                 }
             )
@@ -97,13 +94,12 @@ const UserService =
             }
             else
             {
-                console.log(response.statusText)
                 return null
             }
         }
         catch(error)
         {
-            console.log(error)
+            console.log("Axios error at getUserInfoByAccountId")
             return null
         }
     }

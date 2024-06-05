@@ -35,7 +35,6 @@ const UserController = {
       const newUserId = await UserService.create(userData);
 
       console.log("register user and account successfully")
-      console.log(newUserId)
       res.json({
         message: "Create " + model + " successfully",
           data: {accountId: newAccountId, userId: newUserId},
@@ -117,9 +116,9 @@ const UserController = {
 
   delete: async (req, res, next) => {
     try {
-      const { id } = req.query;
+      const { id } = req.params;
       const object = await UserService.delete(id);
-      if (!object) {
+      if (object == null) {
         return next(createError.BadRequest(Model + " not found"));
       }
 
@@ -358,6 +357,32 @@ const UserController = {
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));
+    }
+  },
+
+  getListOfUserInfos: async (req, res, next) =>
+  {
+    try
+    {
+      const userIds = req.body.userIds
+      const useAddress = req.body.useAddress == "true"
+
+      const userInfos = await UserService.getListOfUserInfos(userIds, useAddress)
+      if(userInfos == null)
+      {
+        return next(createError.BadRequest("Cannot get the list of user infos"))
+      }
+
+      return res.json(
+        {
+          message: "Get list of user infos successfully",
+          data: userInfos
+        }
+      )
+    }
+    catch(error)
+    {
+      return next(createError.InternalServerError(error.message))
     }
   }
 
