@@ -1,5 +1,6 @@
 import createError from "http-errors";
-import ReviewService from "./review.service.js";
+import ReviewService from "./services/review.service.js";
+import CommentService from "./services/comment.service.js";
 const model = "review";
 const Model = "Review";
 const ReviewController = {
@@ -97,6 +98,23 @@ const ReviewController = {
       }
       res.json({
         message: "Delete" + model + "successfully",
+        status: 200,
+        data: object,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  createComment: async (req, res, next) => {
+    try {
+      const data = req.body;
+      const object = await CommentService.create(data);
+      if (!object) {
+        return next(createError.BadRequest("Bad request!"));
+      }
+      await ReviewService.addCommentIdToReview(data.review, object._id);
+      res.json({
+        message: "Create" + " comment " + "successfully",
         status: 200,
         data: object,
       });

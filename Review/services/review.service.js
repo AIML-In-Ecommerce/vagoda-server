@@ -1,4 +1,4 @@
-import Review from "./review.model.js";
+import Review from "../models/review.model.js";
 
 const ReviewService = {
   async getAll(filter, projection) {
@@ -28,6 +28,15 @@ const ReviewService = {
   async delete(id) {
     return await Review.findByIdAndDelete(id);
   },
+  async addCommentIdToReview(reviewId, commentId) {
+     return await Review.findByIdAndUpdate(
+        reviewId, 
+        { $push: { conversation: { comment: commentId } } },
+        { new: true, useFindAndModify: false }
+      );
+
+    }
+
 };
 
 export default ReviewService;

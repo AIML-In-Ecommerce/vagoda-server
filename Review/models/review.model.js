@@ -1,33 +1,25 @@
 import mongoose from "mongoose";
+import User from "./user.model.js";
+import { Product } from "./product.model.js";
+import Comment from "./comment.model.js";
+import mongooseAutoPopulate from "mongoose-autopopulate";
 
 const Schema = mongoose.Schema;
 
-const CommentSchema = new Schema({
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
 
 const ReviewSchema = new Schema({
   product: {
     type: Schema.Types.ObjectId, 
     ref: "Product",
     required: true,
+    autopopulate: true,
+  
   },
   user: {
     type: Schema.Types.ObjectId, 
     ref: "User",
     required: true,
+    autopopulate: true,
   },
   rating: {
     type: Number,
@@ -44,12 +36,19 @@ const ReviewSchema = new Schema({
     type: Date, 
     default: Date.now, 
   },
-  conversation: [CommentSchema],
+  conversation: [{
+    comment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+
+    }
+  }],
   like: {
     type: [Schema.Types.ObjectId], 
     ref: "User",
   },
 });
+ReviewSchema.plugin(mongooseAutoPopulate);
 
 const Review = mongoose.model("Review", ReviewSchema);
 

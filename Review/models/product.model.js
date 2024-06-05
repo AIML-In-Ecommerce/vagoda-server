@@ -1,8 +1,8 @@
   import mongoose from "mongoose";
   import { ProductStatus } from "../shared/enums.js";
-  import Category from "./category.model.js";
-  import SubCategory from "./subCategory.model.js";
-  import SubCategoryType from "./subCategoryType.model.js";
+  // import Category from "./category.model.js";
+  // import SubCategory from "./subCategory.model.js";
+  // import SubCategoryType from "./subCategoryType.model.js";
   import mongooseAutoPopulate from "mongoose-autopopulate";
   const Schema = mongoose.Schema;
   const ProductSchema = new Schema({
@@ -38,17 +38,17 @@
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      autopopulate: true,
+      // autopopulate: true,
     },
     subCategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "SubCategory",
-        autopopulate: true,
+        // autopopulate: true,
       },
     subCategoryType:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "SubCategoryType",
-        autopopulate: true,
+        // autopopulate: true,
       },
     shop: {
       type: mongoose.Schema.Types.ObjectId,
@@ -104,13 +104,6 @@
     },
     profit: {
       type: Number,
-    },
-    //There is size... material... warranty... place of manufacture only
-    attribute: {
-      size: {type: [String]},
-      material: String,
-      warrantly: String,
-      manufacturingPlace: String
     },
   });
   ProductSchema.plugin(mongooseAutoPopulate);
