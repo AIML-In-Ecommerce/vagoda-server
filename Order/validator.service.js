@@ -11,7 +11,12 @@ const ValidatorService =
     {
         console.log("System validator")
         next()
-    }
+    },
+
+    validateSellerRole(req, res, next)
+    {
+        next()
+    },
 }
 
 export default ValidatorService

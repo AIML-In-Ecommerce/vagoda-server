@@ -120,3 +120,25 @@ services:
       - .env
     # volumes:
     #   - .:/usr/src/datn/payment
+
+    redis_cache:
+      build:
+        context: ./Cache
+        dockerfile: Dockerfile
+      ports:
+        - "6379:6379"
+      # env_file:
+      #   - .env
+      # volumes:
+      #   - .:/usr/src/datn/payment
+    
+    statistics:
+      build:
+        context: ./Statistics
+        dockerfile: Dockerfile
+      ports:
+        - "3012:3012"
+      env_file:
+        - .env
+      # volumes:
+      #   - .:/usr/src/datn/payment

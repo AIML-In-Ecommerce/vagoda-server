@@ -204,10 +204,9 @@ const AuthController = {
       {
         return next(createError.Unauthorized("Unauthorized"))
       }
+      
 
-
-
-      return res.json({
+      res.json({
         message: "Login successfully",
         data: response
       })
@@ -237,7 +236,7 @@ const AuthController = {
       }
 
 
-      return res.json({
+      res.json({
         message: "Login successfully",
         data: response
       })

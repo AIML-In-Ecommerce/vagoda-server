@@ -37,7 +37,38 @@ const UserService =
             console.log(err)
             return null
         }
-    }
+    },
+
+    async getListOfUserInfos(userIds, useAddress)
+    {
+        const url = publicAPIURL + "/user_info/list"
+        const requestBody = 
+        {
+            userIds: userIds,
+            useAddress: useAddress
+        }
+
+        try
+        {
+            const response = await axios.post(url, requestBody)
+            
+            if(response.status == 200 || response.status == 201)
+            {
+                const data = response.data
+                return data.data
+            }
+            else
+            {
+                console.log("Not success in getListOfUserInfos")
+                return null
+            }
+        }
+        catch(error)
+        {
+            console.log("Axios error in getListOfUserInfos")
+            return null
+        }
+    },
 }
 
 export default UserService

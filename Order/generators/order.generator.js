@@ -4,6 +4,7 @@ import UserService from "../support/user.service.js"
 import CartService from "../support/cart.service.js"
 import Order from "../order.model.js"
 import orderPaymentInfoProvider from "../providers/order.payment_info.provider.js"
+import OrderService from "../order.service.js"
 
 
 async function generateOrder(requiredData)
@@ -65,20 +66,21 @@ async function generateOrder(requiredData)
       let totalPrice = 0
       let profit = 0
 
-      const productInfosInOrder = targetProducts.map((product) =>
+      const productInfosInOrder = []
+      
+      for(let i = 0; i < targetProducts.length; i++)
       {
+        const product = targetProducts[i]
         const info = 
         {
           product: product._id,
           quantity: product.quantity,
           purchasedPrice: product.finalPrice
         }
-
+        productInfosInOrder.push(info)
         totalPrice = totalPrice + info.purchasedPrice*info.quantity
         profit = totalPrice - product.platformFee*info.quantity
-
-        return info
-      })
+      }
 
       const shippingFee = 0
       const promotionValue = 0
@@ -166,9 +168,10 @@ const OrderGenerators =
       })
   
       const zalopayResponse = await PaymentService.getZaloPayURL(requiredData.userId, totalAmount, products, orderIds)
-  
+      // console.log(zalopayResponse)
       if(zalopayResponse.order_url == undefined)
       {
+        //TODO: set status to failed
         return null
       }
   

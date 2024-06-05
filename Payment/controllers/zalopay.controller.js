@@ -24,29 +24,35 @@ const ZaloPayController = {
    */
   processPaymentRequest: async (req, res, next) => {
     const { products, userId, amount, orderIds } = req.body;
+
     const embed_data = {
       //sau khi hoàn tất thanh toán sẽ đi vào link này (thường là link web thanh toán thành công của mình)
-      orderIds: orderIds,
-      // redirecturl: `${process.env.FRONTEND_PATH}/payment`, //khi front-end chưa lên production -> tạm comment lại
+      merchantinfo: 
+      {
+        orderIds: orderIds
+      },
+      redirecturl: `${process.env.FRONTEND_PATH}/payment`, //khi front-end chưa lên production -> tạm comment lại
     };
     const transID = Math.floor(Math.random() * 1000000);
 
     const order = {
-      app_id: process.env.ZALOPAY_APP_ID,
+      app_id: Number(process.env.ZALOPAY_APP_ID),
       app_trans_id: `${moment().format("YYMMDD")}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
       app_user: userId,
       app_time: Date.now(), // miliseconds
-      item: JSON.stringify(products),
+      item: JSON.stringify([{}]),
       embed_data: JSON.stringify(embed_data),
       amount: amount,
       //khi thanh toán xong, zalopay server sẽ POST đến url này để thông báo cho server của mình
       //Chú ý: cần dùng public url thì Zalopay Server mới call đến được (local thì dùng ngrok)
-      // callback_url: `${process.env.NGROK_SERVER_PATH}/zalopay/callback`,
-      callback_url: `${process.env.BASE_PATH}:${process.env.PAYMENT_PORT}/zalopay/callback`,
+      callback_url: `${process.env.NGROK_SERVER_PATH}/zalopay/callback`,
+      // callback_url: `${process.env.ZALOPAY_CALLBACK_URL}:${process.env.PAYMENT_PORT}/zalopay/callback`,
+      // callback_url: `${process.env.BASE_PATH}:${process.env.PAYMENT_PORT}/zalopay/callback`,
       description: `Techzone - Payment for the order #${transID}`,
       bank_code: "",
     };
-    console.log(order)
+
+    // console.log(order)
     // appid|app_trans_id|appuser|amount|apptime|embeddata|item
     const data =
       process.env.ZALOPAY_APP_ID +
@@ -62,18 +68,23 @@ const ZaloPayController = {
       order.embed_data +
       "|" +
       order.item;
+
     order.mac = CryptoJS.HmacSHA256(data, process.env.ZALOPAY_KEY1).toString();
 
     try {
+
       const result = await axios.post(
         process.env.ZALOPAY_ENDPOINT_CREATE,
         null,
-        { params: order }
+        {
+          params: order
+        }
       );
 
       return res.status(200).json(result.data);
     } catch (error) {
       console.log(error);
+      return res.next(createError.MethodNotAllowed("Failed to request transactions"))
     }
   },
 

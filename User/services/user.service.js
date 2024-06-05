@@ -237,6 +237,34 @@ const UserService = {
     return addresses
   },
 
+  async getListOfUserInfos(userIds, useAddress = undefined)
+  {
+    let rawUserInfos = null
+
+    if(useAddress == undefined)
+    {
+      rawUserInfos = await User.find({_id: {$in: userIds}}).select("-address")
+    }
+    else if(useAddress == false)
+    {
+      rawUserInfos = await User.find({_id: {$in: userIds}}).select("-address")
+    }
+    else if(useAddress == true)
+    {
+      rawUserInfos = await User.find({_id: {$in: userIds}})
+    }
+    else
+    {
+      return null
+    }
+
+    if(rawUserInfos == null)
+    {
+      return null
+    }
+
+    return rawUserInfos
+  }
 
 };
 

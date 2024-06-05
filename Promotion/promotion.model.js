@@ -44,10 +44,11 @@ const PromotionSchema = new Schema({
     type: Number,
     required: true
   },
-  // saleCategory: [{
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "Category"
-  // }],
+  //note
+  targetProducts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product"
+  }],
   createdAt: {
     type: Number,
     default: Date.now

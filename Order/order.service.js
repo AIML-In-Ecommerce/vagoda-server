@@ -444,6 +444,129 @@ const OrderService = {
     return successfulUpdatedList
   },
 
+  async getAllSellerOrders(shopId, targetOrderStatus = undefined)
+  {
+
+    let listOfOrders = await Order.find({shop: shopId})
+    if(listOfOrders == null)
+    {
+      return null
+    }
+
+    if(listOfOrders.length == 0)
+    {
+      return []
+    }
+
+    if(targetOrderStatus != undefined)
+    {
+      listOfOrders = listOfOrders.filter((order) => order.orderStatus[order.orderStatus.length - 1].status == targetOrderStatus)
+    }
+
+
+    const userInfos = new Map()
+    const productsInfos = new Map()
+    // const promotionIds = new Map()
+    // const paymentMethodIds = new Map()
+
+    listOfOrders.forEach((value) =>
+    {
+      const userId = value.user
+      userInfos.set(userId.toString(), {})
+
+      // if(value.promotion != null)
+      // {
+      //   promotionIds.set(value.promotion.toString(), {})
+      // }
+      // if(value.paymentMethod != null)
+      // {
+      //   paymentMethodIds.set(value.paymentMethod.toString(), {})
+      // }
+
+    })
+
+    //fetch userinfo
+    const fetchedUserInfos = await UserService.getListOfUserInfos(Array.from(userInfos.keys()), false)
+    if(fetchedUserInfos == null)
+    {
+      return null
+    }
+
+    fetchedUserInfos.forEach((value) =>
+    {
+      const info = 
+      {
+        _id: value._id,
+        fullName: value.fullName,
+      }
+
+      userInfos.set(value._id, info)
+    })
+
+    // //fetch promotion infos
+    // const fetchedPromotionsInfos = await PromotionService.getPromotionByIds(promotionIds.keys())
+    // if(fetchedPromotionsInfos == null)
+    // {
+    //   return null
+    // }
+
+    // //fetch payment method
+    // //TODO: update payment method later
+
+    //fetch product's infos
+    listOfOrders.forEach((value) =>
+    {
+      value.products.forEach((item) =>
+      {
+        productsInfos.set(item.product.toString(), {})
+      })
+    })
+
+    const fetchedProductInfos = await ProductService.getProductByIds(Array.from(productsInfos.keys()))
+    if(fetchedProductInfos == null)
+    {
+      return null
+    }
+
+    fetchedProductInfos.forEach((product) =>
+    {
+      productsInfos.set(product._id, product)
+    })
+
+
+    const finalResult = listOfOrders.map((value) =>
+    {
+      const item = JSON.parse(JSON.stringify(value))
+      //map user to Item
+
+      const user = userInfos.get(item.user.toString())
+
+      const products = item.products.map((product) =>
+      {
+        const targetProduct = JSON.parse(JSON.stringify(productsInfos.get(product.product.toString())))
+
+        targetProduct.finalPrice = undefined
+        targetProduct.purchasedPrice = product.purchasedPrice
+        targetProduct.quantity = product.quantity
+
+        return targetProduct
+      })
+
+      //construct promotion and paymemt method here, later
+
+      //finally, re-assign fields of item
+      item.user = user
+      item.products = products
+      //item.promotion = promotion
+      //item.paymentMethod = paymentMethod
+
+      return item
+    })
+
+
+    return finalResult
+  }
+
 
 };
 

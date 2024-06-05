@@ -2,10 +2,10 @@ import express from "express";
 import OrderController from "./order.controller.js";
 import ValidatorService from "./validator.service.js";
 
-const router = express.Router();
 
-const buyerRouter = router.use(ValidatorService.validateSystemRole ,ValidatorService.validateBuyerRole)
-const systemRouter = router.use(ValidatorService.validateSystemRole)
+const buyerRouter = express.Router().use(ValidatorService.validateSystemRole ,ValidatorService.validateBuyerRole)
+const sellerRouter = express.Router().use(ValidatorService.validateSystemRole, ValidatorService.validateSellerRole)
+const systemRouter = express.Router().use(ValidatorService.validateSystemRole)
 
 //customer
 buyerRouter.get("/buyer/orders", OrderController.getAllCustomerOrders);
@@ -16,19 +16,22 @@ buyerRouter.put("/buyer/order/status/cancel", OrderController.cancelOrderByBuyer
 // buyerRouter.put("/buyer/order/status/update_many", OrderController.updateManyOrderStatus)
 // buyerRouter.put("buyer/order/status/update_one", OrderController.update)
 // buyerRouter.delete("/buyer/order/delete", OrderController.delete);
-
-
 buyerRouter.get("/order/statuses", OrderController.getStatus);
 
 
 //seller center
-// router.get("/s/orders", OrderController.getShopOrders)
-// router.get("/s/order",)
+sellerRouter.get("/seller/orders", OrderController.getShopOrders)
+sellerRouter.get("/seller/order", OrderController.getSellerOrderById)
+sellerRouter.post("/seller/order/status/update_one", OrderController.updateOneOrderStatusBySeller)
+sellerRouter.post("/seller/order/status/update_many", OrderController.updateManyOrderStatusBySeller)
+sellerRouter.post("/seller/order/status/cancel_one", OrderController.cancelOneOrderBySeller)
+sellerRouter.post("/seller/order/status/cancel_many", OrderController.cancelManyOrderBySeller)
 
-
+//service calls
 systemRouter.post("/system/order/zalopay/update_callback", OrderController.updateOrderStatusWhenZaloPayCallback)
 
-export default router;
+
+export default {buyerRouter, sellerRouter, systemRouter};
 
 /**
  * @swagger

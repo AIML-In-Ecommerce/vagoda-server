@@ -13,6 +13,7 @@ router.delete('/user/:id', uploadCloud.array('avatar'), UserController.delete);
 router.post('/user/register', UserController.register);
 
 router.get("/user_info", UserController.getUserInfo)
+router.get("/user_info/list", UserController.getListOfUserInfos)
 router.get("/user_info/shipping_address", UserController.getShippingAddress)
 router.post('/user_info/shipping_address', UserController.insertShippingAddress)
 router.put("/user_info/shipping_address", UserController.updateShippingAddress)

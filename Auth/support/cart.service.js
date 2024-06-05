@@ -1,7 +1,7 @@
 import axios from "axios"
 
 
-const PORT = process.env.PRODUCT_PORT
+const PORT = process.env.CART_PORT
 const BASE_PATH = process.env.BASE_PATH
 const publicAPIURL = `${BASE_PATH}:${PORT}`
 
