@@ -121,24 +121,31 @@ services:
     # volumes:
     #   - .:/usr/src/datn/payment
 
-    redis_cache:
-      build:
-        context: ./Cache
-        dockerfile: Dockerfile
-      ports:
-        - "6379:6379"
-      # env_file:
-      #   - .env
-      # volumes:
-      #   - .:/usr/src/datn/payment
+  redis_cache:
+    image: redis:latest
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    env_file:
+      - .env
+    # environment:
+    #   - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     
-    statistics:
-      build:
-        context: ./Statistics
-        dockerfile: Dockerfile
-      ports:
-        - "3012:3012"
-      env_file:
-        - .env
-      # volumes:
-      #   - .:/usr/src/datn/payment
+  statistics:
+    build:
+      context: ./Statistics
+      dockerfile: Dockerfile
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+    ports:
+      - "3012:3012"
+    env_file:
+      - .env
+    # volumes:
+    #   - .:/usr/src/datn/payment
