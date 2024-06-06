@@ -121,6 +121,12 @@ const ProductService = {
     //console.log(filteredProducts)
     return { filteredProducts, total };
   },
+  async searchProductsByKeyword(keyword) {
+    const query = { $text: { $search: keyword } };
+    const filteredProducts = await Product.find(query);
+    return filteredProducts;
+  }
+  
 };
 
 export default ProductService;

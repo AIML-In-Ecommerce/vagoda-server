@@ -172,6 +172,34 @@ const ProductController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  relatedProduct: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const object = await ProductService.getById(id);
+      if (!object) {
+        return next(createError.BadRequest(Model + " not found"));
+      }
+      const firstword = object.name.split(" ")[0];
+      let list = await ProductService.searchProductsByKeyword(firstword);
+      let index = 1;
+      while (list.length > 10) {
+        let keyword = object.name.split(" ")[index];
+        list = list.map((product) => {
+          product.name.toLowerCase().includes(keyword.toLowerCase())
+        });
+
+        index++;
+      }
+      
+      res.json({
+        message: "Get related " + model + "successfully",
+        status: 200,
+        data: list,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
 };
 
 export default ProductController;

@@ -21,6 +21,8 @@ router.post("/products/list", ProductController.getListByIds);
 router.get("/products/top-selling", ProductController.getTopSelling);
 router.post("/products/filter", ProductController.getFilteredProducts);
 
+router.get("/related", ProductController.relatedProduct);
+
 export default router;
 
 /**
