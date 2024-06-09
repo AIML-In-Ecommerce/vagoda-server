@@ -11,6 +11,8 @@ router.delete('/review/:id', ReviewController.delete);
 
 router.get('/productReviews/:productId', ReviewController.getByProductId);
 
+router.post('/comment', ReviewController.createComment);
+
 export default router;
 
 /**

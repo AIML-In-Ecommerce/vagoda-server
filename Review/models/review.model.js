@@ -6,17 +6,15 @@ import mongooseAutoPopulate from "mongoose-autopopulate";
 
 const Schema = mongoose.Schema;
 
-
 const ReviewSchema = new Schema({
   product: {
-    type: Schema.Types.ObjectId, 
+    type: Schema.Types.ObjectId,
     ref: "Product",
     required: true,
     autopopulate: true,
-  
   },
   user: {
-    type: Schema.Types.ObjectId, 
+    type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
     autopopulate: true,
@@ -33,19 +31,22 @@ const ReviewSchema = new Schema({
     type: [String],
   },
   createdAt: {
-    type: Date, 
-    default: Date.now, 
+    type: Date,
+    default: Date.now,
   },
-  conversation: [{
-    comment: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment",
-
-    }
-  }],
+  conversation: [
+    {
+      comment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+        autopopulate: true,
+      },
+    },
+  ],
   like: {
-    type: [Schema.Types.ObjectId], 
+    type: [Schema.Types.ObjectId],
     ref: "User",
+    // autopopulate: true,
   },
 });
 ReviewSchema.plugin(mongooseAutoPopulate);

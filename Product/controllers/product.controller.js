@@ -179,24 +179,33 @@ const ProductController = {
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
-      const firstword = object.name.split(" ")[0];
-      let list = await ProductService.searchProductsByKeyword(firstword);
+      const words = object.name.trim().split(/\s+/);
+      console.log(words);
+      //const firstword = object.name.split(" ")[0];
+      let list = await ProductService.searchProductsByKeyword(words[0]);
+      list = list.filter((product) => product._id.toString() !== id);
       let index = 1;
-      while (list.length > 10) {
-        let keyword = object.name.split(" ")[index];
-        list = list.map((product) => {
-          product.name.toLowerCase().includes(keyword.toLowerCase())
+      while (list.length > 10 && index < words.length) {
+        let temp = list;
+        let keyword = words[index];
+        list = list.filter((product) => {
+          // console.log(product.name);
+          product.name.toLowerCase().includes(keyword.toLowerCase());
         });
-
+        if (list.length == 0) {
+          list = temp;
+          break;
+        }
         index++;
       }
-      
+
       res.json({
         message: "Get related " + model + "successfully",
         status: 200,
         data: list,
       });
     } catch (error) {
+      console.log(error);
       next(createError.InternalServerError(error.message));
     }
   },
