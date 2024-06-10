@@ -111,9 +111,9 @@ const ProductSchema = new Schema({
       },
     ],
     size: { type: [String] },
-    material: String,
-    warrantly: String,
-    manufacturingPlace: String,
+    material: { type: String },
+    warrantly: { type: String },
+    manufacturingPlace: { type: String },
   },
 });
 ProductSchema.plugin(mongooseAutoPopulate);
