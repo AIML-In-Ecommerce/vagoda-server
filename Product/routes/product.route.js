@@ -1,6 +1,7 @@
 import express from "express";
 import ProductController from "../controllers/product.controller.js";
 import uploadCloud from "../shared/uploader.js";
+import xlsxUpload from "../shared/xlsxUpload.js";
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.get("/products/top-selling", ProductController.getTopSelling);
 router.post("/products/filter", ProductController.getFilteredProducts);
 
 router.get("/related/:id", ProductController.relatedProduct);
+router.post("/import", xlsxUpload.single("file"), ProductController.importProducts);
 
 export default router;
 
