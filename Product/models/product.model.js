@@ -107,12 +107,11 @@ const ProductSchema = new Schema({
           label: { type: String },
           value: { type: String },
         },
-        type: Object.values("REQUIRE", "OPTIONAL"),
       },
     ],
     size: { type: [String] },
     material: { type: String },
-    warrantly: { type: String },
+    warranty: { type: String },
     manufacturingPlace: { type: String },
   },
 });
