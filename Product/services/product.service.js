@@ -1,4 +1,7 @@
 import { Product } from "../models/product.model.js";
+import Category from "../models/category.model.js";
+import SubCategory from "../models/subCategory.model.js";
+import SubCategoryType from "../models/subCategoryType.model.js";
 
 const ProductService = {
   async getAll(filter, projection) {
@@ -129,6 +132,82 @@ const ProductService = {
     const query = { $text: { $search: keyword } };
     const filteredProducts = await Product.find(query);
     return filteredProducts;
+  },
+
+  async searchProductsByKeyword(keyword) {
+    if (!keyword || keyword === "") {
+      throw new Error("Keyword is required for searching");
+    }
+
+    const query = {
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } }
+      ]
+    };
+    
+    const categories = await Category.find({ name: { $regex: keyword, $options: "i" } });
+    const subCategories = await SubCategory.find({ name: { $regex: keyword, $options: "i" } });
+    const subCategoryTypes = await SubCategoryType.find({ name: { $regex: keyword, $options: "i" } });
+
+    const categoryIds = categories.map(cat => cat._id);
+    const subCategoryIds = subCategories.map(subCat => subCat._id);
+    const subCategoryTypeIds = subCategoryTypes.map(subCatType => subCatType._id);
+
+    if (categoryIds.length > 0) query.$or.push({ category: { $in: categoryIds } });
+    if (subCategoryIds.length > 0) query.$or.push({ subCategory: { $in: subCategoryIds } });
+    if (subCategoryTypeIds.length > 0) query.$or.push({ subCategoryType: { $in: subCategoryTypeIds } });
+
+    console.log('Query:', JSON.stringify(query, null, 2));
+
+    const filteredProducts = await Product.find(query)
+                                        .populate('category')
+                                        .populate('subCategory')
+                                        .populate('subCategoryType');
+
+    return filteredProducts;
+  },
+
+  async importProducts(data, shopId) {
+    console.log(data[0]['Hình ảnh   *'].split(',')// Lọc bỏ các giá trị không phải là chuỗi
+    .map(url => url.trim()))
+
+    const products = data.map(item => ({
+      name: item['Tên sản phẩm *'],
+      description: item['Mô tả   *'],
+      originalPrice: item['Giá ban đầu  *'],
+      finalPrice: item['Giá sau khi giảm  *'],
+      category: null,
+      subCategory: null,
+      subCategoryType: null,
+      shop: shopId,
+      platformFee: 10000,
+      status: item['Trạng thái   *'],
+      images: item['Hình ảnh   *'].split(',').map(url => url.trim()),
+      avgRating: 0,
+      soldQuantity: 0,
+      brand: item['Thương hiệu   *'],
+      isFlashSale: false,
+      inventoryAmount: item['Số lượng hàng trong kho   *'],
+      profit: 0,
+      attribute: {
+        colors: item['Màu sắc '].split(',').map(color => {
+          const [label, value, link] = color.replace('[', '').replace(']', '').split(',');
+          return {
+            link: link.trim(),
+            color: {
+              label: label.trim(),
+              value: value.trim(),
+            },
+          };
+        }),
+        size: item['Kích cỡ'].split(',').map(size => size.trim()),
+        material: item['Chất liệu '].trim(),
+        warranty: item['Bảo hành'].trim(),
+        manufacturingPlace: '',
+      },
+    }));
+    return products
   },
 };
 

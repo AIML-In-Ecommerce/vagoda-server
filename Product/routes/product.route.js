@@ -1,7 +1,7 @@
 import express from "express";
 import ProductController from "../controllers/product.controller.js";
 import uploadCloud from "../shared/uploader.js";
-import xlsxUpload from "../shared/xlsx_upload_cloud.js";
+import xlsxUploadLocal from "../shared/xlsx_upload_local.js";
 
 const router = express.Router();
 
@@ -23,9 +23,10 @@ router.get("/products/top-selling", ProductController.getTopSelling);
 router.post("/products/filter", ProductController.getFilteredProducts);
 
 router.get("/related/:id", ProductController.relatedProduct);
+router.get("/products/search", ProductController.searchProductsByKeyword);
 router.post(
   "/import",
-  xlsxUpload.single("file"),
+  xlsxUploadLocal.single("file"),
   ProductController.importProducts
 );
 

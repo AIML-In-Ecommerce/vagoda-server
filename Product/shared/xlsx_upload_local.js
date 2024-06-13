@@ -24,6 +24,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const xlsxUpload = multer({ storage: storage, fileFilter: fileFilter });
+const xlsxUploadLocal = multer({ storage: storage, fileFilter: fileFilter });
 
 export default xlsxUploadLocal;

@@ -1,12 +1,12 @@
 import createError from "http-errors";
 import ProductService from "../services/product.service.js";
-// import fs from 'fs';
-// import path from 'path';
+import fs from 'fs';
+import path from 'path';
 import xlsx from "xlsx";
-// import { dirname } from 'path';
-// import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-// const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const model = "product";
 const Model = "Product";
@@ -216,27 +216,46 @@ const ProductController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  searchProductsByKeyword: async (req, res, next) => {
+    try {
+      const keyword = req.query.keyword || ""
+      console.log(keyword)
+      const filteredProducts = await ProductService.searchProductsByKeyword(
+        keyword
+      );
+      res.json({
+        message: "Search " + model + " by keyword successfully",
+        status: 200,
+        data: filteredProducts,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+
   importProducts: async (req, res, next) => {
     console.log("insert batch");
     if (!req.file) {
       return res.status(400).send("No file uploaded.");
     }
-    const filePath = req.file.path;
+    const filePath = path.join(__dirname, '../uploads', req.file.filename);
     try {
       const workbook = xlsx.readFile(filePath);
-      const sheetName = workbook.SheetNames[1];
+      const sheetName = workbook.SheetNames[2];
       const worksheet = workbook.Sheets[sheetName];
       const data = xlsx.utils.sheet_to_json(worksheet);
-      console.log(data);
-
-      const result = await ProductService.insertMany(data);
-
+      console.log(data)
+      const shopId = req.body.shopId;
+      const products =  await ProductService.importProducts(data, shopId);
+      console.log(products)
+      fs.unlinkSync(filePath);
       res.json({
-        message: "Create " + data.length + " products " + "successfully",
+        message: "Create" + " products " + "successfully",
         status: 200,
         data: "object",
       });
     } catch (error) {
+      console.log(error)
       next(createError.InternalServerError(error.message));
     }
   },

@@ -46,6 +46,6 @@ async function getPublicIdFromUrl(imageUrl) {
   }
 }
 
-const xlsxUpload = multer({ storage });
+const xlsxUploadCloud = multer({ storage });
 
-export default xlsxUpload;
+export default xlsxUploadCloud;
