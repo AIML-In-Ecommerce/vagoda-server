@@ -209,7 +209,7 @@ const ProductService = {
         manufacturingPlace: '',
       },
     }));
-    return products
+    return await Product.insertMany(products);
   },
 };
 
