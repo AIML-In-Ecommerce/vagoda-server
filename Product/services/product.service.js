@@ -169,7 +169,7 @@ const ProductService = {
   },
 
   async importProducts(data, shopId) {
-    console.log(data[0]['Hình ảnh   *'].split(',')// Lọc bỏ các giá trị không phải là chuỗi
+    console.log(data[0]['Hình ảnh   *'].split(',')
     .map(url => url.trim()))
 
     const products = data.map(item => ({
@@ -192,7 +192,9 @@ const ProductService = {
       profit: 0,
       attribute: {
         colors: item['Màu sắc '].split(',').map(color => {
-          const [label, value, link] = color.replace('[', '').replace(']', '').split(',');
+          console.log('Color1:', color)
+          const [label, value, link] = color.replace('[', '').replace(']', '').split(';');
+          console.log('Color:', label, value, link);
           return {
             link: link.trim(),
             color: {

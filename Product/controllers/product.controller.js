@@ -238,21 +238,29 @@ const ProductController = {
     if (!req.file) {
       return res.status(400).send("No file uploaded.");
     }
+    const filename = req.file.filename;
+    const currentDate = Date.now();
     const filePath = path.join(__dirname, '../uploads', req.file.filename);
     try {
       const workbook = xlsx.readFile(filePath);
-      const sheetName = workbook.SheetNames[2];
+      const sheetName = workbook.SheetNames[1];
       const worksheet = workbook.Sheets[sheetName];
       const data = xlsx.utils.sheet_to_json(worksheet);
-      console.log(data)
+      console.log("data",data)
       const shopId = req.body.shopId;
       const products =  await ProductService.importProducts(data, shopId);
       console.log(products)
-      fs.unlinkSync(filePath);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(`Error while deleting file: ${filePath}`, err);
+          return next(createError.InternalServerError('Failed to delete the file from the server'));
+        }
+        console.log(`Successfully deleted file: ${filePath}`);
+      });
       res.json({
-        message: "Create" + " products " + "successfully",
+        message: "Create " + data.length + " products " + "successfully",
         status: 200,
-        data: "object",
+        data: products,
       });
     } catch (error) {
       console.log(error)
