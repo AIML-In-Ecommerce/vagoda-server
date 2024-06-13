@@ -1,12 +1,12 @@
 import createError from "http-errors";
 import ProductService from "../services/product.service.js";
-import fs from 'fs';
-import path from 'path';
-import xlsx from 'xlsx';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+// import fs from 'fs';
+// import path from 'path';
+import xlsx from "xlsx";
+// import { dirname } from 'path';
+// import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const model = "product";
 const Model = "Product";
@@ -219,18 +219,20 @@ const ProductController = {
   importProducts: async (req, res, next) => {
     console.log("insert batch");
     if (!req.file) {
-      return res.status(400).send('No file uploaded.');
+      return res.status(400).send("No file uploaded.");
     }
-    const filePath = path.join(__dirname, '../uploads', req.file.filename);
+    const filePath = req.file.path;
     try {
       const workbook = xlsx.readFile(filePath);
       const sheetName = workbook.SheetNames[1];
       const worksheet = workbook.Sheets[sheetName];
       const data = xlsx.utils.sheet_to_json(worksheet);
       console.log(data);
-      fs.unlinkSync(filePath);
+
+      const result = await ProductService.insertMany(data);
+
       res.json({
-        message: "Create" + " products " + "successfully",
+        message: "Create " + data.length + " products " + "successfully",
         status: 200,
         data: "object",
       });

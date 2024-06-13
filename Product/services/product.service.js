@@ -18,6 +18,10 @@ const ProductService = {
     return await newObject.save();
   },
 
+  async createMany(objects) {
+    return await Product.insertMany(objects);
+  },
+
   async update(id, updateData) {
     return await Product.findByIdAndUpdate(id, updateData, { new: true });
   },
@@ -125,8 +129,7 @@ const ProductService = {
     const query = { $text: { $search: keyword } };
     const filteredProducts = await Product.find(query);
     return filteredProducts;
-  }
-  
+  },
 };
 
 export default ProductService;
