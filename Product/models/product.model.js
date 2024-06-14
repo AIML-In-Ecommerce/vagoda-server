@@ -3,6 +3,7 @@ import { ProductStatus } from "../shared/enums.js";
 import Category from "./category.model.js";
 import SubCategory from "./subCategory.model.js";
 import SubCategoryType from "./subCategoryType.model.js";
+import Shop from "./shop.model.js";
 import mongooseAutoPopulate from "mongoose-autopopulate";
 const Schema = mongoose.Schema;
 const ProductSchema = new Schema({

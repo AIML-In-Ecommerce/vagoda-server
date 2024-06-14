@@ -164,13 +164,16 @@ const ProductService = {
                                         .populate('category')
                                         .populate('subCategory')
                                         .populate('subCategoryType')
-                                        .select('_id name description material originalPrice finalPrice shop brand soldQuantity avgRating images');
+                                        .populate('shop')
+                                        .select('_id name description attribute originalPrice finalPrice shop brand soldQuantity avgRating images');
+
+    console.log('Filtered products:', JSON.stringify(filteredProducts, null, 2));
 
     const formattedProducts = filteredProducts.map(product => ({
       _id: product._id,
       name: product.name,
       description: product.description,
-      material: product.attribute?.material,
+      material: product.attribute?.material || '',
       originalPrice: product.originalPrice,
       finalPrice: product.finalPrice,
       shop: product.shop.name,
