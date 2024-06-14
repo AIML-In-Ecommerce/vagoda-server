@@ -163,9 +163,24 @@ const ProductService = {
     const filteredProducts = await Product.find(query)
                                         .populate('category')
                                         .populate('subCategory')
-                                        .populate('subCategoryType');
+                                        .populate('subCategoryType')
+                                        .select('_id name description material originalPrice finalPrice shop brand soldQuantity avgRating images');
 
-    return filteredProducts;
+    const formattedProducts = filteredProducts.map(product => ({
+      _id: product._id,
+      name: product.name,
+      description: product.description,
+      material: product.attribute?.material,
+      originalPrice: product.originalPrice,
+      finalPrice: product.finalPrice,
+      shop: product.shop.name,
+      brand: product.brand,
+      soldQuantity: product.soldQuantity,
+      avgRating: product.avgRating,
+      images: product.images
+  }));
+                                  
+    return formattedProducts;
   },
 
   async importProducts(data, shopId) {
