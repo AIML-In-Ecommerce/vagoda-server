@@ -2,6 +2,7 @@ import express from "express";
 import ProductController from "../controllers/product.controller.js";
 import uploadCloud from "../shared/uploader.js";
 import xlsxUploadLocal from "../shared/xlsx_upload_local.js";
+import FileController from "../controllers/file.controller.js";
 
 const router = express.Router();
 
@@ -29,6 +30,8 @@ router.post(
   xlsxUploadLocal.single("file"),
   ProductController.importProducts
 );
+
+router.get("/files", FileController.getAll);
 
 export default router;
 
