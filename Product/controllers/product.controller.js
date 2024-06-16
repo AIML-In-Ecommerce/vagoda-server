@@ -1,10 +1,18 @@
 import createError from "http-errors";
 import ProductService from "../services/product.service.js";
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 import xlsx from "xlsx";
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import cloudinary from "cloudinary";
+import FileService from "../services/file.service.js";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
+});
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -143,17 +151,21 @@ const ProductController = {
   getFilteredProducts: async (req, res, next) => {
     try {
       const filterOptions = {
+        _id: req.body._id || "",
         keyword: req.body.keyword || "",
         shopId: req.body.shopId || "",
         minPrice: parseFloat(req.body.minPrice) || 0,
         maxPrice: parseFloat(req.body.maxPrice) || Number.MAX_VALUE,
-        category: req.body.category ? req.body.category.split(",") : [],
-        subCategory: req.body.subCategory
-          ? req.body.subCategory.split(",")
-          : [],
-        subCategoryTypes: req.body.subCategoryTypes
-          ? req.body.subCategoryTypes.split(",")
-          : [],
+        // category: req.body.category ? req.body.category.split(",") : [],
+        // subCategory: req.body.subCategory
+        //   ? req.body.subCategory.split(",")
+        //   : [],
+        // subCategoryTypes: req.body.subCategoryTypes
+        //   ? req.body.subCategoryTypes.split(",")
+        //   : [],
+        category: req.body.category || [],
+        subCategory: req.body.subCategory || [],
+        subCategoryTypes: req.body.subCategoryTypes || [],
         avgRating: req.body.avgRating || null,
         sortBy: req.body.sortBy || "",
         index: parseInt(req.body.index) || 1,
@@ -218,8 +230,8 @@ const ProductController = {
   },
   searchProductsByKeyword: async (req, res, next) => {
     try {
-      const keyword = req.query.keyword || ""
-      console.log(keyword)
+      const keyword = req.query.keyword || "";
+      console.log(keyword);
       const filteredProducts = await ProductService.searchProductsByKeyword(
         keyword
       );
@@ -239,32 +251,70 @@ const ProductController = {
       return res.status(400).send("No file uploaded.");
     }
     const filename = req.file.filename;
+    const fn = filename.split("-")[1];
+    console.log("filename", fn);
     const currentDate = Date.now();
-    const filePath = path.join(__dirname, '../uploads', req.file.filename);
+    const filePath = path.join(__dirname, "../uploads", req.file.filename);
     try {
       const workbook = xlsx.readFile(filePath);
       const sheetName = workbook.SheetNames[1];
+      console.log("sheetName", sheetName);
       const worksheet = workbook.Sheets[sheetName];
       const data = xlsx.utils.sheet_to_json(worksheet);
-      console.log("data",data)
+      console.log("data", data);
       const shopId = req.body.shopId;
-      const products =  await ProductService.importProducts(data, shopId);
-      console.log(products)
+      const result = await cloudinary.v2.uploader.upload(filePath, {
+        folder: "Products",
+        resource_type: "auto",
+        format: "xlsx",
+      });
+      console.log("Cloudinary upload result:", result);
+      const cloudinaryUrl = result.secure_url;
+
       fs.unlink(filePath, (err) => {
         if (err) {
           console.error(`Error while deleting file: ${filePath}`, err);
-          return next(createError.InternalServerError('Failed to delete the file from the server'));
+          // return next(
+          //   createError.InternalServerError(
+          //     "Failed to delete the file from the server"
+          //   )
+          // );
         }
-        console.log(`Successfully deleted file: ${filePath}`);
+        //console.log(`Successfully deleted file: ${filePath}`);
       });
+      const products = await ProductService.importProducts(data, shopId);
+      const fileData = {
+        name: fn,
+        url: cloudinaryUrl,
+        shop: shopId,
+        products: products,
+        status: "SUCCESS",
+      };
+      const file = await FileService.create(fileData);
+      console.log(file);
+
       res.json({
         message: "Create " + data.length + " products " + "successfully",
         status: 200,
-        data: products,
+        data: file,
       });
     } catch (error) {
-      console.log(error)
-      next(createError.InternalServerError(error.message));
+      console.log(error);
+      const shopId = req.body.shopId;
+      const fileDataError = {
+        name: fn,
+        url: "",
+        shop: shopId,
+        products: [],
+        status: "FALURE",
+      };
+      const result = await FileService.create(fileDataError);
+      res.json({
+        message: "Create products failed",
+        status: 200,
+        error: error.message,
+        data: fileDataError,
+      });
     }
   },
 };

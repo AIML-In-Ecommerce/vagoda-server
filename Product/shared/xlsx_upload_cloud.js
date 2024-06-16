@@ -1,3 +1,4 @@
+//import cloudinary v2
 import pkg from "cloudinary";
 const { v2: cloudinary } = pkg;
 import { CloudinaryStorage } from "multer-storage-cloudinary";

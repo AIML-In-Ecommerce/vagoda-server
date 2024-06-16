@@ -57,6 +57,7 @@ const ProductService = {
   },
   getFilteredProducts: async (filterOptions) => {
     const {
+      _id,
       keyword,
       shopId,
       minPrice,
@@ -78,6 +79,7 @@ const ProductService = {
       );
     }
     // Apply filters
+    if (_id !== "") query._id = _id;
     if (keyword) query.$text = { $search: keyword };
     if (shopId) query.shop = shopId;
     if (minPrice !== 0 || maxPrice !== Number.MAX_VALUE)
@@ -142,77 +144,95 @@ const ProductService = {
     const query = {
       $or: [
         { name: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } }
-      ]
+        { description: { $regex: keyword, $options: "i" } },
+      ],
     };
-    
-    const categories = await Category.find({ name: { $regex: keyword, $options: "i" } });
-    const subCategories = await SubCategory.find({ name: { $regex: keyword, $options: "i" } });
-    const subCategoryTypes = await SubCategoryType.find({ name: { $regex: keyword, $options: "i" } });
 
-    const categoryIds = categories.map(cat => cat._id);
-    const subCategoryIds = subCategories.map(subCat => subCat._id);
-    const subCategoryTypeIds = subCategoryTypes.map(subCatType => subCatType._id);
+    const categories = await Category.find({
+      name: { $regex: keyword, $options: "i" },
+    });
+    const subCategories = await SubCategory.find({
+      name: { $regex: keyword, $options: "i" },
+    });
+    const subCategoryTypes = await SubCategoryType.find({
+      name: { $regex: keyword, $options: "i" },
+    });
 
-    if (categoryIds.length > 0) query.$or.push({ category: { $in: categoryIds } });
-    if (subCategoryIds.length > 0) query.$or.push({ subCategory: { $in: subCategoryIds } });
-    if (subCategoryTypeIds.length > 0) query.$or.push({ subCategoryType: { $in: subCategoryTypeIds } });
+    const categoryIds = categories.map((cat) => cat._id);
+    const subCategoryIds = subCategories.map((subCat) => subCat._id);
+    const subCategoryTypeIds = subCategoryTypes.map(
+      (subCatType) => subCatType._id
+    );
 
-    console.log('Query:', JSON.stringify(query, null, 2));
+    if (categoryIds.length > 0)
+      query.$or.push({ category: { $in: categoryIds } });
+    if (subCategoryIds.length > 0)
+      query.$or.push({ subCategory: { $in: subCategoryIds } });
+    if (subCategoryTypeIds.length > 0)
+      query.$or.push({ subCategoryType: { $in: subCategoryTypeIds } });
+
+    console.log("Query:", JSON.stringify(query, null, 2));
 
     const filteredProducts = await Product.find(query)
-                                        .populate('category')
-                                        .populate('subCategory')
-                                        .populate('subCategoryType')
-                                        .populate('shop')
-                                        .select('_id name description attribute originalPrice finalPrice shop brand soldQuantity avgRating images');
+      .populate("category")
+      .populate("subCategory")
+      .populate("subCategoryType")
+      .populate("shop")
+      .select(
+        "_id name description attribute originalPrice finalPrice shop brand soldQuantity avgRating images"
+      );
 
-    console.log('Filtered products:', JSON.stringify(filteredProducts, null, 2));
+    console.log(
+      "Filtered products:",
+      JSON.stringify(filteredProducts, null, 2)
+    );
 
-    const formattedProducts = filteredProducts.map(product => ({
+    const formattedProducts = filteredProducts.map((product) => ({
       _id: product._id,
       name: product.name,
       description: product.description,
-      material: product.attribute?.material || '',
+      material: product.attribute?.material || "",
       originalPrice: product.originalPrice,
       finalPrice: product.finalPrice,
       shop: product.shop.name,
       brand: product.brand,
       soldQuantity: product.soldQuantity,
       avgRating: product.avgRating,
-      images: product.images
-  }));
-                                  
+      images: product.images,
+    }));
+
     return formattedProducts;
   },
 
   async importProducts(data, shopId) {
-    console.log(data[0]['Hình ảnh   *'].split(',')
-    .map(url => url.trim()))
+    console.log(data[0]["Hình ảnh   *"].split(",").map((url) => url.trim()));
 
-    const products = data.map(item => ({
-      name: item['Tên sản phẩm *'],
-      description: item['Mô tả   *'],
-      originalPrice: item['Giá ban đầu  *'],
-      finalPrice: item['Giá sau khi giảm  *'],
+    const products = data.map((item) => ({
+      name: item["Tên sản phẩm *"],
+      description: item["Mô tả   *"],
+      originalPrice: item["Giá ban đầu  *"],
+      finalPrice: item["Giá sau khi giảm  *"],
       category: null,
       subCategory: null,
       subCategoryType: null,
       shop: shopId,
       platformFee: 10000,
-      status: item['Trạng thái   *'],
-      images: item['Hình ảnh   *'].split(',').map(url => url.trim()),
+      status: item["Trạng thái   *"],
+      images: item["Hình ảnh   *"].split(",").map((url) => url.trim()),
       avgRating: 0,
       soldQuantity: 0,
-      brand: item['Thương hiệu   *'],
+      brand: item["Thương hiệu   *"],
       isFlashSale: false,
-      inventoryAmount: item['Số lượng hàng trong kho   *'],
+      inventoryAmount: item["Số lượng hàng trong kho   *"],
       profit: 0,
       attribute: {
-        colors: item['Màu sắc '].split(',').map(color => {
-          console.log('Color1:', color)
-          const [label, value, link] = color.replace('[', '').replace(']', '').split(';');
-          console.log('Color:', label, value, link);
+        colors: item["Màu sắc "].split(",").map((color) => {
+          console.log("Color1:", color);
+          const [label, value, link] = color
+            .replace("[", "")
+            .replace("]", "")
+            .split(";");
+          console.log("Color:", label, value, link);
           return {
             link: link.trim(),
             color: {
@@ -221,10 +241,10 @@ const ProductService = {
             },
           };
         }),
-        size: item['Kích cỡ'].split(',').map(size => size.trim()),
-        material: item['Chất liệu '].trim(),
-        warranty: item['Bảo hành'].trim(),
-        manufacturingPlace: '',
+        size: item["Kích cỡ"].split(",").map((size) => size.trim()),
+        material: item["Chất liệu "].trim(),
+        warranty: item["Bảo hành"].trim(),
+        manufacturingPlace: "",
       },
     }));
     return await Product.insertMany(products);
