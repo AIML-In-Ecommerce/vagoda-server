@@ -35,7 +35,13 @@ const ReviewService = {
         { new: true, useFindAndModify: false }
       );
 
-    }
+  },
+  async averageRating(productId) {
+    const reviews = await this.getByProductId(productId);
+    const sum = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const avg = sum / reviews.length;
+    return avg;
+  }
 
 };
 

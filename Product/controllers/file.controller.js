@@ -54,6 +54,19 @@ const FileController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  async filterFiles(req, res) {
+    try {
+      const { name, status, startDate, endDate } = req.query;
+
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+
+      const files = await FileService.filterByNameStatusDate(name, status, start, end);
+      res.status(200).json(files);
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error", error });
+    }
+  },
 };
 
 export default FileController;

@@ -122,6 +122,19 @@ const ReviewController = {
       next(createError.InternalServerError(error.message));
     }
   },
+  averageRating: async (req, res, next) => {
+    try {
+      const { productId } = req.params;
+      const avg = await ReviewService.averageRating(productId) || 0;
+      res.json({
+        message: "Get average rating successfully",
+        status: 200,
+        data: avg,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
 };
 
 export default ReviewController;

@@ -32,6 +32,7 @@ router.post(
 );
 
 router.get("/files", FileController.getAll);
+router.get("/files/filter", FileController.filterFiles)
 
 export default router;
 

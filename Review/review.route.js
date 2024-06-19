@@ -12,6 +12,7 @@ router.delete('/review/:id', ReviewController.delete);
 router.get('/productReviews/:productId', ReviewController.getByProductId);
 
 router.post('/comment', ReviewController.createComment);
+router.get('/avgRating/:productId', ReviewController.averageRating);
 
 export default router;
 

@@ -21,6 +21,27 @@ const FileService = {
     const newObject = new File(objectData);
     return await newObject.save();
   },
+  async filterByNameStatusDate(name, status, startDate, endDate) {
+    const filter = {};
+
+    if (name) {
+      filter.name = { $regex: name, $options: 'i' }; // Tìm kiếm theo tên file (không phân biệt chữ hoa/chữ thường)
+    }
+
+    if (status) {
+      filter.status = status; // Lọc theo trạng thái
+    }
+
+    if (startDate && endDate) {
+      filter.createdAt = { $gte: startDate, $lte: endDate }; // Lọc theo khoảng thời gian
+    } else if (startDate) {
+      filter.createdAt = { $gte: startDate }; // Lọc từ startDate trở đi
+    } else if (endDate) {
+      filter.createdAt = { $lte: endDate }; // Lọc đến endDate
+    }
+
+    return await File.find(filter);
+  },
 };
 
 export default FileService;
