@@ -1,8 +1,10 @@
 import createError from "http-errors";
-import ShopService from "./shop.service.js";
+import ShopService from "../shop.service.js";
+
 const model = "shop";
 const Model = "Shop";
-const ShopController = {
+
+const SystemShopController = {
   getAll: async (req, res, next) => {
     try {
       const filter = req.body;
@@ -180,4 +182,4 @@ const ShopController = {
 
 };
 
-export default ShopController;
+export default SystemShopController;

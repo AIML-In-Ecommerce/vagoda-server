@@ -10,7 +10,7 @@ const ProductAccessSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    session: {
+    sessionUser: {
         type: String,
         default: null
     },
@@ -21,7 +21,7 @@ const ProductAccessSchema = mongoose.Schema({
     time: {
         type: Date,
         required: true,
-        default: Date.now()
+        default: Date.now
     },
     accessType:{
         type: String,
@@ -34,14 +34,14 @@ const ProductAccess = mongoose.model("ProductAccess", ProductAccessSchema)
 
 export default ProductAccess
 
-export function generateProductAccessRecordProp(productId, time, accessType, shopId, userId = undefined, sessionId = undefined)
+export function generateProductAccessRecordProp(productId, time, accessType, shopId, userId = undefined, sessionUserUUID = undefined)
 {
     const record = 
     {
         product: productId,
         shop: shopId,
         user: userId,
-        session: sessionId,
+        sessionUser: sessionUserUUID,
         time: time,
         accessType: accessType
     }

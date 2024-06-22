@@ -8,12 +8,19 @@ const UserService =
 {
     async getUserInfo(userId)
     {
-        const url = publicAPIURL + "/user/info?userId=" + userId
+        const url = publicAPIURL + "/system/user_info"
 
         try
         {
             const response = await axios.get(url, {
-                method: "GET"
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
+                },
+                params:
+                {
+                    userId: userId
+                }
             })
 
             if(response.status == 200)

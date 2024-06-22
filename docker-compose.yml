@@ -149,3 +149,12 @@ services:
       - .env
     # volumes:
     #   - .:/usr/src/datn/payment
+
+  nginx-gateway:
+    build:
+      context: ./NginxGateway
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    env_file:
+      - .env

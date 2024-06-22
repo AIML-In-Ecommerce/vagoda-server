@@ -9,10 +9,8 @@ const ShopStatisticsService =
 
     async getShopTotalSales(shopId, startTime = undefined, endTime = undefined)
     {
-        const targetOrderStatus = OrderStatus.PROCESSING
-        const statistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus,
-            startTime, endTime
-        )
+        // const targetOrderStatus = OrderStatus.PROCESSING
+        const statistics = await StatisticsOrderService.getSalesByShop(shopId, startTime, endTime)
 
         if(statistics == null)
         {
@@ -24,6 +22,8 @@ const ShopStatisticsService =
             totalOrders: statistics.totalOrders,
             totalRevenue: statistics.totalRevenue,
             totalProfit: statistics.totalProfit,
+            avgRevenue: statistics.avgRevenue,
+            avgProfit: statistics.avgProfit,
             statisticsData: statistics.statisticData
         }
 

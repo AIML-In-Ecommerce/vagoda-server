@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
-import { Cart } from "./cart.model.js"
-import ProductService from "./support/product.service.js";
+import { Cart } from "../models/cart.model.js";
+import ProductService from "../support/product.service.js";
+
+const NullColorAttributeKey = "_color_"
+const NullSizeAttributeKey = "_size_"
 
 const CartService = {
   async getAll(filter, projection) {
@@ -82,6 +85,8 @@ const CartService = {
       // }
 
       targetProduct.quantity = item.quantity
+      targetProduct.color = item.color
+      targetProduct.size = item.size
 
       // return newProductValue
       return targetProduct
@@ -116,49 +121,52 @@ const CartService = {
     }
 
     const mapProductList = new Map()
-    productList.forEach((value) =>
+
+    rawCart.products.forEach((product) =>
     {
-      mapProductList.set(value.productId, value.quantity)
+      const clonedProduct = JSON.parse(JSON.stringify(product))
+      const color = clonedProduct.color == null ? NullColorAttributeKey : clonedProduct.color.color.value
+      const size = clonedProduct.size == null ? NullSizeAttributeKey : clonedProduct.size
+      const combinedKey = clonedProduct.product + "+" + color + "+" + size
+
+      mapProductList.set(combinedKey, clonedProduct)
     })
 
     let clonedProductsList = []
 
-    for(let i =0; i < rawCart.products.length; i++)
+    productList.forEach((providedProduct) =>
     {
-      const item = rawCart.products[i]
-      const newQuantity = mapProductList.get(item.product.toString())
-      if(newQuantity > 0)
+      const color = providedProduct.color == null ? NullColorAttributeKey : providedProduct.color.color.value
+      const size = providedProduct.size == null ? NullSizeAttributeKey : providedProduct.size
+      const combinedKey = providedProduct.product + "+" + color + "+" + size
+
+      const targetProduct = mapProductList.get(combinedKey)
+      if(targetProduct != undefined)
       {
-        const newItem = 
-        {
-          product: item.product.toString(),
-          quantity: newQuantity
-        }
-
-        clonedProductsList.push(newItem)
+        targetProduct.quantity = providedProduct.quantity
+        targetProduct.size = providedProduct.size
+        targetProduct.color = providedProduct.color
+        mapProductList.set(combinedKey, targetProduct)
       }
-    }
+      else
+      {
+        //insert new product info
+        mapProductList.set(combinedKey, providedProduct)
+      }
 
-    if(clonedProductsList.length < 1)
+    })
+
+    mapProductList.forEach((value, key) =>
     {
-      for(let i = 0; i < productList.length; i++)
+      if(value.quantity > 0)
       {
-        if(productList[i].quantity > 0)
-        {
-          const newItem = 
-          {
-            product: productList[i].productId,
-            quantity: productList[i].quantity
-          }
-
-          clonedProductsList.push(newItem)
-        }
+        clonedProductsList.push(value)
       }
-    }
+    })
 
     rawCart.products = clonedProductsList
 
-    rawCart.save()
+    await rawCart.save()
 
     return rawCart.products;
   }

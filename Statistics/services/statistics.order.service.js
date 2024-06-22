@@ -5,6 +5,16 @@ import { OrderStatus } from "../shared/enums.js"
 const StatisticsOrderService = 
 {
     
+    /**
+     * Get all orders of a shop at the moment that is between startTime and endTime,
+     * whether the status of the order was completed or not
+     * 
+     * @param {*} shopId 
+     * @param {*} targetOrderStatus 
+     * @param {*} startTime 
+     * @param {*} endTime 
+     * @returns 
+     */
     async getOrderByShopWithStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
     {
         let endTimeToCheck = new Date().getTime()
@@ -49,18 +59,89 @@ const StatisticsOrderService =
 
             if(confirmedOrderStatus != null)
             {
-                // const data = 
-                // {
-                //     _id: order._id.toString(),
-                //     totalPrice: order.totalPrice,
-                //     profit: order.profit,
-                //     shop: order.shop,
-                //     user: order.user,
-                //     promotion: order.promotion,
-                //     shippingFee: order.shippingFee,
-                //     confirmedTime: confirmedOrderStatus
-                // }
+                const data = JSON.parse(JSON.stringify(order))
+                data.orderStatus = undefined
+                data.confirmedTime = confirmedOrderStatus
 
+                totalRevenue += order.totalPrice
+                totalProfit += order.profit
+
+                statisticData.push(data)
+            }
+        })
+
+        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
+        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+
+        const finalResult = 
+        {
+            totalRevenue: totalRevenue,
+            totalProfit: totalProfit,
+            avgRevenue: avgRevenue,
+            avgProfit: avgProfit,
+            totalOrders: statisticData.length,
+            statisticData: statisticData
+        }
+
+        return finalResult
+    },
+
+    /**
+     * Get all orders of a shop at the moment that is between startTime and endTime,
+     * and the status at that moment was completed
+     * 
+     * @param {*} shopId 
+     * @param {*} targetOrderStatus 
+     * @param {*} startTime 
+     * @param {*} endTime 
+     * @returns 
+     */
+    async getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
+    {
+        let endTimeToCheck = new Date().getTime()
+        let startTimeToCheck = 0
+
+        const rawOrders =  await Order.find({shop: shopId})
+
+        if(rawOrders == null)
+        {
+            return null
+        }
+
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime).getTime()
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime).getTime()
+        }
+
+        let totalRevenue = 0
+        let totalProfit = 0
+        const statisticData = []
+
+        rawOrders.forEach((order) =>
+        {
+            let confirmedOrderStatus = null
+            //as an initialized order has the number of status
+            for(let i = order.orderStatus.length - 1; i >= 0; i--)
+            {
+                const checkingOrderStatus = order.orderStatus[i]
+                const timeOfConfirm = checkingOrderStatus.time.getTime()
+ 
+                if(checkingOrderStatus.status == targetOrderStatus &&
+                    (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck)
+                    && checkingOrderStatus.complete != null
+                ) 
+                {
+                    confirmedOrderStatus = checkingOrderStatus
+                    break;
+                }
+            }
+
+            if(confirmedOrderStatus != null)
+            {
                 const data = JSON.parse(JSON.stringify(order))
                 data.orderStatus = undefined
                 data.confirmedTime = confirmedOrderStatus
@@ -488,7 +569,72 @@ const StatisticsOrderService =
         return finalResult
     },
 
+    async getSalesByShop(shopId, startTime = undefined, endTime = undefined)
+    {
+        let endTimeToCheck = new Date().getTime()
+        let startTimeToCheck = 0
 
+        const rawOrders =  await Order.find({shop: shopId})
+
+        if(rawOrders == null)
+        {
+            return null
+        }
+
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime).getTime()
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime).getTime()
+        }
+
+        let totalRevenue = 0
+        let totalProfit = 0
+        const statisticData = []
+
+        rawOrders.forEach((order) =>
+        {
+            let lowerBoundStatus = null
+            //as an initialized order has the number of status
+            for(let i = order.orderStatus.length - 1; i >= 0; i--)
+            {
+                const checkingOrderStatus = order.orderStatus[i]
+                if(checkingOrderStatus.status == OrderStatus.PROCESSING)
+                {
+                    lowerBoundStatus = checkingOrderStatus
+                    break
+                }
+            }
+
+            const upperBoundStatus = order.orderStatus[order.orderStatus.length - 1]
+
+            if((lowerBoundStatus.time > endTimeToCheck) == false && (upperBoundStatus.time < startTimeToCheck) == false)
+            {
+                const data = JSON.parse(JSON.stringify(order))
+                totalRevenue += order.totalPrice
+                totalProfit += order.profit
+
+                statisticData.push(data)
+            }
+        })
+
+        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
+        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+
+        const finalResult = 
+        {
+            totalRevenue: totalRevenue,
+            totalProfit: totalProfit,
+            avgRevenue: avgRevenue,
+            avgProfit: avgProfit,
+            totalOrders: statisticData.length,
+            statisticData: statisticData
+        }
+
+        return finalResult
+    },
 
 }
 

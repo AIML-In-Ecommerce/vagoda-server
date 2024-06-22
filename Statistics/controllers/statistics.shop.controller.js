@@ -1,3 +1,4 @@
+
 import createError from 'http-errors'
 import ShopStatisticsService from "../services/statistics.shop.service.js"
 
@@ -9,7 +10,9 @@ const ShopStatisticsController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 
@@ -35,7 +38,9 @@ const ShopStatisticsController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+            
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 
@@ -63,7 +68,9 @@ const ShopStatisticsController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 
@@ -86,6 +93,26 @@ const ShopStatisticsController =
             return next(createError.InternalServerError(error.message))
         }
     },
+
+    getOperationalQuanlityScore(req, res, next)
+    {
+        try
+        {
+            return res.json(
+                {
+                    message: "Get operational quanlity score successfully",
+                    data: {}
+                }
+            )
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
+    
 
 }
 

@@ -38,6 +38,10 @@ class OrderStatusGeneratorProvider
     {
         const sequentStatus = Object.values(OrderStatus)
         let targetStatusCode = null
+        if(currentStatusCode == OrderStatus.COMPLETED)
+        {
+            return targetStatusCode;
+        }
         //from WAITING_ONLINE_PAYMENT to SHIPPING (i < sequentStatus.length - 2)
         //since COMPLETED is the final status you can get when applying sequent process
         for(let i = 0; i < sequentStatus.length - 2; i++)

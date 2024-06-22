@@ -1,37 +1,55 @@
-import express from "express";
+import express from "express"
+import VerificationService from "./verification.service.js";
 import OrderController from "./order.controller.js";
-import ValidatorService from "./validator.service.js";
+
+const buyerRouter = express.Router()
+const sellerRouter = express.Router()
+const systemRouter = express.Router()
+const router = express.Router()
+
+const rootRouter = express.Router()
 
 
-const buyerRouter = express.Router().use(ValidatorService.validateSystemRole ,ValidatorService.validateBuyerRole)
-const sellerRouter = express.Router().use(ValidatorService.validateSystemRole, ValidatorService.validateSellerRole)
-const systemRouter = express.Router().use(ValidatorService.validateSystemRole)
+// from buyer
+buyerRouter.get("/welcome", (req, res, next) => {return res.json({
+    message: "welcome to buyer path of Order Service",
+    data: {}
+})})
 
-//customer
-buyerRouter.get("/buyer/orders", OrderController.getAllCustomerOrders);
-buyerRouter.get("/buyer/order", OrderController.getCustomerOrderById);
-buyerRouter.post("/buyer/order/create", OrderController.create);
+buyerRouter.get("/orders",  OrderController.getAllCustomerLatestOrders);
+buyerRouter.get("/order",  OrderController.getCustomerOrderById);
+buyerRouter.post("/create",  OrderController.create);
 
-buyerRouter.put("/buyer/order/status/cancel", OrderController.cancelOrderByBuyer);
-// buyerRouter.put("/buyer/order/status/update_many", OrderController.updateManyOrderStatus)
-// buyerRouter.put("buyer/order/status/update_one", OrderController.update)
-// buyerRouter.delete("/buyer/order/delete", OrderController.delete);
-buyerRouter.get("/order/statuses", OrderController.getStatus);
+buyerRouter.put("/status/cancel",  OrderController.cancelOrderByBuyer);
+// buyerRouter.get("/statuses", OrderController.getStatus);
 
 
-//seller center
-sellerRouter.get("/seller/orders", OrderController.getShopOrders)
-sellerRouter.get("/seller/order", OrderController.getSellerOrderById)
-sellerRouter.post("/seller/order/status/update_one", OrderController.updateOneOrderStatusBySeller)
-sellerRouter.post("/seller/order/status/update_many", OrderController.updateManyOrderStatusBySeller)
-sellerRouter.post("/seller/order/status/cancel_one", OrderController.cancelOneOrderBySeller)
-sellerRouter.post("/seller/order/status/cancel_many", OrderController.cancelManyOrderBySeller)
+// from seller
+sellerRouter.get("/welcome", (req, res, next) => {return res.json({
+    message: "welcome to seller path of Order Service",
+    data: {}
+})})
+sellerRouter.get("/orders", OrderController.getShopLatestOrders)
+sellerRouter.get("/order",  OrderController.getSellerOrderById)
+sellerRouter.put("/status/update_one", OrderController.updateOneOrderStatusBySeller)
+sellerRouter.put("/status/update_many", OrderController.updateManyOrderStatusBySeller)
+sellerRouter.put("/status/cancel_one", OrderController.cancelOneOrderBySeller)
+sellerRouter.put("/status/cancel_many", OrderController.cancelManyOrderBySeller)
 
-//service calls
-systemRouter.post("/system/order/zalopay/update_callback", OrderController.updateOrderStatusWhenZaloPayCallback)
+
+// from system
+systemRouter.post("/system/order/zalopay/update_callback", VerificationService.verifySystemRole, OrderController.updateOrderStatusWhenZaloPayCallback)
 
 
-export default {buyerRouter, sellerRouter, systemRouter};
+
+router.use("/buyer", buyerRouter)
+router.use("/seller", sellerRouter)
+
+rootRouter.use("/order", router)
+rootRouter.use(systemRouter)
+
+export default rootRouter
+// export default {authorizedBuyerRouter, authorizedSellerRouter, authorizedSystemRouter, openRouter};
 
 /**
  * @swagger

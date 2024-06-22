@@ -4,6 +4,8 @@ import { OrderStatus, PaymentMethod } from "./shared/enums.js";
 import UserService from "./support/user.service.js";
 const model = " order ";
 const Model = " Order ";
+const AuthorizedUserIdInHeader = "A-User-Id"
+
 const OrderController = {
 
   /**
@@ -12,9 +14,15 @@ const OrderController = {
    *  userId: string
    * }
    */
-  getAllCustomerOrders: async (req, res, next) => {
+  getAllCustomerLatestOrders: async (req, res, next) => {
     try {
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
       const userId = req.query.userId
+
+      if(userId == undefined)
+      {
+        return res(createError.Unauthorized())
+      }
 
       const list = await OrderService.getAllCustomerOrders(userId)
       if (list == null) {
@@ -31,18 +39,25 @@ const OrderController = {
 
   getCustomerOrderById: async (req, res, next) => {
     try {
-      const { orderId } = req.query;
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
       const userId = req.query.userId
+
+      if(userId == undefined)
+      {
+        return res(createError.Unauthorized())
+      }
+
+      const { orderId } = req.query;
 
       const object = await OrderService.getById(orderId);
       if (object == null) {
         return next(createError.BadRequest(Model + " not found"));
       }
       // console.log(object)
-      // if(userId != object.user._id)
-      // {
-      //   return next(createError.NotFound("No document found"))
-      // }
+      if(userId != object.user._id)
+      {
+        return next(createError.NotFound("No document found"))
+      }
 
       res.json({
         message: "Get" + model + "successfully",
@@ -62,7 +77,14 @@ const OrderController = {
    */
   create: async (req, res, next) => {
     try {
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
       const userId = req.query.userId
+
+      if(userId == undefined)
+      {
+        return res(createError.Unauthorized())
+      }
+
       const data = req.body;
       data.userId = userId
       const newOrders = await OrderService.create(data);
@@ -83,8 +105,14 @@ const OrderController = {
 
   cancelOrderByBuyer: async (req, res, next) => {
     try {
-      const orderId = req.body.orderId
-      const userId = req.body.userId
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
+      const userId = req.query.userId
+      const orderId = req.query.orderId
+
+      if(userId == undefined)
+      {
+        return res(createError.Unauthorized())
+      }
 
       const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, undefined, userId, OrderStatus.CANCELLED)
       if (isSuccessfullyCancelled == false) {
@@ -201,19 +229,23 @@ const OrderController = {
   {
     try
     {
+      // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+      const shopId = req.query.shopId
+
+      if(shopId == undefined)
+      {
+        return next(createError.Unauthorized())
+      }
       const orderIds = req.body.orderIds
-      const shopId = req.body.shopId
+      const execTime = req.body.execTime
       const specStatusCode = req.body.specStatusCode
-      if(orderIds == 0)
+
+      if(orderIds == undefined)
       {
         return next(createError.BadRequest("No target order's id to update documents"))
       }
-      if(shopId == undefined)
-      {
-        return next(createError.BadRequest("Missing parameters"))
-      }
       
-      const successfulUpdatedList = await OrderService.updateManyOrderStatus(orderIds, shopId, undefined, specStatusCode)
+      const successfulUpdatedList = await OrderService.updateManyOrderStatus(orderIds, execTime, shopId, undefined, specStatusCode)
       if(successfulUpdatedList.length == 0)
       {
         return next(createError.MethodNotAllowed("Cannot find order list. Cannot update order's status"))
@@ -249,8 +281,16 @@ const OrderController = {
   {
     try
     {
+      // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+      const shopId = req.query.shopId
+
+      if(shopId == undefined)
+      {
+        return next(createError.Unauthorized())
+      }
+
       const orderId = req.body.orderId
-      const shopId = req.body.shopId
+      const execTime = req.body.execTime
       const specStatusCode = req.body.specStatusCode
 
       if(orderId == undefined || shopId == undefined)
@@ -258,7 +298,7 @@ const OrderController = {
         return next(createError.BadRequest("Missing parameters"))
       }
 
-      const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, shopId, undefined, specStatusCode)
+      const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, execTime, shopId, undefined, specStatusCode)
       if(isSuccessfullyCancelled == false)
       {
         return next(createError.MethodNotAllowed("Cannot update orderStatus"))
@@ -282,11 +322,17 @@ const OrderController = {
 
   //Seller center
 
-  getShopOrders: async (req, res, next) =>
+  getShopLatestOrders: async (req, res, next) =>
   {
     try
     {
+      // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
       const shopId = req.query.shopId
+
+      if(shopId == undefined)
+      {
+        return next(createError.Unauthorized())
+      }
       const targetOrderStatus = req.query.orderStatus
 
       const orders = await OrderService.getAllSellerOrders(shopId, targetOrderStatus)
@@ -308,8 +354,14 @@ const OrderController = {
 
   getSellerOrderById: async (req, res, next) => {
     try {
-      const { orderId } = req.query;
+      // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
       const shopId = req.query.shopId
+
+      if(shopId == undefined)
+      {
+        return next(createError.Unauthorized())
+      }
+      const { orderId } = req.query;
 
       const object = await OrderService.getById(orderId);
       if (object == null) {
@@ -334,10 +386,17 @@ const OrderController = {
   {
     try
     {
-      const shopId = req.body.shopId
+      // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+      const shopId = req.query.shopId
+
+      if(shopId == undefined)
+      {
+        return next(createError.Unauthorized())
+      }
       const orderId = req.body.orderId
+      const execTime = req.body.execTime
       
-      const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, shopId, undefined, OrderStatus.CANCELLED)
+      const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, execTime, shopId, undefined, OrderStatus.CANCELLED)
       if(isSuccessfullyCancelled == false)
       {
         return next(createError.MethodNotAllowed("Cannot cancel the order"))
@@ -361,10 +420,17 @@ const OrderController = {
   {
     try
     {
-      const shopId = req.body.shopId
+      // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+      const shopId = req.query.shopId
+
+      if(shopId == undefined)
+      {
+        return next(createError.Unauthorized())
+      }
       const orderIds = req.body.orderIds
+      const execTime = req.body.execTime
       
-      const successfulUpdatedList = await OrderService.updateManyOrderStatus(orderIds, shopId, undefined, OrderStatus.CANCELLED)
+      const successfulUpdatedList = await OrderService.updateManyOrderStatus(orderIds, execTime, shopId, undefined, OrderStatus.CANCELLED)
       if(successfulUpdatedList == null)
       {
         return next(createError.MethodNotAllowed("Cannot cancel the order"))

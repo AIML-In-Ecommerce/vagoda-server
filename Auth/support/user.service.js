@@ -22,7 +22,7 @@ const UserService =
     {
         try
         {
-            const url = publicAPIURL + "/user/register"
+            const url = publicAPIURL + "/system/user/register"
             const requestBody = 
             {
                 email: registerObject.email,
@@ -31,8 +31,13 @@ const UserService =
                 accountType: registerObject.accountType
             }
     
-            const response = await axios.post(url, requestBody)
-            console.log(response.data)
+            const response = await axios.post(url, requestBody, {
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
+                }
+            })
+
             if(response.status == 200 || response.status == 201)
             {
                 return response.data.data
@@ -51,10 +56,15 @@ const UserService =
 
     async deleteUserInfo(targetUserId)
     {
-        const url = publicAPIURL + `/user/${targetUserId}`
+        const url = publicAPIURL + `/system/user/${targetUserId}`
         try
         {
-            const response = await axios.delete(url)
+            const response = await axios.delete(url, {
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
+                }
+            })
 
             if(response.status == 200 || response.status == 201)
             {
@@ -75,7 +85,7 @@ const UserService =
 
     async getUserInfoByAccountId(accountId)
     {
-        const url = publicAPIURL + "/user_info"
+        const url = publicAPIURL + "/system/user_info"
         try
         {
             const response = await axios.get(url,
@@ -84,6 +94,10 @@ const UserService =
                     {
                         accountId: accountId,
                         useAddress: false
+                    },
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
                     }
                 }
             )

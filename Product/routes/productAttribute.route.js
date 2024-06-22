@@ -3,6 +3,16 @@ import ProductAttributeController from "../controllers/productAttribute.controll
 
 const router = express.Router();
 
+router.get("/productAttribute/welcome", (req, res, next) => {return res.json({
+    message: "welcome to productAttribute path of Product Service",
+    data: {}
+})})
+
+router.get("/productAttributes/welcome", (req, res, next) => {return res.json({
+message: "welcome to productAttribute(s) path of Product Service",
+data: {}
+})})
+
 router.get("/productAttributes", ProductAttributeController.getAll);
 router.get("/productAttribute/:id", ProductAttributeController.getById);
 router.post("/productAttribute", ProductAttributeController.create);

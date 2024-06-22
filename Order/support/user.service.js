@@ -9,12 +9,15 @@ const UserService =
 {
     async getUserInfo(userId, useAddress)
     {
-        const url = publicAPIURL + "/user_info"
+        const url = publicAPIURL + "/system/user_info"
 
         try
         {
             const response = await axios.get(url, {
                 method: "GET",
+                headers: {
+                    "origin": `${publicAPIURL}`
+                },
                 params:
                 {
                     userId: userId,
@@ -34,14 +37,14 @@ const UserService =
         }
         catch(err)
         {
-            console.log(err)
+            console.log("Axios error at getUserInfo")
             return null
         }
     },
 
     async getListOfUserInfos(userIds, useAddress)
     {
-        const url = publicAPIURL + "/user_info/list"
+        const url = publicAPIURL + "/system/user_info/list"
         const requestBody = 
         {
             userIds: userIds,
@@ -50,7 +53,14 @@ const UserService =
 
         try
         {
-            const response = await axios.post(url, requestBody)
+            const response = await axios.post(url, requestBody, 
+                {
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
+                    }
+                }
+            )
             
             if(response.status == 200 || response.status == 201)
             {

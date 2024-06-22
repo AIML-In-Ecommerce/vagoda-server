@@ -4,6 +4,16 @@ import uploadCloud from "../shared/uploader.js";
 
 const router = express.Router();
 
+router.get("/product/welcome", (req, res, next) => {return res.json({
+  message: "welcome to product path of Product Service",
+  data: {}
+})})
+
+router.get("/products/welcome", (req, res, next) => {return res.json({
+  message: "welcome to product(s) path of Product Service",
+  data: {}
+})})
+
 router.get("/products", ProductController.getAll);
 router.get("/product/:id", ProductController.getById);
 router.post("/product", uploadCloud.array("images"), ProductController.create);
