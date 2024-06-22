@@ -1,4 +1,4 @@
-############## Production ################
+############## Local host - testing ################
 
 user nobody;
 worker_processes auto;
@@ -28,60 +28,59 @@ http {
     types_hash_max_size 2048;
     
     include /etc/nginx/conf.d/*.conf;
-    # Remove include for sites-enabled to avoid conflicts
     # include /etc/nginx/sites-enabled/*;
 
     upstream auth_service_backend {
-        server 14.225.218.109:3001; 
+        server host.docker.internal:3001; 
     }
 
     upstream user_service_backend {
-        server 14.225.218.109:3002;  
+        server host.docker.internal:3002;  
     }
 
     upstream cart_service_backend {
-        server 14.225.218.109:3003;  
+        server host.docker.internal:3003;  
     }
 
     upstream shop_service_backend {
-        server 14.225.218.109:3004;  
+        server host.docker.internal:3004;  
     }
 
     upstream category_service_backend {
-        server 14.225.218.109:3005; 
+        server host.docker.internal:3005; 
     }
 
     upstream product_service_backend {
-        server 14.225.218.109:3006; 
+        server host.docker.internal:3006; 
     }
 
     upstream review_service_backend {
-        server 14.225.218.109:3007; 
+        server host.docker.internal:3007; 
     }
 
     upstream promotion_service_backend {
-        server 14.225.218.109:3008;  
+        server host.docker.internal:3008;  
     }
 
     upstream order_service_backend {
-        server 14.225.218.109:3009;  
+        server host.docker.internal:3009;  
     }
 
     upstream widget_service_backend {
-        server 14.225.218.109:3010;  
+        server host.docker.internal:3010;  
     }
 
     upstream payment_service_backend {
-        server 14.225.218.109:3011;  
+        server host.docker.internal:3011;  
     }
 
     upstream statistics_service_backend {
-        server 14.225.218.109:3012;  
+        server host.docker.internal:3012;  
     }
         
     server {
         listen 80;
-        server_name 14.225.218.109;  
+        server_name localhost;  
 
         location /auth/ {
             proxy_pass http://auth_service_backend;
