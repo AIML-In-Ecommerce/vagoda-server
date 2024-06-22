@@ -1,7 +1,7 @@
 import createHttpError from "http-errors"
 
 import AuthService from "../support/auth.service.js"
-import { AccountType } from "../../Auth/shared/enums.js"
+import { AccountType } from "../shared/enums.js"
 
 export const AuthorizedUserIdInHeader = "A-User-Id"
 

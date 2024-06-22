@@ -1,5 +1,5 @@
 import axios from "axios"
-import { AccountRegisterType } from "../../User/shared/enums.js"
+import { AccountRegisterType } from "../shared/enums.js"
 
 const PORT = process.env.USER_PORT
 const BASE_PATH = process.env.BASE_PATH
