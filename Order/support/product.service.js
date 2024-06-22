@@ -19,7 +19,10 @@ const ProductService =
 
             const response = await axios.post(url, requestBody,
                 {
-                    method: "POST"
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
+                    }
                 }
             )
 

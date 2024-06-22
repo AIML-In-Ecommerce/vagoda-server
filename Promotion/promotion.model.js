@@ -1,7 +1,41 @@
 import mongoose from "mongoose";
-import { DiscountType } from "./shared/enums.js";
+import { DiscountType, PromotionStatus } from "./shared/enums.js";
 
 const Schema = mongoose.Schema;
+
+const PromotionDirectDiscountSchema = new Schema({
+  value: {
+    type: Number,
+    default: 0
+  },
+  lowerBoundaryForOrder: {
+    type: Number,
+    default: 0
+  }
+}, {_id: false})
+
+const PromotionPercentageDiscountSchema = new Schema({
+  value: {
+    type: Number,
+    default: 0
+  },
+  lowerBoundaryForOrder: {
+    type: Number,
+    default: 0
+  },
+  limitAmountToReduce: {
+    type: Number,
+    default: Number.MAX_VALUE
+  }
+}, {_id: false})
+
+
+const DiscountTypeInfoSchema = new Schema({},
+  {
+    discriminatorKey: "type",
+    _id: false,
+  }
+)
 
 const PromotionSchema = new Schema({
   name: {
@@ -14,50 +48,52 @@ const PromotionSchema = new Schema({
     required: true
   },
   description: {
-    type: String
-  },
-  discountType: {
     type: String,
-    enum: Object.values(DiscountType),
+    default: ""
+  },
+  discountTypeInfo: {
+    type: DiscountTypeInfoSchema,
     required: true
   },
-  discountValue: {
-    type: Number,
-    required: true
-  },
-  upperBound: {
-    type: Number,
-    required: true
-  },
-  lowerBound: {
-    type: Number,
-    required: true
-  },
-  quantity: {
-    type: Number
+  createAt:{
+    type: Date,
+    default: Date.now
   },
   activeDate: {
-    type: Number,
+    type: Date,
     required: true
   },
   expiredDate: {
-    type: Number,
+    type: Date,
     required: true
   },
   //note
   targetProducts: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Product"
+    ref: "Product",
+    default: () => []
   }],
-  createdAt: {
+  quantity: {
     type: Number,
-    default: Date.now
+    default: 0
+  },
+  redeemedTotal: {
+    type: Number,
+    default: 1
+  },
+  status: {
+    type: String,
+    enum: Object.values(PromotionStatus),
+    default: PromotionStatus.UPCOMMING
   },
   code: {
     type: String,
     required: true
   }
 });
+
+PromotionSchema.path("discountTypeInfo").discriminator(DiscountType.DIRECT_PRICE, PromotionDirectDiscountSchema)
+PromotionSchema.path("discountTypeInfo").discriminator(DiscountType.PERCENTAGE, PromotionPercentageDiscountSchema)
 
 const Promotion = mongoose.model("Promotion", PromotionSchema);
 

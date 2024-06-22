@@ -8,7 +8,7 @@ import { specs, swaggerUi } from './configs/swagger.js';
 import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
 
-import cartRoute from "./cart.route.js";
+import cartRoute from "./routes/cart.route.js";
 const app = express();
 
 dotenv.config();

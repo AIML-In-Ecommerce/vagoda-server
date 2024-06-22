@@ -13,7 +13,7 @@ const ShopService =
      */
     async createShopInfo(shopName, accountId)
     {
-        const url = publicAPIURL + "/shop"
+        const url = publicAPIURL + "/system/shop"
         try
         {
             const requestBody =
@@ -22,7 +22,12 @@ const ShopService =
                 account: accountId
             }
 
-            const response = await axios.post(url, requestBody)
+            const response = await axios.post(url, requestBody, {
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
+                }
+            })
 
             if(response.status == 200 || response.status == 201)
             {
@@ -30,7 +35,6 @@ const ShopService =
             }
             else
             {
-                console.log(response.statusText)
                 return null
             }
         }
@@ -44,7 +48,7 @@ const ShopService =
 
     async getShopInfoByAccountId(accountId)
     {
-        const url = publicAPIURL + "/shop_info"
+        const url = publicAPIURL + "/system/shop_info"
         try
         {
             const response = await axios.get(url, 
@@ -54,6 +58,10 @@ const ShopService =
                         accountId: accountId,
                         useShopDetail: false,
                         useDesign: false
+                    },
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
                     }
                 }
             )

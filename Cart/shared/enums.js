@@ -31,4 +31,10 @@ const DiscountType = {
   DIRECT_PRICE: "DIRECT_PRICE",
 };
 
+const PromotionStatus = {
+  UPCOMMING: "UPCOMMING",
+  IN_PROGRESS: "IN_PROGRESS",
+  EXPIRED: "EXPIRED"
+}
+
 export { ProductStatus, AccountStatus, AccountType };

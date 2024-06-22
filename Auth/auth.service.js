@@ -1,40 +1,21 @@
 import bcrypt from 'bcryptjs'
+import crypto from "crypto"
+import CryptoJs from "crypto-js"
 import { AccountType } from './shared/enums.js'
 import ShopService from './support/shop.service.js'
 import AccountService from './support/account.service.js'
 import UserService from './support/user.service.js'
-import { generateAccessToken, generateRefreshToken } from './utils/jwt.js'
+import { generateAccessToken, generateRefreshToken, verifyToken } from './utils/jwt.js'
 import CartService from './support/cart.service.js'
+import RefreshTokenModel, { generateRefreshTokenModelProps } from './refreshToken.model.js'
+import redisClient from './configs/redis.config.js'
+
 
 const SALT_ROUND = Number(process.env.SALT_ROUND)
+const sessionIdStoragePrefix = "#auth-session-id-cache#"
+const EXPIRY_TIME_OF_CACHE_SESSION_ID = 60*60*12
 
 const AuthService = {
-  // async register(data) {
-  //   return await data;
-  // }
-  // async getAll(filter, projection) {
-  //   return await Shop.find(filter).select(projection);
-  // },
-  // // async getAll() {
-  // //   return await AuthorizeRequest.find();
-  // // },
-
-  // async getById(id) {
-  //   return await Shop.findById(id);
-  // },
-
-  // async create(objectData) {
-  //   const newObject = new Shop(objectData);
-  //   return await newObject.save();
-  // },
-
-  // async update(id, updateData) {
-  //   return await Shop.findByIdAndUpdate(id, updateData, { new: true });
-  // },
-
-  // async delete(id) {
-  //   return await Shop.findByIdAndDelete(id);
-  // },
 
   async validatePassword(password, hashedPassword)
   {
@@ -126,21 +107,13 @@ const AuthService = {
       return null
     }
 
-    const registerObject = 
-    {
-      fullName: requiredData.fullName,
-      email: requiredData.email,
-      password: requiredData.password,
-      accountType: AccountType.SHOP
-    }
-    const userServiceResponse = await UserService.registerAccountAndUserInfo(registerObject)
+    const userServiceResponse = await AccountService.createAccount(requiredData.email, requiredData.password, AccountType.SHOP)
     if(userServiceResponse == null)
     {
       return null
     }
 
-    const newAccountId = userServiceResponse.accountId;
-    const newUserId = userServiceResponse.userId;
+    const newAccountId = userServiceResponse
 
     const newShopId = await ShopService.createShopInfo(requiredData.shopName, newAccountId)
     if(newShopId == null)
@@ -199,14 +172,20 @@ const AuthService = {
     //generate access token and refresh token
 
     const accessToken = generateAccessToken(buyerInfo._id, buyerInfo.fullName, account.type)
-    const {refreshToken, expiredDate} = generateRefreshToken(buyerInfo._id, buyerInfo.fullName, account.type)
+    const refreshToken = generateRefreshToken(buyerInfo._id, buyerInfo.fullName, account.type)
+
+    const hashedToken = await bcrypt.hash(refreshToken.refreshToken, SALT_ROUND)
+    const newRefreshTokenRecordProps = generateRefreshTokenModelProps(buyerInfo._id, hashedToken, refreshToken.expiredDate)
+    const newRefreshTokenRecord = new RefreshTokenModel(newRefreshTokenRecordProps)
+    await newRefreshTokenRecord.save()
 
     const finalResult = 
     {
       buyerInfo: buyerInfo,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      refreshTokenExpiredDate: expiredDate
+      accessTokenExpiredDate: accessToken.expiredDate,
+      accessToken: accessToken.accessToken,
+      refreshToken: refreshToken.refreshToken,
+      refreshTokenExpiredDate: refreshToken.expiredDate
     }
 
     return finalResult
@@ -250,18 +229,226 @@ const AuthService = {
 
     //generate access token and refresh token
 
-    const accessToken = generateAccessToken(sellerInfo._id, sellerInfo.fullName, account.type)
-    const {refreshToken, expiredDate} = generateRefreshToken(sellerInfo._id, sellerInfo.fullName, account.type)
+    const accessToken = generateAccessToken(sellerInfo._id, sellerInfo.name, account.type)
+    const refreshToken = generateRefreshToken(sellerInfo._id, sellerInfo.name, account.type)
+
+    const hashedToken = await bcrypt.hash(refreshToken.refreshToken, SALT_ROUND)
+    const newRefreshTokenRecordProps = generateRefreshTokenModelProps(sellerInfo._id, hashedToken, refreshToken.expiredDate)
+    const newRefreshTokenRecord = new RefreshTokenModel(newRefreshTokenRecordProps)
+    await newRefreshTokenRecord.save()
 
     const finalResult = 
     {
       sellerInfo: sellerInfo,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      refreshTokenExpiredDate: expiredDate
+      accessTokenExpiredDate: accessToken.expiredDate,
+      accessToken: accessToken.accessToken,
+      refreshToken: refreshToken.refreshToken,
+      refreshTokenExpiredDate: refreshToken.expiredDate
     }
 
     return finalResult
+  },
+
+  async refreshToken(refreshToken)
+  {
+    const currentDate = new Date()
+    const currentDateTime = currentDate.getTime()
+
+    if(refreshToken == undefined)
+    {
+      console.log("undefinded token")
+      return null
+    }
+
+    const decodedPayload = verifyToken(refreshToken)
+    const exp = new Date(decodedPayload.exp*1000).getTime()
+
+    const refreshTokenRecord = await RefreshTokenModel.findOne({user: decodedPayload.userId}, {}, {sort: {"createAt": -1}})
+    if(refreshTokenRecord == null)
+    {
+      console.log("Null token record")
+      return null
+    }
+
+    refreshTokenRecord.usedAt = currentDate
+    const upadatedRecord = await refreshTokenRecord.save()
+    if(exp < currentDateTime)
+    {
+      console.log("overtime")
+      return null
+    }
+
+    const isValidToken = await bcrypt.compare(refreshToken, upadatedRecord.refreshToken)
+
+    if(isValidToken == false)
+    {
+      console.log("Invalid token")
+      return null
+    }
+
+    // valid refresh token
+
+    const newAccessTokenProps = generateAccessToken(decodedPayload.userId, decodedPayload.fullName, decodedPayload.userRole)
+    const refreshTokenProps = generateRefreshToken(decodedPayload.userId, decodedPayload.fullName, decodedPayload.userRole)
+
+    const hashedNewToken = await bcrypt.hash(refreshTokenProps.refreshToken, SALT_ROUND)
+
+    const newRefreshTokenRecordProps = generateRefreshTokenModelProps(decodedPayload.userId, hashedNewToken, refreshTokenProps.expiredDate)
+    const newRefreshTokenRecord = new RefreshTokenModel(newRefreshTokenRecordProps)
+    await newRefreshTokenRecord.save()
+
+    const finalResult = 
+    {
+      accessToken: newAccessTokenProps.accessToken,
+      accessTokenExpiredDate: newAccessTokenProps.expiredDate,
+      refreshToken: refreshTokenProps.refreshToken,
+      refreshTokenExpiredDate: refreshTokenProps.expiredDate
+    }
+
+    return finalResult
+  },
+
+
+  async verifyAccessToken(providedAccessToken, sentTime)
+  {
+    try
+    {
+      const timeToCheck = new Date(sentTime).getTime()
+      if(providedAccessToken == undefined)
+      {
+        return null
+      }
+
+      const decodedToken = verifyToken(providedAccessToken)
+
+      if(decodedToken.exp == undefined)
+      {
+        return null
+      }
+      // const expiredDate = decodedToken.exp
+      const expiredDate = decodedToken.exp*1000 //to milliseconds
+      if(timeToCheck > expiredDate)
+      {
+        return null
+      }
+
+      const finalResult = 
+      {
+        userId: decodedToken.userId,
+        fullname: decodedToken.fullname,
+        userRole: decodedToken.userRole
+      }
+
+      return finalResult
+    }
+    catch(error)
+    {
+      console.log(error)
+      return null
+    }
+  },
+
+  async generateSessionId(appTime)
+  {
+    let appTimeToExec = new Date()
+    if(appTime != undefined)
+    {
+      appTimeToExec = new Date(appTime)
+    }
+    const userRandomUUID = crypto.randomUUID()
+    const nonce = crypto.randomUUID()
+
+    const data = 
+    {
+      nonce: nonce,
+      appTime: appTimeToExec
+    }
+
+    const stringifiedData = JSON.stringify(data)
+
+    const mac = CryptoJs.HmacSHA256(stringifiedData, process.env.SESS_SECRET_KEY).toString();
+
+    data.mac = mac
+
+    return {
+
+      uuid: userRandomUUID,
+      data: data,
+      sessionId: `${userRandomUUID}-${mac}`
+    }
+  },
+
+  async setSessionIdIntoCache(providedUUID, data)
+  {
+    const stringifiedData = JSON.stringify(data)
+    const cacheKey = `${sessionIdStoragePrefix}{${providedUUID}}`
+    await redisClient.set(cacheKey, stringifiedData, {
+      EX: EXPIRY_TIME_OF_CACHE_SESSION_ID
+    })
+  },
+
+  extractUUIDandSessionIdFromSessionId(sessionId)
+  {
+    if(sessionId == undefined)
+    {
+      return null
+    }
+    if(sessionId.length == 0)
+    {
+      return null
+    }
+
+    const encodedTexts = sessionId.split("-")
+    if(encodedTexts.length != 6)
+    {
+      return null
+    }
+
+    let uuid = encodedTexts[0] + "-" + encodedTexts[1] + "-" + encodedTexts[2] + "-" + encodedTexts[3] + "-" + encodedTexts[4]
+    const mac = encodedTexts[5]
+
+    return {
+      uuid: uuid,
+      mac: mac
+    }
+  },
+
+  async verifySessionId(providedSessionId)
+  {
+    const extractedData = this.extractUUIDandSessionIdFromSessionId(providedSessionId)
+    if(extractedData == null)
+    {
+      return null
+    }
+    const cacheKey = `${sessionIdStoragePrefix}{${extractedData.uuid}}`
+    const stringifiedData = await redisClient.get(cacheKey)
+    if(stringifiedData == null)
+    {
+      return null
+    }
+
+    const parsedData = JSON.parse(stringifiedData)
+    if(parsedData.mac != extractedData.mac)
+    {
+      return null
+    }
+
+    return {
+      uuid: extractedData.uuid,
+      mac: extractedData.mac
+    }
+  },
+
+  async removeSessionFromCache(providedSessionId)
+  {
+    const extractedData = this.extractUUIDandSessionIdFromSessionId(providedSessionId)
+    if(extractedData == null)
+    {
+      return null
+    }
+
+    const cacheKey = `${sessionIdStoragePrefix}{${extractedData.uuid}}`
+    await redisClient.del(cacheKey)
   }
 
 };

@@ -3,6 +3,16 @@ import ReviewController from './review.controller.js';
 
 const router = express.Router();
 
+router.get("/review/welcome", (req, res, next) => {return res.json({
+    message: "welcome to preview path of Preview Service",
+    data: {}
+  })})
+
+router.get("/reviews/welcome", (req, res, next) => {return res.json({
+    message: "welcome to preview(s) path of Preview Service",
+    data: {}
+})})
+
 router.get('/reviews', ReviewController.getAll);
 router.get('/review/:id', ReviewController.getById);
 router.post('/review', ReviewController.create);

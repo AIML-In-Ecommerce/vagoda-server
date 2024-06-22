@@ -45,9 +45,9 @@ const ZaloPayController = {
       amount: amount,
       //khi thanh toán xong, zalopay server sẽ POST đến url này để thông báo cho server của mình
       //Chú ý: cần dùng public url thì Zalopay Server mới call đến được (local thì dùng ngrok)
-      callback_url: `${process.env.NGROK_SERVER_PATH}/zalopay/callback`,
-      // callback_url: `${process.env.ZALOPAY_CALLBACK_URL}:${process.env.PAYMENT_PORT}/zalopay/callback`,
-      // callback_url: `${process.env.BASE_PATH}:${process.env.PAYMENT_PORT}/zalopay/callback`,
+      // callback_url: `${process.env.NGROK_SERVER_PATH}/payment/zalopay/callback`,
+      callback_url: `${process.env.GATEWAY_URL}/payment/zalopay/callback`,
+      // callback_url: `${process.env.BASE_PATH}:${process.env.PAYMENT_PORT}/payment/zalopay/callback`,
       description: `Techzone - Payment for the order #${transID}`,
       bank_code: "",
     };

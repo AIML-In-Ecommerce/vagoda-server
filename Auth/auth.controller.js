@@ -5,75 +5,10 @@ import AccountService from "./support/account.service.js";
 import { AccountType } from "./shared/enums.js";
 dotenv.config();
 
+const SESSION_ID_COOKIE_KEY = String(process.env.SESSION_COOKIE_KEY) || "ssid"
+
 const AuthController = {
-  // register: async (req, res, next) => {
-  //   try {
-  //     let { fullName, shopName, email, password, accountType} = req.body;
-  //     if(req.body == undefined)
-  //     {
-  //       return next(createError.BadRequest("Missing request body"))
-  //     }
-  //     if(fullName == undefined) {
-  //       return next(createError.BadRequest("Missing full name"))
-  //     }
-  //     if(shopName == undefined && accountType == "SHOP") {
-  //       return next(createError.BadGateway("Missing shop name"))
-  //     }
 
-  //     const userServiceResponse = await UserService.registerAccountAndUserInfo({
-  //       email: email,
-  //       password: password,
-  //       fullName: fullName,
-  //       accountType: accountType
-  //     })
-
-  //     if(userServiceResponse == null)
-  //     {
-  //       return next(createError.MethodNotAllowed("Cannot create a new account"))
-  //     }
-
-  //     const newAccountId = userServiceResponse.accountId
-  //     const newUserInfoId = userServiceResponse.userId
-  //     console.log("account: "+ newAccountId)
-  //     console.log("user: "+ newUserInfoId)
-
-  //     if(accountType == "SHOP")
-  //     {
-  //       const newShopId = await ShopService.createShopInfo(shopName, newAccountId)
-  //       if(newShopId == null)
-  //       {
-  //         await UserService.deleteUserInfo(newUserInfoId)
-  //         await AccountService.deleteAccount(newAccountId)
-
-  //         return next(createError.MethodNotAllowed("Your register was failed"))
-  //       }
-
-  //       return res.json(
-  //         {
-  //           message: "Register successfully",
-  //           data: {
-  //             accountId: newAccountId,
-  //             shopId: newShopId
-  //           }
-  //         }
-  //       )
-  //     }
-      
-  //     res.json({
-  //       message:  "Register successfully",
-  //       data: {
-  //         accountId: newAccountId,
-  //         userId: newUserInfoId
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.log(error)
-  //     next(createError.InternalServerError(error.message));
-  //   }
-  // },
-
-
-  
   registerSeller: async (req, res, next) =>
   {
     try
@@ -282,8 +217,149 @@ const AuthController = {
     {
       return next(createError.BadRequest("Type not found"))
     }
-  }
+  },
 
+  refreshToken: async (req, res, next) =>
+  {
+    try
+    {
+      const refreshToken = req.body.refreshToken
+
+      const response = await AuthService.refreshToken(refreshToken)
+      if(response == null)
+      {
+        return next(createError.MethodNotAllowed("Cannot refresh the new token"))
+      }
+
+      return res.json({
+        message: "Refresh token successfully",
+        data: response
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  verifyAccessToken: async (req, res, next) =>
+  {
+    try
+    {
+      const providedAccessToken = req.body.accessToken
+      const sentTime = req.body.sentTime
+
+      const info = await AuthService.verifyAccessToken(providedAccessToken, sentTime)
+      if(info == null)
+      {
+        return next(createError.Unauthorized("Invalid access token"))
+      }
+
+      return res.json(
+        {
+          message: "Valid token",
+          data: info
+        }
+      )
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  async getSessionId(req, res, next)
+  {
+    try
+    {
+      const appTime = req.query.appTime
+
+      const sessionData = await AuthService.generateSessionId(appTime)
+
+      //store session id in Redis
+      await AuthService.setSessionIdIntoCache(sessionData.uuid, sessionData.data)
+
+      //set to cookie
+      res.cookie(SESSION_ID_COOKIE_KEY, sessionData.sessionId)
+
+      return res.json({
+        message: "Get session id sucessfully",
+        data: sessionData.sessionId
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  async removeSession(req, res, next)
+  {
+    try
+    {
+      const sessionId = req.cookies[`${sessionIdCookieKey}`]
+      console.log(sessionId)
+      if(sessionId == undefined)
+      {
+        return next(createError.MethodNotAllowed("Cannot remove session id"))
+      }
+      await AuthService.removeSessionFromCache(sessionId)
+
+      res.clearCookie(SESSION_ID_COOKIE_KEY)
+
+      return res.json(
+        {
+          message: "Remove session cookie successfully",
+          data: {}
+        }
+      )
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  async verifySessionId(req, res, next)
+  {
+    try
+    {
+      const sessionId = req.body.sessionId
+      const verifiedData = await AuthService.verifySessionId(sessionId)
+      if(verifiedData == null)
+      {
+        return next(createError.Unauthorized("Invalid sessionId value"))
+      }
+
+      return res.json({
+        message: "Valid sessionId value",
+        data: verifiedData
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  async logout(req, res, next)
+  {
+    try
+    {
+
+
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
 
 };
 

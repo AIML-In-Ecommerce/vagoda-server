@@ -9,10 +9,19 @@ const CartService =
 {
     async getCartInfoByUserId(userId)
     {
-        const url = publicAPIURL + `/cart/user/${userId}`
+        const url = publicAPIURL + `/system/cart/user`
         try
         {
-            const response = await axios.get(url)
+            const response = await axios.get(url, {
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
+                },
+                params:
+                {
+                    userId: userId
+                }
+            })
             if(response.status == 200)
             {
                 const data = response.data
@@ -20,8 +29,6 @@ const CartService =
             }
             else
             {
-                console.log(response.status)
-                console.log(response.data)
                 return null
             }
         }

@@ -11,13 +11,16 @@ const ShopService =
 
     async getShopInfo(shopId)
     {
-        const url = publicAPIURL + "/shop_info"
+        const url = publicAPIURL + "/system/shop_info"
 
         try
         {
             const response = await axios.get(url, 
                 {
-                    method: "GET",
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
+                    },
                     params: 
                     {
                         shopId: shopId,
@@ -49,7 +52,7 @@ const ShopService =
 
     async getShopInfos(shopInfos)
     {
-        const url = publicAPIURL + "/shops/"
+        const url = publicAPIURL + "/system/shops"
 
         const requestBody = 
         {

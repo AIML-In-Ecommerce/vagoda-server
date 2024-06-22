@@ -22,7 +22,14 @@ const OrderService =
                 paidAt: paidAt
             }
 
-            const response = await axios.post(url, requestBody)
+            const response = await axios.post(url, requestBody, 
+                {
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
+                    }
+                }
+            )
             if(response.status != 200)
             {
                 return null

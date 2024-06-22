@@ -3,33 +3,41 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const RefreshTokenSchema = new Schema({
-  name: {
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
+  refreshToken: {
     type: String,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-  },
-  design: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Widget",
-  },
-  shopInfoDesign: {
-    type: ShopInfoDesignSchema,
-  },
-  shopDetail: {
-    type: ShopDetailSchema,
+    required: true
   },
   createAt: {
     type: Date,
-    default: Date.now,
+    required: true,
+    default: Date.now
   },
+  expireAt: {
+    type: Date,
+    required: true
+  },
+  usedAt: {
+    type: Date,
+    default: null
+  }
 });
 
-const Shop = mongoose.model("Shop", ShopSchema);
+const RefreshTokenModel = mongoose.model("RefreshToken", RefreshTokenSchema);
 
-export default Shop;
+export function generateRefreshTokenModelProps(userId, hashedRefreshToken, expireAt)
+{
+  const recordProps = 
+  {
+    user: userId,
+    refreshToken: hashedRefreshToken,
+    expireAt: expireAt
+  }
+
+  return recordProps
+}
+
+export default RefreshTokenModel;

@@ -3,15 +3,26 @@ import PromotionController from "./promotion.controller.js";
 
 const router = express.Router();
 
-router.get("/promotions", PromotionController.getAll);
-router.post("/promotions", PromotionController.getByIds);
-router.get("/promotion/:id", PromotionController.getById);
-router.post("/promotion", PromotionController.create);
-router.put("/promotion/:id", PromotionController.update);
-router.delete("/promotion/:id", PromotionController.delete);
+router.get("/promotion/welcome", (req, res, next) => {return res.json({
+    message: "welcome to promotion path of Promotion Service",
+    data: {}
+})})
 
-router.post("/promotions/list", PromotionController.getListByIds);
-router.get("/prototions/shop/:id", PromotionController.getByShopId);
+router.get("/promotions/welcome", (req, res, next) => {return res.json({
+    message: "welcome to promotion(s) path of Promotion Service",
+    data: {}
+  })})
+
+// router.get("/promotion/", PromotionController.getAll);
+
+router.get("/promotion/info", PromotionController.getById);
+router.post("/promotion/list", PromotionController.getByIds);
+router.post("/promotion/seller/create", PromotionController.create);
+router.put("/promotion/seller/update", PromotionController.update);
+router.delete("/promotion/seller/delete", PromotionController.delete);
+
+router.get("/promotion/shop/all", PromotionController.getByShopId);
+router.post("/promotion/shop/selection", PromotionController.getPromotionBySelection)
 
 export default router;
 

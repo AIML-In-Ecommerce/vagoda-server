@@ -1,16 +1,32 @@
 import express from "express";
-import ShopController from "./shop.controller.js";
+import ShopController from "./controller/shop.controller.js";
+import VerificationService from "./verification.service.js";
+import SystemShopController from "./controller/system.shop.controller.js";
 
 const router = express.Router();
 
-router.get("/shops", ShopController.getAll);
-router.post("/shops", ShopController.getShopByIdList)
-router.get("/shop/:id", ShopController.getById);
-router.post("/shop", ShopController.create);
-router.put("/shop/:id", ShopController.update);
-router.delete("/shop/:id", ShopController.delete);
+router.get("/shops/welcome", (req, res, next) => {return res.json({
+    message: "welcome to shop(s) path of Shop Service",
+    data: {}
+})})
 
+router.get("/shop/welcome", (req, res, next) => {return res.json({
+    message: "welcome to shop path of Shop Service",
+    data: {}
+})})
+
+router.get("/shops", ShopController.getAll);
+router.get("/shop/:id", ShopController.getById);
+router.put("/shop/:id", ShopController.update);
 router.get("/shop_info", ShopController.getShopBySelection)
+router.post("/shops", ShopController.getShopByIdList)
+
+
+// from system
+router.post("/system/shops", ShopController.getShopByIdList)
+router.post("/system/shop", VerificationService.verifySystemRole, ShopController.create);
+router.delete("/system/shop", VerificationService.verifySystemRole, SystemShopController.delete);
+router.get("/system/shop_info", VerificationService.verifySystemRole, ShopController.getShopBySelection)
 
 export default router;
 

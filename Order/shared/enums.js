@@ -38,4 +38,12 @@ const PaymentMethod =
   ZALOPAY: "ZALOPAY"
 }
 
-export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType, PaymentMethod };
+const PromotionStatus = {
+  UPCOMMING: "UPCOMMING",
+  IN_PROGRESS: "IN_PROGRESS",
+  EXPIRED: "EXPIRED"
+}
+
+export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType, PaymentMethod,
+  PromotionStatus
+ };
