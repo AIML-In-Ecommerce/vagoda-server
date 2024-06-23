@@ -44,6 +44,7 @@ const PromotionStatus = {
   EXPIRED: "EXPIRED"
 }
 
+
 export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType, PaymentMethod,
   PromotionStatus
  };

@@ -1,5 +1,6 @@
 import express from "express";
 import PromotionController from "./promotion.controller.js";
+import SystemPromotionController from "./system.promotion.controller.js";
 
 const router = express.Router();
 
@@ -23,6 +24,10 @@ router.delete("/promotion/seller/delete", PromotionController.delete);
 
 router.get("/promotion/shop/all", PromotionController.getByShopId);
 router.post("/promotion/shop/selection", PromotionController.getPromotionBySelection)
+
+
+//from system
+router.put("/system/promotions/be_used", SystemPromotionController.updateUsedPromotionsQuantity)
 
 export default router;
 

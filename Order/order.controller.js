@@ -2,6 +2,9 @@ import createError from "http-errors";
 import OrderService from "./order.service.js";
 import { OrderStatus, PaymentMethod } from "./shared/enums.js";
 import UserService from "./support/user.service.js";
+import CartService from "./support/cart.service.js";
+import ProductService from "./support/product.service.js";
+import PromotionService from "./support/promotion.service.js";
 const model = " order ";
 const Model = " Order ";
 const AuthorizedUserIdInHeader = "A-User-Id"
@@ -92,7 +95,27 @@ const OrderController = {
         return next(createError.BadRequest("Cannot create the new order"));
       }
 
-      //TODO: remove cart
+      //update sold quantity of products which have been bought
+      const cartInfo = await CartService.getCartInfoByUserId(userId)
+      if(cartInfo != null)
+      {
+        const targetUpdateInfos = cartInfo.products.map((product) =>
+        {
+          const record = {
+            product: product._id,
+            quantity: product.quantity
+          }
+          return record
+        })
+
+        await ProductService.increaseSoldAmountOfManyProducts(targetUpdateInfos)
+      }
+
+      //update remain quantity of promotions which have been used
+      await PromotionService.updateUsedPromotionsQuantity(data.promotionIds)
+
+      //TODO: clear cart of user
+      await CartService.clearCartByUserId(userId)
 
       res.json({
         message: "Create" + model + "successfully",

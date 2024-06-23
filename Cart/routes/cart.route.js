@@ -18,6 +18,7 @@ router.get("/cart/welcome", (req, res, next) => {return res.json({
 // from buyer
 router.get("/cart/user", CartController.getCartByUserId)
 router.put("/cart/user", CartController.updateProducts)
+router.put("/cart/user/clear", CartController.clearCart)
 
 
 // from system
@@ -25,6 +26,7 @@ router.get("/system/cart/user", VerificationService.verifySystemRole, SystemCart
 router.put("/system/cart/user", VerificationService.verifySystemRole, SystemCartController.updateProducts)
 router.post("/system/cart/create", VerificationService.verifySystemRole, SystemCartController.create);
 router.delete("/system/cart/delete", VerificationService.verifySystemRole, SystemCartController.delete);
+router.put("/system/cart/user/clear", VerificationService.verifySystemRole, SystemCartController.clearCart)
 
 export default router;
 

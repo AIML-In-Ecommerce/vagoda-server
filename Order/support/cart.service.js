@@ -37,8 +37,39 @@ const CartService =
             console.log("Axios error at getCartInfoByUserId")
             return null
         }
-    }
+    },
 
+    async clearCartByUserId(userId)
+    {
+        const url = publicAPIURL + `/system/cart/user/clear`
+        try
+        {
+            const response = await axios.put(url, undefined ,{
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
+                },
+                params:
+                {
+                    userId: userId
+                }
+            })
+            if(response.status == 200)
+            {
+                const data = response.data
+                return data.data
+            }
+            else
+            {
+                return null
+            }
+        }
+        catch(error)
+        {
+            console.log("Axios error at clearCartByUserId")
+            return null
+        }
+    },
 
 }
 

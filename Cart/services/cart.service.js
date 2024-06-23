@@ -144,14 +144,15 @@ const CartService = {
       if(targetProduct != undefined)
       {
         targetProduct.quantity = providedProduct.quantity
-        targetProduct.size = providedProduct.size
-        targetProduct.color = providedProduct.color
         mapProductList.set(combinedKey, targetProduct)
       }
       else
       {
         //insert new product info
-        mapProductList.set(combinedKey, providedProduct)
+        const clonedProduct = JSON.parse(JSON.stringify(providedProduct))
+        clonedProduct.color = providedProduct.color == null ? undefined : providedProduct.color
+        clonedProduct.size = providedProduct.size == null ? undefined : providedProduct.size
+        mapProductList.set(combinedKey, clonedProduct)
       }
 
     })
@@ -169,7 +170,19 @@ const CartService = {
     await rawCart.save()
 
     return rawCart.products;
-  }
+  },
+
+  async clearCartByUserId(userId)
+  {
+    const rawCart = await Cart.findOne({user: userId})
+    if(rawCart == null)
+    {
+      return null
+    }
+
+    rawCart.products = []
+    return await rawCart.save()
+  },
 
 };
 

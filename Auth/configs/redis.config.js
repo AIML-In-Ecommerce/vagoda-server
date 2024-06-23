@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 
-import { createClient } from 'redis'
+import { createClient } from "redis"
 
 dotenv.config()
 

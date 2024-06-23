@@ -1,5 +1,5 @@
 import axios from "axios"
-import { DiscountType } from "../shared/enums"
+import { DiscountType } from "../shared/enums.js"
 
 const PORT = process.env.PROMOTION_PORT
 const BASE_PATH = process.env.BASE_PATH
@@ -60,6 +60,39 @@ const PromotionService =
         }
 
         return discountValue
+    },
+
+    async updateUsedPromotionsQuantity(promotionIds)
+    {
+        const url = publicAPIURL + "/system/promotions/be_used"
+        const requestBody = {
+            promotionIds: promotionIds
+        }
+
+        try
+        {
+            const response = await axios.put(url, requestBody, {
+                headers: 
+                {
+                    "origin": `${publicAPIURL}`
+                }
+            })
+
+            if(response.status == 200)
+            {
+                const data = await response.data
+                return data.data
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch(error)
+        {
+            console.log("Axios Error at updateUsedPromotionQuantity")
+            return null
+        }
     },
 
 }

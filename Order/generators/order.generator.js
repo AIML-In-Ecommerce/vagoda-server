@@ -4,10 +4,7 @@ import UserService from "../support/user.service.js"
 import CartService from "../support/cart.service.js"
 import Order from "../order.model.js"
 import orderPaymentInfoProvider from "../providers/order.payment_info.provider.js"
-import OrderService from "../order.service.js"
 import PromotionService from "../support/promotion.service.js"
-import { DiscountType } from "../shared/enums.js"
-
 
 async function generateOrder(requiredData)
 {
@@ -57,6 +54,7 @@ async function generateOrder(requiredData)
     })
 
     let promotionInfosOnShops = null
+    let listOfReferencePromotions = []
     //TODO: fetch promotion
     if(requiredData.promotionIds != undefined && requiredData.promotionIds != null
       && requiredData.promotionIds.length > 0 )
@@ -64,6 +62,15 @@ async function generateOrder(requiredData)
       const fetchedPromotionInfos = await PromotionService.getPromotionByIds(requiredData.promotionIds)
       if(fetchedPromotionInfos != null)
       {
+        listOfReferencePromotions = fetchedPromotionInfos.map((fetchedPromotionInfo) =>
+        {
+          const clonedPromotionInfo = JSON.parse(JSON.stringify(fetchedPromotionInfo))
+          clonedPromotionInfo.limit = 1
+          clonedPromotionInfo.usedTime = 0
+
+          return clonedPromotionInfo
+        })
+
         promotionInfosOnShops = new Map()
         //fetchedPromotionInfos.length is small
         for(let i = 0; i < fetchedPromotionInfos.length; i++)
@@ -71,16 +78,14 @@ async function generateOrder(requiredData)
           const shopId = fetchedPromotionInfos[i].shop
           const activeDate = new Date(fetchedPromotionInfos[i].activeDate)
           const expiredDate = new Date(fetchedPromotionInfos[i].expiredDate)
-  
+          
           if(execTime.getTime() >= activeDate.getTime() && execTime.getTime() <= expiredDate.getTime()
           )
           {
             if(fetchedPromotionInfos[i].targetProducts.length == 0)
             {
               promotionInfosOnShops.set(shopId, {
-                indexInFetchedPromotionInfos: i,
-                limit: 1,
-                usedTime: 0
+                indexInFetchedPromotionInfos: i
               })
             }
             else
@@ -90,8 +95,6 @@ async function generateOrder(requiredData)
                 const combinedKey = shopId + "+" + productId
                 promotionInfosOnShops.set(combinedKey, {
                   indexInFetchedPromotionInfos: i,
-                  limit: 1,
-                  usedTime: 0
                 })
               })
             }
@@ -113,7 +116,6 @@ async function generateOrder(requiredData)
 
       const productInfosInOrder = []
       let promotion = null
-
       
       for(let i = 0; i < targetProducts.length; i++)
       {
@@ -121,8 +123,8 @@ async function generateOrder(requiredData)
         const info = 
         {
           product: product._id,
-          color: product.color,
-          size: product.size,
+          color: product.color == null ? undefined : product.color,
+          size: product.size == null ? undefined : product.size,
           quantity: product.quantity,
           purchasedPrice: product.finalPrice
         }
@@ -135,15 +137,18 @@ async function generateOrder(requiredData)
           //here we try to get local promotion or promotions that are only available for some products in the shop
           const combinedKey = shopId + "+" + product._id
           const targetPromotion = promotionInfosOnShops.get(combinedKey)
-          if(targetPromotion != undefined && (targetPromotion.usedTime < targetPromotion.limit))
+          if(targetPromotion != undefined)
           {
-            const targetPromotionInfo = fetchedPromotionInfos[targetPromotion.indexInFetchedPromotionInfos]
-            appliedDiscountValue = PromotionService.calculateDiscountValue(targetPromotionInfo, product.finalPrice)
+            const targetPromotionInfo = listOfReferencePromotions[targetPromotion.indexInFetchedPromotionInfos]
+            if(targetPromotionInfo.usedTime < targetPromotionInfo.limit)
+            {
+              appliedDiscountValue = PromotionService.calculateDiscountValue(targetPromotionInfo, product.finalPrice)
 
-            //update the useTime value which makes it reach the limitation of use
-            targetPromotion.usedTime = targetPromotion.usedTime + 1
-            promotionInfosOnShops.set(combinedKey, targetPromotion)
-            promotion = targetPromotionInfo
+              //update the useTime value which makes it reach the limitation of use
+              targetPromotion.usedTime = targetPromotion.usedTime + 1
+              listOfReferencePromotions[targetPromotion.indexInFetchedPromotionInfos] = targetPromotionInfo
+              promotion = targetPromotionInfo
+            }
           }
         }
         productInfosInOrder.push(info)
@@ -196,7 +201,7 @@ async function generateOrder(requiredData)
     //And, as we found, the product list in each order is stable
     //Which means that it ensures savedOrders[i].products[j].product == ProductsOnShop.get(savedOrders[i].shop)[j] is true
 
-    const finalResult = savedOrders.map((order) =>
+    const createdOrders = savedOrders.map((order) =>
     {
       const clonedOrder = JSON.parse(JSON.stringify(order))
       const targetProducts = productsOnShop.get(clonedOrder.shop.toString()) //already have quantity value
@@ -214,25 +219,27 @@ async function generateOrder(requiredData)
       return clonedOrder
     })
 
-    return finalResult
+    return createdOrders
+
+    return newOrders
 }
 
 const OrderGenerators = 
 {
   async generateOrderWhenCOD(requiredData)
   {
-      return await generateOrder(requiredData)   
+      return await generateOrder(requiredData)
   },
 
 
   async generateOrderWhenZaloPay(requiredData)
   {
-      const newOrders = await generateOrder(requiredData)
+      const newOrdersData = await generateOrder(requiredData)
       //call to Payment service to ask for ZaloPay's payment url
   
       let totalAmount = 0
       let products = []
-      const orderIds = newOrders.map((order) =>
+      const orderIds = newOrdersData.orders.map((order) =>
       {
         totalAmount = totalAmount + order.totalPrice
         order.products.forEach((product) =>

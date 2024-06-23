@@ -169,6 +169,43 @@ const SystemCartController = {
     }
   },
 
+  async clearCart(req, res, next)
+  {
+    try
+    {
+      const userId = req.query.userId
+  
+      if(userId == undefined)
+      {
+        return next(createError.BadRequest("Bad request to cart service"))
+      }
+  
+      //check userId in accessToken and userId in req.params.id
+      //if khac nhau ==> next(createError.Forbidden)
+  
+      const result = await CartService.clearCartByUserId(userId)
+
+      if(result != null)
+      {
+        return res.json(
+          {
+            message: "Clear cart successfully",
+            data: result
+          }
+        )
+      }
+      else
+      {
+        return next(createError.MethodNotAllowed("Cannot clear the cart"))
+      }
+      
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
 };
 
 export default SystemCartController;
