@@ -166,6 +166,34 @@ const PromotionController = {
     }
   },
 
+  async getPromotionsWithCodes(req, res, next)
+  {
+    try
+    {
+      const shopId = req.query.shopId
+
+      const codes = req.body.codes
+
+      const listOfPromotions = await PromotionService.getPromotionsByCodes(shopId, codes)
+      if(listOfPromotions == null)
+      {
+        return next(createError.BadRequest())
+      }
+
+      return res.json(
+        {
+          message: "Get promotions by codes successfully",
+          data: listOfPromotions
+        }
+      )
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
 };
 
 export default PromotionController;

@@ -37,4 +37,12 @@ const PromotionStatus = {
   EXPIRED: "EXPIRED"
 }
 
-export { ProductStatus, AccountStatus, AccountType };
+const AccountRegisterType = 
+{
+  STANDARD: "STANDARD",
+  GOOGLE: "GOOGLE",
+  FACEBOOK: "FACEBOOK"
+}
+
+
+export { ProductStatus, AccountStatus, AccountType, AccountRegisterType };

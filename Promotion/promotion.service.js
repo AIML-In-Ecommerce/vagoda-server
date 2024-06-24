@@ -228,7 +228,18 @@ const PromotionService = {
     }
 
     return updatedPromotionIds
-  }
+  },
+
+  async getPromotionsByCodes(shopId, codes)
+  {
+    const rawPromotions = await Promotion.find({shop: shopId, code: {$in: codes}})
+    if(rawPromotions == null)
+    {
+      return null
+    }
+
+    return rawPromotions
+  },
 
 };
 

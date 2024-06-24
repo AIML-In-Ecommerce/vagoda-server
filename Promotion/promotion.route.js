@@ -21,6 +21,7 @@ router.post("/promotion/list", PromotionController.getByIds);
 router.post("/promotion/seller/create", PromotionController.create);
 router.put("/promotion/seller/update", PromotionController.update);
 router.delete("/promotion/seller/delete", PromotionController.delete);
+router.post("/promotion/codes", PromotionController.getPromotionsWithCodes)
 
 router.get("/promotion/shop/all", PromotionController.getByShopId);
 router.post("/promotion/shop/selection", PromotionController.getPromotionBySelection)

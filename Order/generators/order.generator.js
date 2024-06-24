@@ -220,8 +220,6 @@ async function generateOrder(requiredData)
     })
 
     return createdOrders
-
-    return newOrders
 }
 
 const OrderGenerators = 
@@ -235,11 +233,15 @@ const OrderGenerators =
   async generateOrderWhenZaloPay(requiredData)
   {
       const newOrdersData = await generateOrder(requiredData)
+      if(newOrdersData == null)
+      {
+        return null
+      }
       //call to Payment service to ask for ZaloPay's payment url
   
       let totalAmount = 0
       let products = []
-      const orderIds = newOrdersData.orders.map((order) =>
+      const orderIds = newOrdersData.map((order) =>
       {
         totalAmount = totalAmount + order.totalPrice
         order.products.forEach((product) =>
