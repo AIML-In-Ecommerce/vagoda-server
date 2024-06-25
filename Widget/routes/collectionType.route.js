@@ -3,6 +3,16 @@ import CollectionTypeController from "../controllers/collectionType.controller.j
 
 const router = express.Router();
 
+router.get("/collectionType/welcome", (req, res, next) => {return res.json({
+    message: "welcome to collectionType path of Widget Service",
+    data: {}
+})})
+
+router.get("/collectionTypes/welcome", (req, res, next) => {return res.json({
+    message: "welcome to collectionType(s) path of Widget Service",
+    data: {}
+})})
+
 router.get("/collectionTypes", CollectionTypeController.getAll);
 router.get("/collectionType/:id", CollectionTypeController.getById);
 router.post("/collectionType", CollectionTypeController.create);

@@ -9,7 +9,7 @@ const PaymentService =
 {
     async getZaloPayURL(userId, amount, products, orderIds)
     {
-        const url = publicAPIURL + "/zalopay/payment"
+        const url = publicAPIURL + "/system/zalopay/payment"
         const requestBody = 
         {
             products: products,
@@ -20,7 +20,12 @@ const PaymentService =
 
         try
         {
-            const response = await axios.post(url, requestBody)
+            const response = await axios.post(url, requestBody, {
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
+                }
+            })
             
             return response.data
         }

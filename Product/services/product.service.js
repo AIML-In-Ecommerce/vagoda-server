@@ -280,6 +280,76 @@ const ProductService = {
     });
     return await Product.insertMany(products);
   },
+
+  async increaseSoldAmountOfAProduct(productId, quantity)
+  {
+    const rawProductInfo = await Product.findOne({_id: productId})
+    if(rawProductInfo == null)
+    {
+      return null
+    }
+
+    const newSoldAmount = rawProductInfo.soldQuantity + Math.abs(quantity)
+
+    rawProductInfo.soldQuantity = newSoldAmount
+    return (await rawProductInfo.save())._id.toString()
+  },
+
+  async decreaseSoldAmountOfAProduct(productId, quantity)
+  {
+    const rawProductInfo = await Product.findOne({_id: productId})
+    if(rawProductInfo == null)
+    {
+      return null
+    }
+
+    const newSoldAmount = rawProductInfo.soldQuantity - Math.abs(quantity)
+
+    rawProductInfo.soldQuantity = newSoldAmount
+    return (await rawProductInfo.save())._id.toString()
+  },
+
+  async increaseSoldAmountOfManyProduct(updateInfos)
+  {
+    if(updateInfos == undefined)
+    {
+      return null
+    }
+
+    const updatedProductIdList = []
+
+    updateInfos.forEach(async (record) =>
+    {
+      const updatedProductId = await this.increaseSoldAmountOfAProduct(record.product, record.quantity)
+      if(updatedProductId != null)
+      {
+        updatedProductIdList.push(updatedProductId)
+      }
+    })
+
+    return updatedProductIdList
+  },
+
+  async decreaseSoldAmountOfManyProduct(updateInfos)
+  {
+    if(updateInfos == undefined)
+    {
+      return null
+    }
+
+    const updatedProductIdList = []
+
+    updateInfos.forEach(async (record) =>
+    {
+      const updatedProductId = await this.decreaseSoldAmountOfAProduct(record.product, record.quantity)
+      if(updatedProductId != null)
+      {
+        updatedProductIdList.push(updatedProductId)
+      }
+    })
+
+    return updatedProductIdList
+  },
 };
 
 export default ProductService;

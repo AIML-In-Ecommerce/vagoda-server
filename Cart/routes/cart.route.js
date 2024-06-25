@@ -1,15 +1,32 @@
-import express from "express";
-import CartController from "./cart.controller.js";
+import express from "express"
+import CartController from "../controller/cart.controller.js";
+import VerificationService from "../services/verification.service.js";
+import SystemCartController from "../controller/system.cart.controller.js";
 
 const router = express.Router();
 
-router.get("/carts", CartController.getAll);
-router.get("/cart/:id", CartController.getById);
-router.get("/cart/user/:id", CartController.getCartByUserId)
-router.put("/cart/user/:id", CartController.updateProducts)
-router.post("/cart", CartController.create);
-router.put("/cart/:id", CartController.update);
-router.delete("/cart/:id", CartController.delete);
+// router.get("/carts", CartController.getAll);
+// router.get("/cart/:id", CartController.getById);
+
+// router.put("/cart/:id", CartController.update);
+
+router.get("/cart/welcome", (req, res, next) => {return res.json({
+    message: "welcome to cart path of Cart Service",
+    data: {}
+})})
+
+// from buyer
+router.get("/cart/user", CartController.getCartByUserId)
+router.put("/cart/user", CartController.updateProducts)
+router.put("/cart/user/clear", CartController.clearCart)
+
+
+// from system
+router.get("/system/cart/user", VerificationService.verifySystemRole, SystemCartController.getCartByUserId)
+router.put("/system/cart/user", VerificationService.verifySystemRole, SystemCartController.updateProducts)
+router.post("/system/cart/create", VerificationService.verifySystemRole, SystemCartController.create);
+router.delete("/system/cart/delete", VerificationService.verifySystemRole, SystemCartController.delete);
+router.put("/system/cart/user/clear", VerificationService.verifySystemRole, SystemCartController.clearCart)
 
 export default router;
 

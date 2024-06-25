@@ -19,7 +19,10 @@ const ProductService =
 
             const response = await axios.post(url, requestBody,
                 {
-                    method: "POST"
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
+                    }
                 }
             )
 
@@ -39,9 +42,81 @@ const ProductService =
 
             return null;
         }
+    },
 
+    async increaseSoldAmountOfManyProducts(updateInfos)
+    {
+        const url = publicAPIURL + "/system/products/sold_amount/increase"
+        try
+        {
+            const requestBody = 
+            {
+                updateInfos: updateInfos
+            }
 
-    }
+            const response = await axios.put(url, requestBody,
+                {
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
+                    }
+                }
+            )
+
+            if(response.status == 200)
+            {
+                const data = response.data
+                return data.data
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch(error)
+        {
+            console.log("Axios Error at increaseSoldAmountOfManyProducts")
+
+            return null;
+        }
+    },
+
+    async decreaseSoldAmountOfManyProducts(updateInfos)
+    {
+        const url = publicAPIURL + "/system/products/sold_amount/decrease"
+        try
+        {
+            const requestBody = 
+            {
+                updateInfos: updateInfos
+            }
+
+            const response = await axios.put(url, requestBody,
+                {
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
+                    }
+                }
+            )
+
+            if(response.status == 200)
+            {
+                const data = response.data
+                return data.data
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch(error)
+        {
+            console.log("Axios Error at decreaseSoldAmountOfManyProducts")
+
+            return null;
+        }
+    },
 
 }
 

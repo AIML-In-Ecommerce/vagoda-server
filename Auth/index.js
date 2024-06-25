@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 import bodyParser from 'body-parser';
-
+import cookieParser from 'cookie-parser'
 import { specs, swaggerUi } from './configs/swagger.js';
 import { errorHandler, notFound } from './shared/helper/errorHandler.js';
 import db from "./configs/db.js";
@@ -21,12 +21,13 @@ db();
 //   credentials: true, 
 //   origin: "*", 
 //   exposedHeaders: ["Access-Control-Allow-Origin"], 
-//   preflightContinue: true,
+//   // preflightContinue: true,
 // }  
 
 const initializeExpress = (app) => {
   //app.use(express.static(path.join(__dirname, "public")));
-  app.use(cors({}));
+  app.use(cors());
+  app.use(cookieParser())
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   //app.use(morgan("combined", { stream: logger.stream }));

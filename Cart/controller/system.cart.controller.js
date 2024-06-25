@@ -1,8 +1,11 @@
 import createError from "http-errors";
-import CartService from "./cart.service.js"
+import { AuthorizedUserIdInHeader } from "../services/verification.service.js";
+import CartService from "../services/cart.service.js";
 const model = "cart";
 const Model = "Cart";
-const CartController = {
+
+
+const SystemCartController = {
   getAll: async (req, res, next) => {
     try {
       const filter = req.body;
@@ -72,8 +75,8 @@ const CartController = {
 
   delete: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const object = await CartService.delete(id);
+      const cartId = req.query.cartId
+      const object = await CartService.delete(cartId);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
@@ -88,33 +91,33 @@ const CartController = {
   },
 
   getCartByUserId: async (req, res, next) =>
-  {
-    try
     {
-      const userId = req.params.id
-
-      //check userId in accessToken and userId in req.params.id
-      //if khac nhau ==> next(createError.Forbidden)
-
-      const cart = await CartService.getByUserId(userId)
-
-      if(cart == null)
+      try
       {
-        return next(createError.NotFound("Cart not found"))
-      }
-
-      return res.json(
+        const userId = req.query.userId
+  
+        //check userId in accessToken and userId in req.params.id
+        //if khac nhau ==> next(createError.Forbidden)
+  
+        const cart = await CartService.getByUserId(userId)
+  
+        if(cart == null)
         {
-          message: "Get cart successully",
-          data: cart,
+          return next(createError.NotFound("Cart not found"))
         }
-      )
-    }
-    catch(error)
-    {
-      return next(createError.InternalServerError(error.message))
-    }
-  },
+  
+        return res.json(
+          {
+            message: "Get cart successully",
+            data: cart,
+          }
+        )
+      }
+      catch(error)
+      {
+        return next(createError.InternalServerError(error.message))
+      }
+    },
 
   /**
    * req.body = 
@@ -130,7 +133,7 @@ const CartController = {
   {
     try
     {
-      const userId = req.params.id
+      const userId = req.query.userId
       const requestBody = req.body
   
       if(requestBody == undefined || userId == undefined)
@@ -164,8 +167,45 @@ const CartController = {
 
       return next(createError.InternalServerError(error.message))
     }
-  }
+  },
 
+  async clearCart(req, res, next)
+  {
+    try
+    {
+      const userId = req.query.userId
+  
+      if(userId == undefined)
+      {
+        return next(createError.BadRequest("Bad request to cart service"))
+      }
+  
+      //check userId in accessToken and userId in req.params.id
+      //if khac nhau ==> next(createError.Forbidden)
+  
+      const result = await CartService.clearCartByUserId(userId)
+
+      if(result != null)
+      {
+        return res.json(
+          {
+            message: "Clear cart successfully",
+            data: result
+          }
+        )
+      }
+      else
+      {
+        return next(createError.MethodNotAllowed("Cannot clear the cart"))
+      }
+      
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
 };
 
-export default CartController;
+export default SystemCartController;

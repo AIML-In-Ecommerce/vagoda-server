@@ -9,7 +9,9 @@ const StatisticsOrderController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
@@ -38,7 +40,9 @@ const StatisticsOrderController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+            
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
@@ -67,7 +71,9 @@ const StatisticsOrderController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 
@@ -93,7 +99,9 @@ const StatisticsOrderController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 
@@ -121,7 +129,9 @@ const StatisticsOrderController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 
@@ -149,7 +159,9 @@ const StatisticsOrderController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
@@ -179,7 +191,9 @@ const StatisticsOrderController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
@@ -208,7 +222,9 @@ const StatisticsOrderController =
     {
         try
         {
-            const shopId = req.body.shopId
+            // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
+            const shopId = req.query.shopId
+
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime

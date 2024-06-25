@@ -2,6 +2,7 @@ import createError from "http-errors";
 import UserService from "../services/user.service.js";
 import AccountService from "../services/account.service.js";
 import { AccountRegisterType } from "../shared/enums.js";
+import { AuthorizedUserIdInHeader } from "../services/verification.service.js";
 const model = "user";
 const Model = "User";
 
@@ -164,6 +165,8 @@ const UserController = {
     try
     {
       const newShippingAddressObject = req.body
+      
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
       const userId = req.query.userId
 
       if(!newShippingAddressObject || !userId)
@@ -205,6 +208,7 @@ const UserController = {
   {
     try
     {
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
       const userId = req.query.userId
 
       //check userId in accessToken and the above userId
@@ -260,7 +264,9 @@ const UserController = {
   {
     try
     {
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
       const userId = req.query.userId
+
       const documentId = req.query.targetId
       const newShippingAddress = req.body
 
@@ -297,7 +303,9 @@ const UserController = {
   {
     try
     {
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
       const userId = req.query.userId
+
       const documentId = req.query.targetId
 
       if(userId == null || documentId == null)
@@ -330,17 +338,14 @@ const UserController = {
     try {
 
       let object = null
+      // const userId = req.headers[`${AuthorizedUserIdInHeader}`]
       const userId = req.query.userId
-      const accountId = req.query.accountId
+
       const useAddress = req.query.useAddress == "true"
       
       if(userId != undefined)
       {
         object = await UserService.getById(userId, useAddress)
-      }
-      else if(accountId != undefined)
-      {
-        object = await UserService.getByAccountId(accountId, useAddress)
       }
       else
       {

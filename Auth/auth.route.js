@@ -1,5 +1,6 @@
 import express from "express";
 import AuthController from "./auth.controller.js";
+import VerificationService from "./verification.service.js";
 
 const router = express.Router();
 
@@ -8,10 +9,24 @@ const router = express.Router();
 // router.post("/seller/login", AuthController.loginBySeller);
 // router.post("/buyer/login", AuthController.loginByBuyer);
 
+router.get("/auth/welcome", (req, res, next) => {return res.json({
+    message: "welcome to auth path of Auth Service",
+    data: {}
+})})
+  
 
-router.post("/auth/login", AuthController.login)
+router.post("/auth/login",AuthController.login)
 router.post("/auth/register/", AuthController.register)
+router.post("/auth/refresh_token", AuthController.refreshToken)
+router.post("/auth/logout", AuthController.logout)
 
+router.get("/auth/session", AuthController.getSessionId)
+router.delete("/auth/session", AuthController.removeSession)
+
+// from system
+router.post("/system/auth/verify/access_token", VerificationService.verifySystemRole, AuthController.verifyAccessToken)
+router.post("/system/auth/verify/sessionId", VerificationService.verifySystemRole, AuthController.verifySessionId)
+// router.post("/auth/verify/system")
 
 export default router;
 

@@ -1,15 +1,29 @@
 import express from "express";
-import UserController from "../controllers/account.controller.js";
 import AccountController from "../controllers/account.controller.js";
+import VerificationService from "../services/verification.service.js";
+
 
 const router = express.Router();
 
+router.get("/account/welcome", (req, res, next) => {return res.json({
+    message: "welcome to account path of Account Service",
+    data: {}
+})})
+
+router.get("/accounts/welcome", (req, res, next) => {return res.json({
+    message: "welcome to account(s) path of Account Service",
+    data: {}
+})})
+
 router.get("/accounts", AccountController.getAll);
-router.get("/account/:id", AccountController.getById);
-router.post("/account", AccountController.create);
 router.put("/account/:id", AccountController.update);
-router.delete("/account/:id", AccountController.delete);
-router.post("/account/email", AccountController.getByEmail)
+
+
+// from system
+router.get("/system/account/:id", VerificationService.verifySystemRole, AccountController.getById);
+router.post("/system/account", VerificationService.verifySystemRole, AccountController.create);
+router.delete("/system/account/:id", VerificationService.verifySystemRole, AccountController.delete);
+router.post("/system/account/email", VerificationService.verifySystemRole, AccountController.getByEmail)
 
 export default router;
 

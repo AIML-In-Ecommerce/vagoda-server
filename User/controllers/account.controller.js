@@ -67,7 +67,6 @@ const AccountController = {
       }
       res.json({
         message: "Create " + model + " successfully",
-        status: 200,
         data: object,
       });
     } catch (error) {

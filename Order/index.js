@@ -30,10 +30,12 @@ const initializeExpress = (app) => {
 
 initializeExpress(app);
 
-app.use(orderRoute.buyerRouter);
-app.use(orderRoute.sellerRouter);
-app.use(orderRoute.systemRouter);
+// app.use(orderRoute.authorizedBuyerRouter)
+// app.use(orderRoute.authorizedSellerRouter)
+// app.use(orderRoute.authorizedSystemRouter)
+// app.use(orderRoute.openRouter)
 
+app.use(orderRoute)
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 

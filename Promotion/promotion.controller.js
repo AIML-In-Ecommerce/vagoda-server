@@ -24,9 +24,9 @@ const PromotionController = {
   {
     try
     {
-      const requestBody = req.body
+      const promotionIds = req.body.promotionIds
 
-      const listOfPromotion = await PromotionService.getByIds(requestBody)
+      const listOfPromotion = await PromotionService.getByIds(promotionIds)
       if(!listOfPromotion)
       {
         return next(createError.BadRequest(Model + " list not found"));
@@ -49,14 +49,13 @@ const PromotionController = {
 
   getById: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const object = await PromotionService.getById(id);
+      const promotionId = req.query.promotionId
+      const object = await PromotionService.getById(promotionId);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
       res.json({
-        message: "Get" + model + "successfully",
-        status: 200,
+        message: "Get " + model + " successfully",
         data: object,
       });
     } catch (error) {
@@ -66,13 +65,17 @@ const PromotionController = {
 
   create: async (req, res, next) => {
     try {
-      const data = req.body;
+      const shopId = req.query.shopId
+
+      const data = req.body
+      data.shop = shopId
+
       const object = await PromotionService.create(data);
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
       }
       res.json({
-        message: "Create" + model + "successfully",
+        message: "Create " + model + " successfully",
         status: 200,
         data: object,
       });
@@ -82,14 +85,17 @@ const PromotionController = {
   },
   update: async (req, res, next) => {
     try {
+      const shopId = req.query.shopId
+      const promotionId = req.query.promotionId
+
       const data = req.body;
-      const { id } = req.params;
-      const object = await PromotionService.update(id, data);
+
+      const object = await PromotionService.update(promotionId, data);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
       res.json({
-        message: "Update" + model + "successfully",
+        message: "Update " + model + " successfully",
         status: 200,
         data: object,
       });
@@ -100,14 +106,15 @@ const PromotionController = {
 
   delete: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const object = await PromotionService.delete(id);
+      const shopId = req.query.shopId
+      const promotionId = req.query.promotionId
+
+      const object = await PromotionService.delete(promotionId);
       if (!object) {
         return next(createError.BadRequest(Model + " not found"));
       }
       res.json({
-        message: "Delete" + model + "successfully",
-        status: 200,
+        message: "Delete " + model + " successfully",
         data: object,
       });
     } catch (error) {
@@ -115,38 +122,75 @@ const PromotionController = {
     }
   },
 
-  getListByIds: async (req, res, next) => {
-
+  getByShopId: async (req, res, next) => {
     try {
-      const { ids } = req.body;
-
-      const list = await PromotionService.getListByIds(ids);
+      const shopId = req.query.shopId
+      const list = await PromotionService.getByShopId(shopId);
       if (!list) {
-        return next(createError.BadRequest("Products not found"));
+        return next(createError.BadRequest("Shop id not found"));
       }
       res.json({
-        message: "Get list of collectionType successfully",
-        status: 200,
+        message: "Get " + model + " list successfully",
         data: list,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
   },
-  getByShopId: async (req, res, next) => {
-    try {
-      const { shopId } = req.params;
-      const list = await PromotionService.getByShopId(shopId);
-      if (!list) {
-        return next(createError.BadRequest("Shop id" + " not found"));
+
+  async getPromotionBySelection(req, res, next)
+  {
+    try
+    {
+      const shopIds = req.body.shopIds
+      const lowerBoundaryForOrder = req.body.lowerBoundaryForOrder
+      const targetProducts = req.body.targetProducts
+      const inActive = req.body.inActive
+
+      const promotions = await PromotionService.getPromotionBySelectionFromBuyer(shopIds, lowerBoundaryForOrder, targetProducts, inActive)
+      if(promotions == null)
+      {
+        return next(createError.BadRequest("Missing parameters"))
       }
-      res.json({
-        message: "Get" + model + "list successfully",
-        status: 200,
-        data: list,
-      });
-    } catch (error) {
-      next(createError.InternalServerError(error.message));
+
+      return res.json({
+        message: "Get promotions successfully",
+        data: promotions
+      })
+
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  async getPromotionsWithCodes(req, res, next)
+  {
+    try
+    {
+      const shopId = req.query.shopId
+
+      const codes = req.body.codes
+
+      const listOfPromotions = await PromotionService.getPromotionsByCodes(shopId, codes)
+      if(listOfPromotions == null)
+      {
+        return next(createError.BadRequest())
+      }
+
+      return res.json(
+        {
+          message: "Get promotions by codes successfully",
+          data: listOfPromotions
+        }
+      )
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
     }
   },
 

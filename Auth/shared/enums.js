@@ -31,4 +31,18 @@ const DiscountType = {
   DIRECT_PRICE: "DIRECT_PRICE",
 };
 
-export { ProductStatus, AccountStatus, AccountType };
+const PromotionStatus = {
+  UPCOMMING: "UPCOMMING",
+  IN_PROGRESS: "IN_PROGRESS",
+  EXPIRED: "EXPIRED"
+}
+
+const AccountRegisterType = 
+{
+  STANDARD: "STANDARD",
+  GOOGLE: "GOOGLE",
+  FACEBOOK: "FACEBOOK"
+}
+
+
+export { ProductStatus, AccountStatus, AccountType, AccountRegisterType };

@@ -10,7 +10,7 @@ export const generateAccessToken = (userId, fullname, userRole) =>
 {
 
   const nonce = crypto.randomUUID()
-
+  const expiresIn = process.env.ACCESS_TOKEN_EXPIRY
   const payload = 
   {
     userId: userId,
@@ -18,12 +18,14 @@ export const generateAccessToken = (userId, fullname, userRole) =>
     userRole: userRole,
     nonce: nonce
   }
-
-  return jwt.sign(payload, secretKey);
+  const accessToken = jwt.sign(payload, secretKey, {expiresIn: expiresIn});
+  const decodedToken = jwt.decode(accessToken);
+  const expiredDate = new Date(decodedToken.exp * 1000);
+  return { accessToken, expiredDate };
 };
 
 export const generateRefreshToken = (userId, fullname, userRole) => {
-  const expiresIn = '30d'; 
+  const expiresIn = process.env.REFRESH_TOKEN_EXPIRY
   
   const nonce = crypto.randomUUID()
 
@@ -35,7 +37,6 @@ export const generateRefreshToken = (userId, fullname, userRole) => {
   };
 
   const refreshToken = jwt.sign(payload, secretKey, { expiresIn });
-
   const decodedToken = jwt.decode(refreshToken);
   const expiredDate = new Date(decodedToken.exp * 1000);
   return { refreshToken, expiredDate };

@@ -3,6 +3,7 @@ import Order from "./order.model.js";
 import orderGeneratorProvider from "./providers/order.generator.provider.js";
 import orderPaymentInfoProvider from "./providers/order.payment_info.provider.js";
 import orderStatusGeneratorProvider from "./providers/order.status.generator.provider.js";
+import { OrderStatus } from "./shared/enums.js";
 import ProductService from "./support/product.service.js";
 import ShopService from "./support/shop.service.js";
 import UserService from "./support/user.service.js";
@@ -121,6 +122,8 @@ const OrderService = {
 
         targetProduct.finalPrice = undefined
         targetProduct.purchasedPrice = product.purchasedPrice
+        targetProduct.color = product.color,
+        targetProduct.size = product.size
         targetProduct.quantity = product.quantity
 
         return targetProduct
@@ -226,19 +229,11 @@ const OrderService = {
 
         targetProduct.finalPrice = undefined
         targetProduct.purchasedPrice = value.purchasedPrice
+        targetProduct.color = value.color
+        targetProduct.size = value.size
         targetProduct.quantity = value.quantity
 
         return targetProduct
-        return(
-          {
-            _id: targetProduct._id,
-            name: targetProduct.name,
-            originalPrice: targetProduct.originalPrice,
-            image: targetProduct.images[0],
-            purchasedPrice: value.purchasedPrice,
-            quantity: value.quantity
-          }
-        )
       })
   
       //promotion and paymentMethod
@@ -280,9 +275,13 @@ const OrderService = {
     return generator(requiredData)
   },
 
-  async updateOrderStatus(orderId, shopId = undefined, userId = undefined, specStatusCode = undefined)
+  async updateOrderStatus(orderId, execTime = undefined, shopId = undefined, userId = undefined, specStatusCode = undefined)
   {
-    const completeTime = new Date(Date.now())
+    let completeTime = new Date(Date.now())
+    if(execTime != undefined)
+    {
+      completeTime = new Date(execTime)
+    }
 
     let rawOrder = null
 
@@ -301,6 +300,17 @@ const OrderService = {
     }
 
     const currentOrderStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+    if(currentOrderStatus.status == OrderStatus.COMPLETED && currentOrderStatus.complete != null)
+    {
+      return true
+    }
+    else if(currentOrderStatus.status == OrderStatus.COMPLETED && currentOrderStatus.complete == null)
+    {
+      rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
+      await rawOrder.save()
+      return true
+    }
+    
     let newStatus = null
     if(specStatusCode == undefined)
     {
@@ -322,34 +332,14 @@ const OrderService = {
     return true
   },
 
-  // async cancelOrderByUser(orderId)
-  // {
-  //   const rawOrder = await Order.findById(orderId)
-  //   if(rawOrder == null)
-  //   {
-  //     return false
-  //   }
 
-  //   const currentStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
-  //   if(currentStatus.status != OrderStatus.WAITING_ONLINE_PAYMENT && currentStatus.status != OrderStatus.PENDING)
-  //   {
-  //     return false
-  //   }
-
-  //   rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = new Date(Date.now())
-
-  //   const cancelledStatus = orderStatusGeneratorProvider.getStatus(OrderStatus.CANCELLED)
-
-  //   rawOrder.orderStatus.push(cancelledStatus)
-    
-  //   await rawOrder.save()
-
-  //   return true
-  // },
-
-  async updateManyOrderStatus(orderIds, shopId = undefined, userId = undefined, specStatusCode = undefined)
+  async updateManyOrderStatus(orderIds, execTime, shopId = undefined, userId = undefined, specStatusCode = undefined)
   {
-    const completeTime = new Date(Date.now())
+    let completeTime = new Date(Date.now())
+    if(execTime != undefined)
+    {
+      completeTime = new Date(execTime)
+    }
 
     let rawOrders = null
     if(shopId != undefined)
@@ -371,22 +361,34 @@ const OrderService = {
     rawOrders.forEach(async (rawOrder) =>
     {
       const currentOrderStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
-      let newStatus = null
-      if(specStatusCode == undefined)
+      if(currentOrderStatus.status == OrderStatus.COMPLETED && currentOrderStatus.complete != null)
       {
-        newStatus = orderStatusGeneratorProvider.getStatusSequently(currentOrderStatus.status)
+        successfulUpdatedList.push(rawOrder._id.toString())
+      }
+      if(currentOrderStatus.status == OrderStatus.COMPLETED && currentOrderStatus.complete == null)
+      {
+        rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
+        await rawOrder.save()
       }
       else
       {
-        newStatus = orderStatusGeneratorProvider.getStatus(specStatusCode)
-      }
-
-      if(newStatus != null)
-      {
-        rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
-        rawOrder.orderStatus.push(newStatus)
-        await rawOrder.save()
-        successfulUpdatedList.push(rawOrder._id.toString())
+        let newStatus = null
+        if(specStatusCode == undefined)
+        {
+          newStatus = orderStatusGeneratorProvider.getStatusSequently(currentOrderStatus.status)
+        }
+        else
+        {
+          newStatus = orderStatusGeneratorProvider.getStatus(specStatusCode)
+        }
+  
+        if(newStatus != null)
+        {
+          rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
+          rawOrder.orderStatus.push(newStatus)
+          await rawOrder.save()
+          successfulUpdatedList.push(rawOrder._id.toString())
+        }
       }
     })
     
@@ -558,7 +560,6 @@ const OrderService = {
       item.user = user
       item.products = products
       //item.promotion = promotion
-      //item.paymentMethod = paymentMethod
 
       return item
     })

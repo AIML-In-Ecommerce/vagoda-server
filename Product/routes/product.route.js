@@ -3,8 +3,20 @@ import ProductController from "../controllers/product.controller.js";
 import uploadCloud from "../shared/uploader.js";
 import xlsxUploadLocal from "../shared/xlsx_upload_local.js";
 import FileController from "../controllers/file.controller.js";
+import VerificationService from "../services/verification.service.js";
+import SystemProductController from "../controllers/system.product.controller.js";
 
 const router = express.Router();
+
+router.get("/product/welcome", (req, res, next) => {return res.json({
+  message: "welcome to product path of Product Service",
+  data: {}
+})})
+
+router.get("/products/welcome", (req, res, next) => {return res.json({
+  message: "welcome to product(s) path of Product Service",
+  data: {}
+})})
 
 router.get("/products", ProductController.getAll);
 router.get("/product/:id", ProductController.getById);
@@ -33,6 +45,13 @@ router.post(
 
 router.get("/files", FileController.getAll);
 router.get("/files/filter", FileController.filterFiles)
+
+//from system
+
+router.put("/system/product/sold_amount/increase", VerificationService.verifySystemRole, SystemProductController.increaseSoldAmountOfAProduct)
+router.put("/system/product/sold_amount/decrease", VerificationService.verifySystemRole, SystemProductController.decreaseSoldAmountOfAProduct)
+router.put("/system/products/sold_amount/increase", VerificationService.verifySystemRole, SystemProductController.increaseSoldAmountOfManyProduct)
+router.put("/system/products/sold_amount/decrease", VerificationService.verifySystemRole, SystemProductController.decreaseSoldAmountOfManyProduct)
 
 export default router;
 

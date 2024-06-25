@@ -3,6 +3,25 @@ import { OrderStatus, PaymentMethod } from "./shared/enums.js";
 
 const Schema = mongoose.Schema;
 
+const CoordinateOrderSchema = new Schema({
+  lng: {type: Number},
+  lat: {type: Number}
+})
+
+const ColorInProductInOrderSchema = new Schema({
+  link: {
+    type: String
+  },
+  color: {
+    label: {
+      type: String,
+    },
+    value: {
+      type: String
+    }
+  }
+}, {_id: false})
+
 
 //create discriminator
 //ref: https://mongoosejs.com/docs/discriminators.html#embedded-discriminators-in-arrays --> Single nested discriminator
@@ -51,6 +70,14 @@ const OrderSchema = new Schema({
         type: Number,
         required: true,
       },
+      color: {
+        type: ColorInProductInOrderSchema,
+        default: null
+      },
+      size: {
+        type: String,
+        default: null
+      }
     },
   ],
   promotion: {
@@ -99,12 +126,8 @@ const OrderSchema = new Schema({
         type: String,
       },
       coordinate: {
-        lng: {
-          type: Number,
-        },
-        lat: {
-          type: Number,
-        },
+        type: CoordinateOrderSchema,
+        default: null,
       },
       label: {
         type: String,
@@ -146,15 +169,5 @@ OrderSchema.path("paymentMethod").discriminator(PaymentMethod.ZALOPAY, ZaloPayPa
 
 
 const Order = mongoose.model("Order", OrderSchema);
-
-
-//TODO:
-/**
- * Lưu thêm vào database:
- * zp_trans_id: string,
- * mac: string
- * 
- * để hoàn tiền nếu cần
- */
 
 export default Order;

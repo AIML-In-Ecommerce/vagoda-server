@@ -1,8 +1,13 @@
 import express from "express"
 import StatisticsOrderController from "../controllers/statistics.order.controller.js"
+import VerificationService from "../services/verification.service.js"
 
 const router = express.Router()
 
+router.get("/welcome", (req, res, next) => {return res.json({
+    message: "welcome to order path of Statistics Service",
+    data: {}
+})})
 
 router.post("/status", StatisticsOrderController.getOrderStatisticsByShopWithStatus)
 

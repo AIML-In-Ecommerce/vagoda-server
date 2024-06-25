@@ -4,7 +4,7 @@ import { Product } from "../models/product/product.model.js"
 import ProductAccess, { generateProductAccessRecordProp } from "../models/access/productAcess.model.js"
 
 
-const ExpiryTimeOfCacheSearchedProducts = 60*3 //minutes 
+const ExpiryTimeOfCacheSearchedProducts = 60*2 //minutes 
 const NumberOfSearchedProductTaken = 10
 
 const StatisticsAccessService =
@@ -16,7 +16,10 @@ const StatisticsAccessService =
         const currentCacheProductList = await redisClient.get(cacheKey)
 
         const productInfo = await Product.findById(productId)
-
+        if(productInfo == null)
+        {
+            return null
+        }
         if(currentCacheProductList == null)
         {
             const newSearchedProductList = [productInfo]
@@ -62,14 +65,24 @@ const StatisticsAccessService =
 
     async getAccessProductsByBuyer(buyerId, amount, accessType = undefined, startTime = undefined, endTime = undefined)
     {
-        let startTimeToCheck = 0
-        let endTimeToCheck = new Date(Date.now())
+        let startTimeToCheck = new Date(2000, 1, 1)
+        let endTimeToCheck = new Date()
+
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
 
         const cacheKey = `${CachePrefix.UserSearchedProductPrefix}${buyerId}`
         const cacheValue = await redisClient.get(cacheKey)
 
         if(cacheValue != null)
         {
+            console.log("get from cache")
             return JSON.parse(cacheValue)
         }
 
@@ -82,16 +95,17 @@ const StatisticsAccessService =
 
         if(accessType != undefined)
         {
-            rawAccessedProducts = await ProductAccess.find({user: buyerId, accessType: accessType})
+            rawAccessedProducts = await ProductAccess.find({user: buyerId, accessType: accessType, time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
                                                     .sort({time: -1})
                                                     .limit(amount)
         }
         else
         {
-            rawAccessedProducts = await ProductAccess.find({user: buyerId})
+            rawAccessedProducts = await ProductAccess.find({user: buyerId, time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
                                                     .sort({time: -1})
                                                     .limit(amount)
         }
+
 
         if(rawAccessedProducts == null)
         {
@@ -103,13 +117,63 @@ const StatisticsAccessService =
             return []
         }
 
+        let accessProductIds = []
+
+        rawAccessedProducts.forEach((record) =>
+        {
+            accessProductIds.push(record.product.toString())
+        })
+
+        const productList = await Product.find({_id: {$in: accessProductIds}})
+
+        await redisClient.set(cacheKey, JSON.stringify(productList), {
+            EX: ExpiryTimeOfCacheSearchedProducts
+        })
+
+        return productList
+    },
+
+    async getAccessProductsWithShopId(shopId, amount = undefined, accessType = undefined, startTime = undefined, endTime = undefined)
+    {
+        let startTimeToCheck = new Date(2000, 1, 1)
+        let endTimeToCheck = new Date()
+
         if(startTime != undefined)
         {
             startTimeToCheck = new Date(startTime)
         }
-        if(endTime)
+        if(endTime != undefined)
         {
             endTimeToCheck = new Date(endTime)
+        }
+
+        let rawAccessedProducts = null
+        if(accessType != undefined && Object.values(ProductAccessType).includes(accessType) == false)
+        {
+            return null
+        }
+
+        if(accessType != undefined)
+        {
+            rawAccessedProducts = await ProductAccess.find({shop: shopId, accessType: accessType, time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
+                                                        .sort({time: -1})
+                                                        .limit(amount)
+        }
+        else
+        {
+            rawAccessedProducts = await ProductAccess.find({shop: shopId, time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
+                                                        .sort({time: -1})
+                                                        .limit(amount)
+        }
+
+        if(rawAccessedProducts == null)
+        {
+            return null
+        }
+        if(rawAccessedProducts.length == 0)
+        {
+            console.log("empty searched product")
+            return []
         }
 
         let accessProductIds = []
@@ -127,62 +191,17 @@ const StatisticsAccessService =
         return productList
     },
 
-    async getAccessProductsWithShopId(shopId, amount = undefined, accessType = undefined, startTime = undefined, endTime = undefined)
+    async setAccessProductBySessionId(sessionUserUUID, productId, shopId, accessType, execTime)
     {
-        let startTimeToCheck = 0
-        let endTimeToCheck = new Date(Date.now())
-
-        let rawAccessedProducts = null
-        if(accessType != undefined && Object.values(ProductAccessType).includes(accessType) == false)
+        let execTimeToSave = new Date()
+        if(execTime != undefined)
         {
-            return null
+            execTimeToSave = new Date(execTime)
         }
+        const newRecordProps = generateProductAccessRecordProp(productId, execTimeToSave, accessType, shopId, undefined, sessionUserUUID)
 
-        if(accessType != undefined)
-        {
-            rawAccessedProducts = await ProductAccess.find({shop: shopId, accessType: accessType})
-                                                        .sort({time: -1})
-                                                        .limit(amount)
-        }
-        else
-        {
-            rawAccessedProducts = await ProductAccess.find({shop: shopId})
-                                                        .sort({time: -1})
-                                                        .limit(amount)
-        }
-
-        if(rawAccessedProducts == null)
-        {
-            return null
-        }
-        if(rawAccessedProducts.length == 0)
-        {
-            console.log("empty searched product")
-            return []
-        }
-
-        if(startTime != undefined)
-        {
-            startTimeToCheck = new Date(startTime)
-        }
-        if(endTime)
-        {
-            endTimeToCheck = new Date(endTime)
-        }
-
-        let accessProductIds = []
-
-        rawAccessedProducts.forEach((record) =>
-        {
-            const timeToCheck = record.time.getTime()
-            if(timeToCheck >= startTimeToCheck && timeToCheck <= endTimeToCheck)
-            {
-                accessProductIds.push(record._id.toString())
-            }
-        })
-
-        const productList = await Product.find({_id: {$in: accessProductIds}})
-        return productList
+        const newRecord = new ProductAccess(newRecordProps)
+        await newRecord.save()
     },
 
 }
