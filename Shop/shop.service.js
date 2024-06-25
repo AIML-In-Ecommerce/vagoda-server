@@ -151,7 +151,28 @@ const ShopService = {
   
   
     return finalResult
-  }
+  },
+  async addImageLinks(shopId, imageLinks) {
+    const shop = await Shop.findById(shopId);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    const uniqueLinks = imageLinks.filter(link => !shop.imageCollection.includes(link));
+    shop.imageCollection.push(...uniqueLinks);
+
+    await shop.save();
+    return shop.imageCollection;
+  },
+
+  async removeImageLinks(shopId, imageLinks) {
+    const shop = await Shop.findById(shopId);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    shop.imageCollection = shop.imageCollection.filter(link => !imageLinks.includes(link));
+    await shop.save();
+    return shop.imageCollection;
+  },
 
 };
 

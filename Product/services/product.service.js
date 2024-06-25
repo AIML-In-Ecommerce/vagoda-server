@@ -2,6 +2,7 @@ import { Product } from "../models/product.model.js";
 import Category from "../models/category.model.js";
 import SubCategory from "../models/subCategory.model.js";
 import SubCategoryType from "../models/subCategoryType.model.js";
+import axios from "axios";
 
 const ProductService = {
   async getAll(filter, projection) {
@@ -205,48 +206,78 @@ const ProductService = {
   },
 
   async importProducts(data, shopId) {
+     
     console.log(data[0]["Hình ảnh   *"].split(",").map((url) => url.trim()));
+    const response = await axios.get("http://127.0.0.1:3005/categories")
+    const ctgs = response.data.data;
+    
 
-    const products = data.map((item) => ({
-      name: item["Tên sản phẩm *"],
-      description: item["Mô tả   *"],
-      originalPrice: item["Giá ban đầu  *"],
-      finalPrice: item["Giá sau khi giảm  *"],
-      category: null,
-      subCategory: null,
-      subCategoryType: null,
-      shop: shopId,
-      platformFee: 10000,
-      status: item["Trạng thái   *"],
-      images: item["Hình ảnh   *"].split(",").map((url) => url.trim()),
-      avgRating: 0,
-      soldQuantity: 0,
-      brand: item["Thương hiệu   *"],
-      isFlashSale: false,
-      inventoryAmount: item["Số lượng hàng trong kho   *"],
-      profit: 0,
-      attribute: {
-        colors: item["Màu sắc "].split(",").map((color) => {
-          console.log("Color1:", color);
-          const [label, value, link] = color
-            .replace("[", "")
-            .replace("]", "")
-            .split(";");
-          console.log("Color:", label, value, link);
-          return {
-            link: link.trim(),
-            color: {
-              label: label.trim(),
-              value: value.trim(),
-            },
-          };
-        }),
-        size: item["Kích cỡ"].split(",").map((size) => size.trim()),
-        material: item["Chất liệu "].trim(),
-        warranty: item["Bảo hành"].trim(),
-        manufacturingPlace: "",
-      },
-    }));
+    // let ctg = item["Danh mục   *"].split("/"); // Nữ/Áo nữ/Áo thun
+    // const category = categories.find((cat) => cat.name === ctg[0]);
+    // const subCategories = category.subCategories;
+    // const subCategory = subCategories.find((subCat) => subCat.name === ctg[1]);
+    // const subCategoryTypes = subCategory.subCategoryTypes;
+    // const subCategoryType = subCategoryTypes.find((sct) => sct.name === ctg[2]);
+
+    // category.subCategory = null;
+    // subCategory.subCategoryTypes = null;
+
+    const products = data.map((item) => {
+      let ctg = item["Danh mục   *"].split("/"); // Nữ/Áo nữ/Áo thun
+      console.log(ctg)
+      let categories = JSON.parse(JSON.stringify(ctgs));
+      let category = categories.find((cat) => cat.name === ctg[0]);
+      let subCategories = category.subCategories;
+      console.log("subctgs ",subCategories)
+      let subCategory = subCategories.find((subCat) => subCat.name === ctg[1]);
+      console.log("subcategory ",subCategory)
+      let subCategoryTypes = subCategory.subCategories;
+      let subCategoryType = subCategoryTypes.find((sct) => sct.name === ctg[2]);
+  
+      category.subCategories = null;
+      subCategory.subCategories = null;
+  
+      return {
+        name: item["Tên sản phẩm *"],
+        description: item["Mô tả   *"],
+        originalPrice: item["Giá ban đầu  *"],
+        finalPrice: item["Giá sau khi giảm  *"],
+        category: category,
+        subCategory: subCategory,
+        subCategoryType: subCategoryType,
+        shop: shopId,
+        platformFee: 10000,
+        status: item["Trạng thái   *"],
+        images: item["Hình ảnh   *"].split(",").map((url) => url.trim()),
+        avgRating: 0,
+        soldQuantity: 0,
+        brand: item["Thương hiệu   *"],
+        isFlashSale: false,
+        inventoryAmount: item["Số lượng hàng trong kho   *"],
+        profit: 0,
+        attribute: {
+          colors: item["Màu sắc "].split(",").map((color) => {
+            console.log("Color1:", color);
+            const [label, value, link] = color
+              .replace("[", "")
+              .replace("]", "")
+              .split(";");
+            console.log("Color:", label, value, link);
+            return {
+              link: link.trim(),
+              color: {
+                label: label.trim(),
+                value: value.trim(),
+              },
+            };
+          }),
+          size: item["Kích cỡ"].split(",").map((size) => size.trim()),
+          material: item["Chất liệu "].trim(),
+          warranty: item["Bảo hành"].trim(),
+          manufacturingPlace: "",
+        },
+      };
+    });
     return await Product.insertMany(products);
   },
 };

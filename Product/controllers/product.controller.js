@@ -255,6 +255,7 @@ const ProductController = {
     console.log("filename", fn);
     const currentDate = Date.now();
     const filePath = path.join(__dirname, "../uploads", req.file.filename);
+    let cloudinaryUrl = "";
     try {
       const workbook = xlsx.readFile(filePath);
       const sheetName = workbook.SheetNames[1];
@@ -269,7 +270,7 @@ const ProductController = {
         format: "xlsx",
       });
       console.log("Cloudinary upload result:", result);
-      const cloudinaryUrl = result.secure_url;
+      cloudinaryUrl = result.secure_url;
 
       fs.unlink(filePath, (err) => {
         if (err) {
@@ -303,7 +304,7 @@ const ProductController = {
       const shopId = req.body.shopId;
       const fileDataError = {
         name: fn,
-        url: "",
+        url: cloudinaryUrl,
         shop: shopId,
         products: [],
         status: "FALURE",

@@ -10,6 +10,9 @@ router.post("/shop", ShopController.create);
 router.put("/shop/:id", ShopController.update);
 router.delete("/shop/:id", ShopController.delete);
 
+router.put("/shop/addImgCollection/:shop", ShopController.addImageLinks)
+router.put("/shop/removeImgCollection/:shop", ShopController.removeImageLinks)
+
 router.get("/shop_info", ShopController.getShopBySelection)
 
 export default router;

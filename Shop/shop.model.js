@@ -86,6 +86,10 @@ const ShopSchema = new Schema({
     required: true,
     default: () => ({})
   },
+  imageCollection: {
+    type: [String],
+    default: []
+  },
   createAt: {
     type: Date,
     default: Date.now,

@@ -129,8 +129,8 @@ const ReviewController = {
       res.json({
         message: "Get average rating successfully",
         status: 200,
-        data: avg,
-      });
+        data: avg.toFixed(2),
+      })
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
