@@ -1,16 +1,3 @@
-<<<<<<< HEAD:Shop/shop.controller.js
-  import createError from "http-errors";
-  import ShopService from "./shop.service.js";
-  const model = "shop";
-  const Model = "Shop";
-  const ShopController = {
-    getAll: async (req, res, next) => {
-      try {
-        const filter = req.body;
-        const list = await ShopService.getAll(filter, "");
-        if (!list) {
-          return next(createError.BadRequest(Model + " list not found"));
-=======
 import createError from "http-errors";
 import ShopService from "../shop.service.js";
 
@@ -55,12 +42,6 @@ const ShopController = {
         {
           message: "Get list of shops successfully",
           data: listOfShops
->>>>>>> fc3dc9114afff15f48b63e8d91b3f1fc890c5683:Shop/controller/shop.controller.js
-        }
-        res.json({
-          message: "Get " + model + " list successfully",
-          status: 200,
-          data: list,
         });
       } catch (error) {
         next(createError.InternalServerError(error.message));
@@ -97,27 +78,8 @@ const ShopController = {
       }
     },
 
-<<<<<<< HEAD:Shop/shop.controller.js
     getById: async (req, res, next) => {
       try {
-=======
-  delete: async (req, res, next) => {
-    try {
-      const shopId = req.query.shopId
-      const object = await ShopService.delete(shopId);
-      if (!object) {
-        return next(createError.BadRequest(Model + " not found"));
-      }
-      res.json({
-        message: "Delete" + model + "successfully",
-        status: 200,
-        data: object,
-      });
-    } catch (error) {
-      next(createError.InternalServerError(error.message));
-    }
-  },
->>>>>>> fc3dc9114afff15f48b63e8d91b3f1fc890c5683:Shop/controller/shop.controller.js
 
         const id = req.params.id
 
@@ -205,32 +167,7 @@ const ShopController = {
           data: shopInfo
         })
       }
-<<<<<<< HEAD:Shop/shop.controller.js
       catch(error)
-=======
-
-      return res.json({
-        message: "Get shop info successfully",
-        data: shopInfo
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-      return next(createError.InternalServerError(error.message))
-    }
-  },
-
-  getShopBySelection: async (req, res, next) => {
-    try {
-      const shopId = req.query.shopId
-      const accountId = req.query.accountId
-      const useDesign = req.query.useDesign == "true"
-      const useShopDetail = req.query.useShopDetail == "true"
-
-      let object = null
-      if(shopId != null)
->>>>>>> fc3dc9114afff15f48b63e8d91b3f1fc890c5683:Shop/controller/shop.controller.js
       {
         console.log(error)
         return next(createError.InternalServerError(error.message))
