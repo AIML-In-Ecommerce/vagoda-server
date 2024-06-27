@@ -94,7 +94,7 @@ const ShopStatisticsService =
         return finalResult
     },
 
-    async getTopGlobalShopsHasProductsInTopSales(amount = undefined, startTime = undefined, endTime = undefined)
+    async getTopGlobalShopsHaveProductsInTopSales(amount = undefined, startTime = undefined, endTime = undefined)
     {
         //if cachedInfos == null ==> re-calculate the statistics
         const topProductsInGlobalSales = await StatisticsProductService.getTopProductsInGlobalSales(undefined, startTime, endTime, true)

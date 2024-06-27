@@ -115,7 +115,7 @@ const ShopStatisticsController =
         }
     },
 
-    async getTopGlobalShopsHasProductsInTopSales(req, res, next)
+    async getTopGlobalShopsHaveProductsInTopSales(req, res, next)
     {
         try
         {
@@ -149,7 +149,7 @@ const ShopStatisticsController =
             }
 
 
-            let statistics = await ShopStatisticsService.getTopGlobalShopsHasProductsInTopSales(amount, startTime, endTime)
+            let statistics = await ShopStatisticsService.getTopGlobalShopsHaveProductsInTopSales(amount, startTime, endTime)
             if(statistics == null)
             {
                 return next(createError.BadRequest("Cannot get the statistics"))
