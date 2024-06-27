@@ -16,7 +16,7 @@ const StatisticsProductController =
             const endTime = req.body.endTime
             const amount = req.body.amount
 
-            const statistics = await StatisticsProductService.getTopProductInSalesBySeller(shopId, amount, startTime, endTime)
+            const statistics = await StatisticsProductService.getTopProductInSalesBySeller(shopId, amount, startTime, endTime, false)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -208,6 +208,34 @@ const StatisticsProductController =
                 message: "Get amount of buyers statistics successfully",
                 data: statistics
             })
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
+    async getTopProductInGlobalSales(req, res, next)
+    {
+        try
+        {
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+            const amount = req.body.amount
+
+            const statistics = await StatisticsProductService.getTopProductsInGlobalSales(amount, startTime, endTime)
+            if(statistics == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
+
+            return res.json(
+                {
+                    message: "Get top sales of products successfully",
+                    data: statistics
+                }
+            )
         }
         catch(error)
         {

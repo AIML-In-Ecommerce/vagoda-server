@@ -258,9 +258,13 @@ const ProductService = {
       return null
     }
 
-    const newSoldAmount = rawProductInfo.soldQuantity + Math.abs(quantity)
+    const absQuantity = Math.abs(quantity)
+
+    const newSoldAmount = rawProductInfo.soldQuantity + absQuantity
+    const newInventory = rawProductInfo.inventoryAmount - absQuantity
 
     rawProductInfo.soldQuantity = newSoldAmount
+    rawProductInfo.inventoryAmount = newInventory
     return (await rawProductInfo.save())._id.toString()
   },
 
@@ -272,9 +276,12 @@ const ProductService = {
       return null
     }
 
-    const newSoldAmount = rawProductInfo.soldQuantity - Math.abs(quantity)
+    const absQuantity = Math.abs(quantity)
+    const newSoldAmount = rawProductInfo.soldQuantity - absQuantity
+    const newInventory = rawProductInfo.inventoryAmount + absQuantity
 
     rawProductInfo.soldQuantity = newSoldAmount
+    rawProductInfo.inventoryAmount = newInventory
     return (await rawProductInfo.save())._id.toString()
   },
 

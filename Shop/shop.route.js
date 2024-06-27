@@ -23,7 +23,7 @@ router.post("/shops", ShopController.getShopByIdList)
 
 
 // from system
-router.post("/system/shops", ShopController.getShopByIdList)
+router.post("/system/shops", VerificationService.verifySystemRole, ShopController.getShopByIdList)
 router.post("/system/shop", VerificationService.verifySystemRole, ShopController.create);
 router.delete("/system/shop", VerificationService.verifySystemRole, SystemShopController.delete);
 router.get("/system/shop_info", VerificationService.verifySystemRole, ShopController.getShopBySelection)

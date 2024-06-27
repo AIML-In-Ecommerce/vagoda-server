@@ -12,7 +12,7 @@ const StatisticsAccessService =
     async setAccessProductByBuyer(buyerId, productId, shopId, accessType, execTime)
     {
         const searchTime = new Date(execTime)
-        const cacheKey = `${CachePrefix.UserSearchedProductPrefix}${buyerId}`
+        const cacheKey = `${CachePrefix.USER_SEARCH_PRODUCT_PREFIX}${buyerId}`
         const currentCacheProductList = await redisClient.get(cacheKey)
 
         const productInfo = await Product.findById(productId)
@@ -77,7 +77,7 @@ const StatisticsAccessService =
             endTimeToCheck = new Date(endTime)
         }
 
-        const cacheKey = `${CachePrefix.UserSearchedProductPrefix}${buyerId}`
+        const cacheKey = `${CachePrefix.USER_SEARCH_PRODUCT_PREFIX}${buyerId}`
         const cacheValue = await redisClient.get(cacheKey)
 
         if(cacheValue != null)

@@ -28,7 +28,29 @@ const SystemPromotionController =
         }
     },
 
+    async updateCancelPromotionsQuantity(req, res, next)
+    {
+        try
+        {
+            const promotionIds = req.body.promotionIds
+            
+            const updatedPromotionIds = await PromotionService.updateCancelPromotionsQuantity(promotionIds)
+            if(updatedPromotionIds == null)
+            {
+                return next(createError.BadRequest("Cannot update specified promotions"))
+            }
 
+            return res.json({
+                message: "Update promotions successfully",
+                data: updatedPromotionIds
+            })
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message));
+        }
+    },
 }
 
 export default SystemPromotionController

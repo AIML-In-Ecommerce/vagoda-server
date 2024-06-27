@@ -10,6 +10,7 @@ router.get("/welcome", (req, res, next) => {return res.json({
 })})
 
 
+router.post("/top/in_global_sales", StatisticsProductController.getTopProductInGlobalSales)
 router.post("/top/in_sales", StatisticsProductController.getTopProductInSalesBySeller)
 router.post("/sold_amount/detail", StatisticsProductController.getSoldAmountOfProducts)
 router.post("/sold_amount/all", StatisticsProductController.getSoldAmountOfAllProducts)

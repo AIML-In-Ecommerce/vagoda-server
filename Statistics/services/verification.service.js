@@ -89,7 +89,7 @@ const VerificationService =
 
     async verifySessionId(req, res, next)
     {
-        const sessionId = req.cookies[`${SESSION_ID_COOKIE_KEY}`]
+        const sessionId = req.body.ssid
 
         const verifiedData = await AuthService.verifySessionId(sessionId)
         if(verifiedData == null)

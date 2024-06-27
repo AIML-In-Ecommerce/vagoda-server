@@ -241,6 +241,26 @@ const PromotionService = {
     return rawPromotions
   },
 
+  async updateCancelPromotionsQuantity(promotionIds)
+  {
+    const rawPromotions = await Promotion.find({_id: {$in: promotionIds}})
+    if(rawPromotions == null)
+    {
+      return null
+    }
+
+    const updatedPromotionIds = []
+    for(let i = 0; i< rawPromotions.length; i++)
+    {
+      const rawPromotion = rawPromotions[i]
+      rawPromotion.quantity = rawPromotion.quantity + 1
+      const updatedPromotion = await rawPromotion.save()
+      updatedPromotionIds.push(updatedPromotion._id.toString())
+    }
+
+    return updatedPromotionIds
+  },
+
 };
 
 export default PromotionService;
