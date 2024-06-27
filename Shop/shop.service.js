@@ -11,40 +11,22 @@ const ShopService = {
     const rawShopInfo = await Shop.findById(id);
     if(rawShopInfo == null)
     {
-      return null
+      return null 
     }
 
-    const finalResult = 
+    const finalResult = JSON.parse(JSON.stringify(rawShopInfo))
+
+    if(useShopDetail == false)
     {
-      _id: rawShopInfo._id,
-      name: rawShopInfo.name,
-      location: rawShopInfo.location,
-      description: rawShopInfo.description,
-      createAt: rawShopInfo.createAt,
-      __v: rawShopInfo.__v
+      finalResult.shopDetail = undefined
     }
 
-    if(useShopDetail == undefined)
+    if(useDesign == false)
     {
-      finalResult.shopDetail = rawShopInfo.shopDetail
+      finalResult.design = undefined
+      finalResult.shopInfoDesign = undefined
     }
-    else if(useShopDetail == true)
-    {
-      finalResult.shopDetail = rawShopInfo.shopDetail
-    }
-
-    if(useDesign == undefined)
-    {
-      finalResult.design = rawShopInfo.design,
-      finalResult.shopInfoDesign = rawShopInfo.shopInfoDesign
-    }
-    else if(useDesign == true)
-    {
-      finalResult.design = rawShopInfo.design,
-      finalResult.shopInfoDesign = rawShopInfo.shopInfoDesign
-    }
-  
-  
+    
     return finalResult
   },
 
@@ -60,34 +42,17 @@ const ShopService = {
 
     const finalResult = rawShopInfos.map((item) =>
     {
-      const infoObject =
+      const infoObject = JSON.parse(JSON.stringify(item))
+
+      if(useShopDetail == false)
       {
-        _id: item._id,
-        name: item.name,
-        location: item.location,
-        description: item.description,
-        createAt: item.createAt,
-        __v: item.__v
+        infoObject.shopDetail = undefined
       }
 
-      if(useShopDetail == undefined)
+      if(useDesign == false)
       {
-        infoObject.shopDetail = item.shopDetail
-      }
-      else if(useShopDetail == true)
-      {
-        infoObject.shopDetail = item.shopDetail
-      }
-
-      if(useDesign == undefined)
-      {
-        infoObject.design = item.design,
-        infoObject.shopInfoDesign = item.shopInfoDesign
-      }
-      else if(useDesign == true)
-      {
-        infoObject.design = item.design,
-        infoObject.shopInfoDesign = item.shopInfoDesign
+        infoObject.design = undefined
+        infoObject.shopInfoDesign = undefined
       }
 
       return infoObject
@@ -119,37 +84,19 @@ const ShopService = {
       return null
     }
 
-    const finalResult = 
+    const finalResult = JSON.parse(JSON.stringify(rawShopInfo))
+
+    if(useShopDetail == false)
     {
-      _id: rawShopInfo._id,
-      name: rawShopInfo.name,
-      location: rawShopInfo.location,
-      description: rawShopInfo.description,
-      createAt: rawShopInfo.createAt,
-      __v: rawShopInfo.__v
+      finalResult.shopDetail = undefined
     }
 
-    if(useShopDetail == undefined)
+    if(useDesign == false)
     {
-      finalResult.shopDetail = rawShopInfo.shopDetail
+      finalResult.design = undefined
+      finalResult.shopInfoDesign = undefined
     }
-    else if(useShopDetail == true)
-    {
-      finalResult.shopDetail = rawShopInfo.shopDetail
-    }
-
-    if(useDesign == undefined)
-    {
-      finalResult.design = rawShopInfo.design,
-      finalResult.shopInfoDesign = rawShopInfo.shopInfoDesign
-    }
-    else if(useDesign == true)
-    {
-      finalResult.design = rawShopInfo.design,
-      finalResult.shopInfoDesign = rawShopInfo.shopInfoDesign
-    }
-  
-  
+    
     return finalResult
   },
   async addImageLinks(shopId, imageLinks) {
