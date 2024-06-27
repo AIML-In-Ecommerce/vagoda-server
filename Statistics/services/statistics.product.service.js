@@ -1,6 +1,7 @@
+import redisClient from "../configs/redis.config.js"
 import ProductAccess from "../models/access/productAcess.model.js"
 import { Product } from "../models/product/product.model.js"
-import { OrderStatus, ProductAccessType } from "../shared/enums.js"
+import { CachePrefix, OrderStatus, ProductAccessType } from "../shared/enums.js"
 import StatisticsOrderService from "./statistics.order.service.js"
 
 const DEFAULT_MAX_TOP_PRODUCTS_IN_SALES = 10
@@ -8,7 +9,7 @@ const DEFAULT_MAX_TOP_PRODUCTS_IN_SALES = 10
 const StatisticsProductService = 
 {
 
-    async getTopProductInSalesBySeller(shopId, amount = undefined, startTime = undefined, endTime = undefined)
+    async getTopProductInSalesBySeller(shopId, amount = undefined, startTime = undefined, endTime = undefined, useProductInfo = false)
     {
         const targetOrderStatus = OrderStatus.PROCESSING
         const orderStatistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
@@ -61,35 +62,47 @@ const StatisticsProductService =
             synthesizedProductCount.push(synthesizedValue)
         })
 
-        synthesizedProductCount = synthesizedProductCount.sort((a, b) => a.count - b.count)
+        synthesizedProductCount.sort((a, b) => b.count - a.count)
 
         if(amount != undefined)
         {
             synthesizedProductCount = synthesizedProductCount.slice(0, amount)
         }
-        else
-        {
-            synthesizedProductCount = synthesizedProductCount.slice(0, DEFAULT_MAX_TOP_PRODUCTS_IN_SALES)
-        }
+        // else
+        // {
+        //     synthesizedProductCount = synthesizedProductCount.slice(0, DEFAULT_MAX_TOP_PRODUCTS_IN_SALES)
+        // }
 
         const productIds = synthesizedProductCount.map((item) =>
         {
             return item._id
         })
 
+        const mapOfProductInfos = new Map()
         const productInfos = await Product.find({_id: {$in: productIds}})
 
-        const finalResult = productInfos.map((product) =>
+        productInfos.forEach((product) =>
         {
-            const productId = product.id.toString()
+            const clonedProduct = JSON.parse(JSON.stringify(product))
+            mapOfProductInfos.set(clonedProduct._id, clonedProduct)
+        })
+
+        const finalResult = productIds.map((productId) =>
+        {
+            const productInfo = mapOfProductInfos.get(productId)
             const countValue = productCount.get(productId)
 
             const record = 
             {
                 _id: productId,
-                title: product.name,
+                title: productInfo.name,
                 value: countValue.value,
                 count: countValue.count
+            }
+
+            if(useProductInfo == true)
+            {
+                record.productInfo = productInfo
             }
 
             return record
@@ -566,6 +579,109 @@ const StatisticsProductService =
             totalBuyers: totalBuyers,
             statisticData: statisticData
         }
+
+        return finalResult
+    },
+
+    async getTopProductsInGlobalSales(amount = undefined, startTime = undefined, endTime = undefined, useProductInfo = false)
+    {
+        const targetOrderStatus = OrderStatus.PROCESSING
+        const orderStatistics = await StatisticsOrderService.getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime)
+        if(orderStatistics == null)
+        {
+            return null
+        }
+
+        const productCount = new Map()
+
+        orderStatistics.statisticData.forEach((order) =>
+        {
+            order.products.forEach((product) =>
+            {
+                const productId = product.product.toString()
+                const productPrice = product.purchasedPrice*product.quantity
+                const productCountValue = productCount.get(productId)
+                if(productCountValue == undefined) //need to initialize
+                {
+                    const initValue = {
+                        count: product.quantity,
+                        value: productPrice
+                    }
+                    productCount.set(productId, initValue)
+                }
+                else
+                {
+                    const newPrice = productCountValue.value + product.purchasedPrice*product.quantity
+                    const newCount = productCountValue.count + product.quantity
+                    const newValue = 
+                    {
+                        count: newCount,
+                        value: newPrice
+                    }
+                    productCount.set(productId, newValue)
+                }
+            })
+
+        })
+
+        let synthesizedProductCount = []
+        productCount.forEach((value, key) =>
+        {
+            const synthesizedValue = 
+            {
+                _id: key,
+                count: value.count,
+                value: value.value
+            }
+            synthesizedProductCount.push(synthesizedValue)
+        })
+
+        synthesizedProductCount.sort((a, b) => b.count - a.count)
+
+        if(amount != undefined)
+        {
+            synthesizedProductCount = synthesizedProductCount.slice(0, amount)
+        }
+        // else
+        // {
+        //     synthesizedProductCount = synthesizedProductCount.slice(0, DEFAULT_MAX_TOP_PRODUCTS_IN_SALES)
+        // }
+
+        const productIds = synthesizedProductCount.map((item) =>
+        {
+            return item._id
+        })
+
+        const productInfos = await Product.find({_id: {$in: productIds}})
+
+        const mapOfProductInfos = new Map()
+        productInfos.forEach((product) =>
+        {
+            const clonedProduct = JSON.parse(JSON.stringify(product))
+            mapOfProductInfos.set(clonedProduct._id, clonedProduct)
+        })
+
+        //use productId in productIds array to ensure that we can get sorted products infos
+        const finalResult = productIds.map((productId) =>
+        {
+            const productInfo = mapOfProductInfos.get(productId)
+            const countValue = productCount.get(productId)
+
+            const record = 
+            {
+                _id: productId,
+                title: productInfo.name,
+                value: countValue.value,
+                count: countValue.count
+            }
+
+            if(useProductInfo == true)
+            {
+                record.productInfo = productInfo
+            }
+
+            return record
+        })
 
         return finalResult
     },

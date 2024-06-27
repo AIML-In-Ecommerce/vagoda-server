@@ -1,8 +1,10 @@
-import Order from '../models/order/order.model.js'
+
 import { OrderStatus } from '../shared/enums.js'
 import StatisticsOrderService from './statistics.order.service.js'
-import ProductAccess from "../models/access/productAcess.model.js"
 import StatisticsAccessService from './statistics.access.service.js'
+import StatisticsProductService from './statistics.product.service.js'
+import ShopSupportService from '../support/shop.support.js'
+
 
 const ShopStatisticsService =
 {
@@ -88,6 +90,68 @@ const ShopStatisticsService =
             conversionRate: conversionRate,
             statisticData: orderStatistics.statisticData
         }
+
+        return finalResult
+    },
+
+    async getTopGlobalShopsHaveProductsInTopSales(amount = undefined, startTime = undefined, endTime = undefined)
+    {
+        //if cachedInfos == null ==> re-calculate the statistics
+        const topProductsInGlobalSales = await StatisticsProductService.getTopProductsInGlobalSales(undefined, startTime, endTime, true)
+        if(topProductsInGlobalSales == null)
+        {
+            return null
+        }
+
+        const shopInfosStatistics = new Map()
+
+        topProductsInGlobalSales.forEach((record) =>
+        {
+            const productId = record._id
+            const shopId = record.productInfo.shop
+            const newRevenue = record.value
+            const newSold = record.count
+
+            const shopInfosStatisticsRecord = shopInfosStatistics.get(shopId)
+            if(shopInfosStatisticsRecord == undefined)
+            {
+                //initialize the first value
+                const initValue = {
+                    shopId: shopId,
+                    shopInfo: null,
+                    revenue: newRevenue,
+                    sold: newSold,
+                    productIds: [productId]
+                }
+
+                shopInfosStatistics.set(shopId, initValue)
+            }
+            else
+            {
+                shopInfosStatisticsRecord.revenue = shopInfosStatisticsRecord.revenue + newRevenue
+                shopInfosStatisticsRecord.sold = shopInfosStatisticsRecord.sold + newSold
+                shopInfosStatisticsRecord.productIds.push(productId)
+
+                shopInfosStatistics.set(shopId, shopInfosStatisticsRecord)
+            }
+        })
+
+        const fetchedShopInfos = await ShopSupportService.getListOfShopInfosByShopIds(Array.from(shopInfosStatistics.keys()))
+        if(fetchedShopInfos != null)
+        {
+            fetchedShopInfos.forEach((fetchedShopInfo) =>
+            {
+                const statistics = shopInfosStatistics.get(fetchedShopInfo._id)
+                if(statistics != undefined)
+                {
+                    statistics.shopInfo = fetchedShopInfo
+                }
+            })
+        }
+        
+        let finalResult = Array.from(shopInfosStatistics.values())
+
+        finalResult.sort((a, b) => b.sold - a.sold)
 
         return finalResult
     },

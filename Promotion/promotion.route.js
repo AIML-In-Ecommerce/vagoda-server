@@ -29,6 +29,7 @@ router.post("/promotion/shop/selection", PromotionController.getPromotionBySelec
 
 //from system
 router.put("/system/promotions/be_used", SystemPromotionController.updateUsedPromotionsQuantity)
+router.put("/system/promotions/cancel", SystemPromotionController.updateCancelPromotionsQuantity)
 
 export default router;
 

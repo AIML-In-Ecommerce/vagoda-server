@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import Order from "../models/order/order.model.js"
 import { OrderStatus } from "../shared/enums.js"
 
@@ -17,23 +18,34 @@ const StatisticsOrderService =
      */
     async getOrderByShopWithStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
     {
-        let endTimeToCheck = new Date().getTime()
-        let startTimeToCheck = 0
-
-        const rawOrders =  await Order.find({shop: shopId})
-
-        if(rawOrders == null)
-        {
-            return null
-        }
+        let endTimeToCheck = new Date()
+        let startTimeToCheck = new Date(2000, 1, 1)
 
         if(startTime != undefined)
         {
-            startTimeToCheck = new Date(startTime).getTime()
+            startTimeToCheck = new Date(startTime)
         }
         if(endTime != undefined)
         {
-            endTimeToCheck = new Date(endTime).getTime()
+            endTimeToCheck = new Date(endTime)
+        }
+
+        // const rawOrders =  await Order.find({shop: shopId})
+        const rawOrders =  await Order.find({shop: shopId, 
+            orderStatus: {
+                $elemMatch: {
+                    status: targetOrderStatus,
+                    time: {
+                        $gte: startTimeToCheck,
+                        $lte: endTimeToCheck
+                    }
+                }
+            }
+        })
+        
+        if(rawOrders == null)
+        {
+            return null
         }
 
         let totalRevenue = 0
@@ -47,10 +59,15 @@ const StatisticsOrderService =
             for(let i = order.orderStatus.length - 1; i >= 0; i--)
             {
                 const checkingOrderStatus = order.orderStatus[i]
-                const timeOfConfirm = checkingOrderStatus.time.getTime()
+                // const timeOfConfirm = checkingOrderStatus.time.getTime()
  
-                if(checkingOrderStatus.status == targetOrderStatus &&
-                    (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck))
+                // if(checkingOrderStatus.status == targetOrderStatus &&
+                //     (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck))
+                // {
+                //     confirmedOrderStatus = checkingOrderStatus
+                //     break;
+                // }
+                if(checkingOrderStatus.status == targetOrderStatus)
                 {
                     confirmedOrderStatus = checkingOrderStatus
                     break;
@@ -100,14 +117,6 @@ const StatisticsOrderService =
     {
         let endTimeToCheck = new Date().getTime()
         let startTimeToCheck = 0
-
-        const rawOrders =  await Order.find({shop: shopId})
-
-        if(rawOrders == null)
-        {
-            return null
-        }
-
         if(startTime != undefined)
         {
             startTimeToCheck = new Date(startTime).getTime()
@@ -115,6 +124,24 @@ const StatisticsOrderService =
         if(endTime != undefined)
         {
             endTimeToCheck = new Date(endTime).getTime()
+        }
+
+        const rawOrders =  await Order.find({shop: shopId, 
+            orderStatus: {
+                $elemMatch: {
+                    status: targetOrderStatus,
+                    time: {
+                        $gte: startTimeToCheck,
+                        $lte: endTimeToCheck
+                    },
+                    complete: {$ne: null}
+                }
+            }
+        })
+
+        if(rawOrders == null)
+        {
+            return null
         }
 
         let totalRevenue = 0
@@ -128,12 +155,13 @@ const StatisticsOrderService =
             for(let i = order.orderStatus.length - 1; i >= 0; i--)
             {
                 const checkingOrderStatus = order.orderStatus[i]
-                const timeOfConfirm = checkingOrderStatus.time.getTime()
+                // const timeOfConfirm = checkingOrderStatus.time.getTime()
  
-                if(checkingOrderStatus.status == targetOrderStatus &&
-                    (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck)
-                    && checkingOrderStatus.complete != null
-                ) 
+                // if(checkingOrderStatus.status == targetOrderStatus &&
+                //     (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck)
+                //     && checkingOrderStatus.complete != null
+                // )
+                if(checkingOrderStatus.status == targetOrderStatus) 
                 {
                     confirmedOrderStatus = checkingOrderStatus
                     break;
@@ -171,15 +199,8 @@ const StatisticsOrderService =
 
     async getOrderByShopWithLatestStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
     {
-        let endTimeToCheck = new Date().getTime()
-        let startTimeToCheck = 0
-
-        const rawOrders =  await Order.find({shop: shopId})
-
-        if(rawOrders == null)
-        {
-            return null
-        }
+        let endTimeToCheck = new Date()
+        let startTimeToCheck = new Date(2000, 1, 1)
 
         if(startTime != undefined)
         {
@@ -188,6 +209,51 @@ const StatisticsOrderService =
         if(endTime != undefined)
         {
             endTimeToCheck = new Date(endTime).getTime()
+        }
+
+        const orderAggregatePipline = [
+            {
+                $match: {
+                    shop: mongoose.Schema.Types.ObjectId(shopId)
+                }
+            },
+            {
+                $project: {
+                    orderStatus: 1,
+                    user: 1,
+                    shop: 1,
+                    products: 1,
+                    promotion: 1,
+                    paymentMethod: 1,
+                    shippingFee: 1,
+                    totalPrice: 1,
+                    profit: 1,
+                    shippingAddress: 1,
+                    lastStatus: {
+                    $arrayElemAt: ["$orderStatus", -1]
+                    }
+                }
+            },
+            {
+                $match: {
+                    "lastStatus.status": targetOrderStatus,
+                    "lastStatus.time": {
+                        $gte: startTimeToCheck,
+                        $lte: endTimeToCheck
+                    }
+                }
+            },
+            {
+                $project: {
+                    lastStatus: 0
+                }
+            }
+        ]
+        const rawOrders =  await Order.aggregate(orderAggregatePipline)
+
+        if(rawOrders == null)
+        {
+            return null
         }
 
         let totalRevenue = 0
@@ -199,10 +265,11 @@ const StatisticsOrderService =
             let confirmedOrderStatus = null
             //as an initialized order has the number of status
             const latestStatus = order.orderStatus[order.orderStatus.length - 1]
-            const confirmedTime = latestStatus.time.getTime()
-            if(latestStatus.status == targetOrderStatus &&
-                (confirmedTime >= startTimeToCheck && confirmedTime <= endTimeToCheck)
-            )
+            // const confirmedTime = latestStatus.time.getTime()
+            // if(latestStatus.status == targetOrderStatus &&
+            //     (confirmedTime >= startTimeToCheck && confirmedTime <= endTimeToCheck)
+            // )
+            if(latestStatus.status == targetOrderStatus)
             {
                 confirmedOrderStatus = latestStatus
             }
@@ -246,23 +313,33 @@ const StatisticsOrderService =
             return null
         }
 
-        let endTimeToCheck = new Date().getTime()
-        let startTimeToCheck = 0
+        let endTimeToCheck = new Date()
+        let startTimeToCheck = new Date(2000, 1, 1)
 
-        const rawOrders =  await Order.find({shop: shopId})
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        const rawOrders =  await Order.find({shop: shopId, 
+            orderStatus: {
+                $elemMatch: {
+                    status: targetOrderStatus,
+                    time: {
+                        $gte: startTimeToCheck,
+                        $lte: endTimeToCheck
+                    }
+                }
+            }
+        })
 
         if(rawOrders == null)
         {
             return null
-        }
-
-        if(startTime != undefined)
-        {
-            startTimeToCheck = new Date(startTime).getTime()
-        }
-        if(endTime != undefined)
-        {
-            endTimeToCheck = new Date(endTime).getTime()
         }
 
         let totalRevenue = 0
@@ -276,11 +353,15 @@ const StatisticsOrderService =
             for(let i = order.orderStatus.length - 1; i >= 0; i--)
             {
                 const checkingOrderStatus = order.orderStatus[i]
-                const timeOfConfirm = checkingOrderStatus.time.getTime()
+                // const timeOfConfirm = checkingOrderStatus.time.getTime()
                 const deadlineToCheck = checkingOrderStatus.deadline.getTime()
                 const completedTimeToCheck = checkingOrderStatus.complete != null ? checkingOrderStatus.complete.getTime() : null
+                // if(checkingOrderStatus.status == targetOrderStatus &&
+                //     (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck) &&
+                //     ((completedTimeToCheck != null && completedTimeToCheck > deadlineToCheck) ||
+                //     (completedTimeToCheck == null && currentTime > deadlineToCheck))
+                // )
                 if(checkingOrderStatus.status == targetOrderStatus &&
-                    (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck) &&
                     ((completedTimeToCheck != null && completedTimeToCheck > deadlineToCheck) ||
                     (completedTimeToCheck == null && currentTime > deadlineToCheck))
                 )
@@ -292,18 +373,6 @@ const StatisticsOrderService =
 
             if(confirmedOrderStatus != null)
             {
-                // const data = 
-                // {
-                //     _id: order._id.toString(),
-                //     totalPrice: order.totalPrice,
-                //     profit: order.profit,
-                //     shop: order.shop,
-                //     user: order.user,
-                //     promotion: order.promotion,
-                //     shippingFee: order.shippingFee,
-                //     confirmedTime: confirmedOrderStatus
-                // }
-
                 const data = JSON.parse(JSON.stringify(order))
                 data.orderStatus = undefined
                 data.confirmedTime = confirmedOrderStatus
@@ -341,23 +410,33 @@ const StatisticsOrderService =
             return null
         }
 
-        let endTimeToCheck = new Date().getTime()
-        let startTimeToCheck = 0
+        let endTimeToCheck = new Date()
+        let startTimeToCheck = new Date(2000, 1, 1)
 
-        const rawOrders =  await Order.find({shop: shopId})
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        const rawOrders =  await Order.find({shop: shopId, 
+            orderStatus: {
+                $elemMatch: {
+                    status: targetOrderStatus,
+                    time: {
+                        $gte: startTimeToCheck,
+                        $lte: endTimeToCheck
+                    }
+                }
+            }
+        })
 
         if(rawOrders == null)
         {
             return null
-        }
-
-        if(startTime != undefined)
-        {
-            startTimeToCheck = new Date(startTime).getTime()
-        }
-        if(endTime != undefined)
-        {
-            endTimeToCheck = new Date(endTime).getTime()
         }
 
         let totalRevenue = 0
@@ -371,11 +450,15 @@ const StatisticsOrderService =
             for(let i = order.orderStatus.length - 1; i >= 0; i--)
             {
                 const checkingOrderStatus = order.orderStatus[i]
-                const timeOfConfirm = checkingOrderStatus.time.getTime()
+                // const timeOfConfirm = checkingOrderStatus.time.getTime()
                 const deadlineToCheck = checkingOrderStatus.deadline.getTime()
                 const completedTimeToCheck = checkingOrderStatus.complete != null ? checkingOrderStatus.complete.getTime() : null
+                // if(checkingOrderStatus.status == targetOrderStatus &&
+                //     (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck) &&
+                //     ((completedTimeToCheck != null && completedTimeToCheck <= deadlineToCheck) ||
+                //     (completedTimeToCheck == null && currentTime <= deadlineToCheck))
+                // )
                 if(checkingOrderStatus.status == targetOrderStatus &&
-                    (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck) &&
                     ((completedTimeToCheck != null && completedTimeToCheck <= deadlineToCheck) ||
                     (completedTimeToCheck == null && currentTime <= deadlineToCheck))
                 )
@@ -417,22 +500,33 @@ const StatisticsOrderService =
 
     async getOrdersWithOnWaitingForStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
     {
-        let endTimeToCheck = new Date().getTime()
-        let startTimeToCheck = 0
-
-        const rawOrders = await Order.find({shop: shopId})
-        if(rawOrders == null)
-        {
-            return null
-        }
+        let endTimeToCheck = new Date()
+        let startTimeToCheck = new Date(2000, 1, 1)
 
         if(endTimeToCheck != undefined)
         {
-            endTimeToCheck = new Date(endTime).getTime()
+            endTimeToCheck = new Date(endTime)
         }
         if(startTime != undefined)
         {
-            startTimeToCheck = new Date(startTime).getTime()
+            startTimeToCheck = new Date(startTime)
+        }
+
+        const rawOrders = await Order.find({shop: shopId, 
+            orderStatus: {
+                $elemMatch: {
+                    status: targetOrderStatus,
+                    time: {
+                        $gte: startTimeToCheck,
+                        $lte: endTimeToCheck
+                    },
+                    complete: {$eq: null}
+                }
+            }
+        })
+        if(rawOrders == null)
+        {
+            return null
         }
 
         let totalRevenue = 0
@@ -448,10 +542,11 @@ const StatisticsOrderService =
                 const checkingOrderStatus = order.orderStatus[i]
                 const timeOfConfirm = checkingOrderStatus.time.getTime()
                 const completedTimeToCheck = checkingOrderStatus.complete != null ? checkingOrderStatus.complete.getTime() : null
-                if(checkingOrderStatus.status == targetOrderStatus &&
-                    (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck) &&
-                    (completedTimeToCheck == null)
-                )
+                // if(checkingOrderStatus.status == targetOrderStatus &&
+                //     (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck) &&
+                //     (completedTimeToCheck == null)
+                // )
+                if(checkingOrderStatus.status == targetOrderStatus)
                 {
                     confirmedOrderStatus = checkingOrderStatus
                     break;
@@ -571,8 +666,17 @@ const StatisticsOrderService =
 
     async getSalesByShop(shopId, startTime = undefined, endTime = undefined)
     {
-        let endTimeToCheck = new Date().getTime()
-        let startTimeToCheck = 0
+        let endTimeToCheck = new Date()
+        let startTimeToCheck = new Date(2000, 1, 1)
+
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
 
         const rawOrders =  await Order.find({shop: shopId})
 
@@ -581,14 +685,6 @@ const StatisticsOrderService =
             return null
         }
 
-        if(startTime != undefined)
-        {
-            startTimeToCheck = new Date(startTime).getTime()
-        }
-        if(endTime != undefined)
-        {
-            endTimeToCheck = new Date(endTime).getTime()
-        }
 
         let totalRevenue = 0
         let totalProfit = 0
@@ -610,9 +706,171 @@ const StatisticsOrderService =
 
             const upperBoundStatus = order.orderStatus[order.orderStatus.length - 1]
 
-            if((lowerBoundStatus.time > endTimeToCheck) == false && (upperBoundStatus.time < startTimeToCheck) == false)
+            if(lowerBoundStatus != null)
+            {
+                if((lowerBoundStatus.time > endTimeToCheck) == false && (upperBoundStatus.time < startTimeToCheck) == false)
+                {
+                    const data = JSON.parse(JSON.stringify(order))
+                    totalRevenue += order.totalPrice
+                    totalProfit += order.profit
+    
+                    statisticData.push(data)
+                }
+            }
+        })
+
+        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
+        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+
+        const finalResult = 
+        {
+            totalRevenue: totalRevenue,
+            totalProfit: totalProfit,
+            avgRevenue: avgRevenue,
+            avgProfit: avgProfit,
+            totalOrders: statisticData.length,
+            statisticData: statisticData
+        }
+
+        return finalResult
+    },
+
+    async getGlobalCompletedOrdersWithStatus(targetOrderStatus, startTime, endTime)
+    {
+        let startTimeToCheck = new Date(2000, 1, 1)
+        let endTimeToCheck = new Date()
+        
+        if(startTime != undefined && startTime != null)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined && endTime != null)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        const rawOrders = await Order.find({
+            orderStatus: {
+                $elemMatch: {
+                    status: targetOrderStatus,
+                    time: {
+                        $gte: startTimeToCheck,
+                        $lte: endTimeToCheck
+                    },
+                    complete: {$ne: null}
+                }
+            }
+        })
+
+        if(rawOrders == null)
+        {
+            return null
+        }
+
+        let totalRevenue = 0
+        let totalProfit = 0
+        const statisticData = []
+
+        rawOrders.forEach((order) =>
+        {
+            let confirmedOrderStatus = null
+            //as an initialized order has the number of status
+            for(let i = order.orderStatus.length - 1; i >= 0; i--)
+            {
+                const checkingOrderStatus = order.orderStatus[i]
+
+                if(checkingOrderStatus.status == targetOrderStatus)
+                {
+                    confirmedOrderStatus = checkingOrderStatus
+                    break;
+                }
+            }
+
+            if(confirmedOrderStatus != null)
             {
                 const data = JSON.parse(JSON.stringify(order))
+                data.orderStatus = undefined
+                data.confirmedTime = confirmedOrderStatus
+
+                totalRevenue += order.totalPrice
+                totalProfit += order.profit
+
+                statisticData.push(data)
+            }
+        })
+
+        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
+        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+
+        const finalResult = 
+        {
+            totalRevenue: totalRevenue,
+            totalProfit: totalProfit,
+            avgRevenue: avgRevenue,
+            avgProfit: avgProfit,
+            totalOrders: statisticData.length,
+            statisticData: statisticData
+        }
+
+        return finalResult
+    },
+
+    async getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime)
+    {
+        let startTimeToCheck = new Date(2000, 1, 1)
+        let endTimeToCheck = new Date()
+        
+        if(startTime != undefined && startTime != null)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined && endTime != null)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        const rawOrders = await Order.find({
+            orderStatus: {
+                $elemMatch: {
+                    status: targetOrderStatus,
+                    time: {
+                        $gte: startTimeToCheck,
+                        $lte: endTimeToCheck
+                    }
+                }
+            }
+        })
+
+        if(rawOrders == null)
+        {
+            return null
+        }
+
+        let totalRevenue = 0
+        let totalProfit = 0
+        const statisticData = []
+
+        rawOrders.forEach((order) =>
+        {
+            let confirmedOrderStatus = null
+            //as an initialized order has the number of status
+            for(let i = order.orderStatus.length - 1; i >= 0; i--)
+            {
+                const checkingOrderStatus = order.orderStatus[i]
+
+                if(checkingOrderStatus.status == targetOrderStatus)
+                {
+                    confirmedOrderStatus = checkingOrderStatus
+                    break;
+                }
+            }
+
+            if(confirmedOrderStatus != null)
+            {
+                const data = JSON.parse(JSON.stringify(order))
+                data.orderStatus = undefined
+                data.confirmedTime = confirmedOrderStatus
+
                 totalRevenue += order.totalPrice
                 totalProfit += order.profit
 

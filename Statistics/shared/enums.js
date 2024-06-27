@@ -38,7 +38,9 @@ const PaymentMethod =
 
 const CachePrefix = 
 {
-  UserSearchedProductPrefix: "#user-searched-product#",
+  USER_SEARCH_PRODUCT_PREFIX: "#user-searched-product#",
+  GLOBAL_TOP_IN_SALES_SUBCATEGORY_PREFIX: "#global-top-in-sales-subcategory#",
+  GLOBAL_TOP_SHOPS_HAS_PRODUCTS_IN_TOP_SALES: "#global-top-shops-has-products-in-top-sales#"
 }
 
 const ProductAccessType =
