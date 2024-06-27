@@ -18,6 +18,23 @@ const CommentService = {
 
   async create(objectData) {
     const newObject = new Comment(objectData);
+
+    if (objectData.shop) {
+      const review = await Review.findById(objectData.review)
+        .populate({
+          path: 'product',
+          populate: {
+            path: 'shop'
+          }
+        })
+        .exec();
+
+      if (review.product.shop._id.toString() === objectData.shop.toString()) {
+        review.isResponseByShop = true;
+        await review.save();
+      }
+    }
+
     return await newObject.save();
   },
 

@@ -48,6 +48,10 @@ const ReviewSchema = new Schema({
     ref: "User",
     // autopopulate: true,
   },
+  isResponseByShop: {
+    type: Boolean,
+    default: false,
+  },
 });
 ReviewSchema.plugin(mongooseAutoPopulate);
 

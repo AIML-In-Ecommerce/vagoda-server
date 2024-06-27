@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import User from "./user.model.js";
+import Shop from "./shop.model.js";
 import mongooseAutoPopulate from "mongoose-autopopulate";
 
 const Schema = mongoose.Schema;
@@ -13,7 +14,11 @@ const CommentSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    autopopulate: true,
+  },
+  shop: {
+    type: Schema.Types.ObjectId,
+    ref: "Shop",
     autopopulate: true,
   },
   content: {
