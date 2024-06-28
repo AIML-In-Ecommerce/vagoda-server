@@ -116,6 +116,41 @@ const UserService =
             console.log("Axios error at getUserInfoByAccountId")
             return null
         }
+    },
+
+    async getUserInfoByUserId(userId)
+    {
+        const url = publicAPIURL + "/system/user_info"
+        try
+        {
+            const response = await axios.get(url,
+                {
+                    params:
+                    {
+                        userId: userId,
+                        useAddress: false
+                    },
+                    headers:
+                    {
+                        "origin": `${publicAPIURL}`
+                    }
+                }
+            )
+
+            if(response.status == 200)
+            {
+                return response.data.data
+            }
+            else
+            {
+                return null
+            }
+        }
+        catch(error)
+        {
+            console.log("Axios error at getUserInfoByUserId")
+            return null
+        }
     }
 }
 

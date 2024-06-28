@@ -169,8 +169,15 @@ const AuthService = {
       return null
     }
 
-    //generate access token and refresh token
+      //find older refresh-token record if it exist
+      const olderRefreshTokenRecord = await RefreshTokenModel.findOne({user: buyerInfo._id, usedAt: {$eq: null}},  {}, {sort: {"createAt": -1}})
+      if(olderRefreshTokenRecord != null)
+      {
+        olderRefreshTokenRecord.usedAt = new Date()
+        await olderRefreshTokenRecord.save()
+      }
 
+    //generate access token and refresh token
     const accessToken = generateAccessToken(buyerInfo._id, buyerInfo.fullName, account.type)
     const refreshToken = generateRefreshToken(buyerInfo._id, buyerInfo.fullName, account.type)
 
@@ -234,6 +241,15 @@ const AuthService = {
 
     const hashedToken = await bcrypt.hash(refreshToken.refreshToken, SALT_ROUND)
     const newRefreshTokenRecordProps = generateRefreshTokenModelProps(sellerInfo._id, hashedToken, refreshToken.expiredDate)
+
+    //find older refresh-token record if it exist
+    const olderRefreshTokenRecord = await RefreshTokenModel.findOne({user: sellerInfo._id, usedAt: {$eq: null}},  {}, {sort: {"createAt": -1}})
+    if(olderRefreshTokenRecord != null)
+    {
+      olderRefreshTokenRecord.usedAt = new Date()
+      await olderRefreshTokenRecord.save()
+    }
+
     const newRefreshTokenRecord = new RefreshTokenModel(newRefreshTokenRecordProps)
     await newRefreshTokenRecord.save()
 
@@ -263,7 +279,7 @@ const AuthService = {
     const decodedPayload = verifyToken(refreshToken)
     const exp = new Date(decodedPayload.exp*1000).getTime()
 
-    const refreshTokenRecord = await RefreshTokenModel.findOne({user: decodedPayload.userId}, {}, {sort: {"createAt": -1}})
+    const refreshTokenRecord = await RefreshTokenModel.findOne({user: decodedPayload.userId, usedAt: {$eq: null}}, {}, {sort: {"createAt": -1}})
     if(refreshTokenRecord == null)
     {
       console.log("Null token record")
@@ -295,10 +311,12 @@ const AuthService = {
 
     const newRefreshTokenRecordProps = generateRefreshTokenModelProps(decodedPayload.userId, hashedNewToken, refreshTokenProps.expiredDate)
     const newRefreshTokenRecord = new RefreshTokenModel(newRefreshTokenRecordProps)
+    // const record = await newRefreshTokenRecord.save()
     await newRefreshTokenRecord.save()
 
     const finalResult = 
     {
+      userId: decodedPayload.userId,
       accessToken: newAccessTokenProps.accessToken,
       accessTokenExpiredDate: newAccessTokenProps.expiredDate,
       refreshToken: refreshTokenProps.refreshToken,
