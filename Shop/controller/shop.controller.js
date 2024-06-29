@@ -1,6 +1,7 @@
 import createError from "http-errors";
 import ShopService from "../shop.service.js";
 import axios from "axios";
+import { uuid } from "uuidv4";
 
 const model = "shop";
 const Model = "Shop";
@@ -245,7 +246,7 @@ const ShopController = {
 
         for (const url of imageUrls) {
           const buffer = await downloadImage(url)
-          const filename = uuidv4();
+          const filename = uuid();
           const cloudinaryUrl = await uploadToCloudinary(buffer, filename);
           cloudinaryUrls.push(cloudinaryUrl);
         }

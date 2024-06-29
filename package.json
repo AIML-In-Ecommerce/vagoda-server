@@ -6,7 +6,8 @@
     "fs": "^0.0.1-security",
     "http-errors": "^2.0.0",
     "mongoose": "^8.2.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "uuidv4": "^6.2.13"
   },
   "name": "techzone",
   "description": "",
