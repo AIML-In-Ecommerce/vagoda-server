@@ -1,5 +1,6 @@
 import express from 'express';
 import ReviewController from './review.controller.js';
+import Review from './models/review.model.js';
 
 const router = express.Router();
 
@@ -18,6 +19,8 @@ router.get('/review/:id', ReviewController.getById);
 router.post('/review', ReviewController.create);
 router.put('/review/:id', ReviewController.update);
 router.delete('/review/:id', ReviewController.delete);
+
+router.post('/reviews/filter', ReviewController.getFilteredReviews)
 
 router.get('/productReviews/:productId', ReviewController.getByProductId);
 

@@ -16,6 +16,7 @@ const ReviewController = {
         message: "Get " + model + " list successfully",
         status: 200,
         data: list,
+        length: list.length,
       });
     } catch (error) {
       next(createError.InternalServerError(error.message));
@@ -132,6 +133,37 @@ const ReviewController = {
         data: avg.toFixed(2),
       })
     } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  getFilteredReviews: async (req, res, next) => {
+    try {
+      const filterOptions = {
+        shop: req.body.shopId || "", //shop id
+        product: req.body.product || "", // product.name contains 
+        category: req.body.category || "", //category id
+        rating: req.body.rating || null,
+        isResponse: req.body.isResponse,
+        index: parseInt(req.body.index) || 1,
+        amount: parseInt(req.body.amount) || 20, // Default amount per page is 20
+        sortBy: req.body.sortBy || "",
+      };
+      console.log(req.body);
+      if (filterOptions.index < 1) filterOptions.index = 1;
+      const { filteredReviews, total } =
+        await ReviewService.getFilteredReviews(filterOptions);
+      const totalPages = Math.ceil(total / filterOptions.amount);
+      // console.log(filteredProducts.length ,total, totalPages)
+      res.json({
+        message: "Get filter " + model + " list successfully",
+        status: 200,
+        data: filteredReviews,
+        total: total,
+        totalPages: totalPages,
+        length: filteredReviews.length
+      });
+    } catch (error) {
+      console.log(error);
       next(createError.InternalServerError(error.message));
     }
   },

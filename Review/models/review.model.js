@@ -11,7 +11,6 @@ const ReviewSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Product",
     required: true,
-    autopopulate: true,
   },
   user: {
     type: Schema.Types.ObjectId,

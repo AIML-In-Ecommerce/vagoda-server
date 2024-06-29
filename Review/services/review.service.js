@@ -1,4 +1,5 @@
 import Review from "../models/review.model.js";
+import { Product } from "../models/product.model.js";
 
 const ReviewService = {
   async getAll(filter, projection) {
@@ -41,7 +42,85 @@ const ReviewService = {
     const sum = reviews.reduce((sum, review) => sum + review.rating, 0);
     const avg = sum / reviews.length;
     return avg;
-  }
+  },
+  async getFilteredReviews(filterOptions) {
+    const {
+      shop,
+      product,
+      category,
+      rating,
+      isResponse,
+      index,
+      amount,
+      sortBy,
+    } = filterOptions;
+    console.log("service filter option: ", filterOptions)
+  
+    const query = {};
+  
+    if (shop) {
+      query.shop = shop;
+    }
+  
+    // if (product) {
+    //   query['product.name'] = { $regex: product, $options: 'i' };
+    // }
+    if (product) {
+      const filteredProduct = await Product.find({ name: { $regex: product, $options: 'i' } });
+      const listProductId = filteredProduct.map(product => product._id);
+      query.product = { $in: listProductId };
+    }
+
+    if (category != "") {
+      query.category = category;
+    }
+  
+    if (rating !== null && !isNaN(rating)) {
+      query.rating = rating;
+    }
+  
+    if (isResponse) {
+      query.isResponseByShop = isResponse;
+    }
+  
+    console.log("Query:", JSON.stringify(query, null, 2));
+  
+    const total = await Review.countDocuments(query);
+  
+    let sortOption = {};
+    switch (sortBy) {
+      case 'ascending rating':
+        sortOption = { rating: 1 };
+        break;
+      case 'descending rating':
+        sortOption = { rating: -1 };
+        break;
+      case 'latest':
+        sortOption = { createdAt: -1 };
+        break;
+      default:
+        break;
+    }
+  
+    console.log("Sort Option:", sortOption);
+  
+    const filteredReviews = await Review.find(query)
+      .populate({
+        path: 'product',
+        populate: {
+          path: 'name attribute shop',
+        },
+      })
+      // .populate('user', 'username')
+      .sort(sortOption)
+      .skip((index - 1) * amount)
+      .limit(amount)
+      .exec();
+  
+    // console.log("Filtered Reviews:", JSON.stringify(filteredReviews, null, 2));
+  
+    return { filteredReviews, total };
+  },
 
 };
 
