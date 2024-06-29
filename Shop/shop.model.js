@@ -48,7 +48,6 @@ const ShopDetailSchema = new Schema({
   },
   replyPercentage: {
     type: Number,
-    required: true,
     default: 0.0000
   },
 });

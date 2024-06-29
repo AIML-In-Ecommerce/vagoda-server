@@ -1,8 +1,28 @@
 import createError from "http-errors";
 import ShopService from "../shop.service.js";
+import axios from "axios";
 
 const model = "shop";
 const Model = "Shop";
+
+const downloadImage = async (url) => {
+  const response = await axios({
+    url,
+    responseType: 'arraybuffer',
+  });
+  return Buffer.from(response.data, 'binary');
+};
+const uploadToCloudinary = async (buffer, filename) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      { folder: 'Shop', public_id: filename },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.url);
+      }
+    ).end(buffer);
+  })
+}
 const ShopController = {
   getAll: async (req, res, next) => {
     try {
@@ -219,6 +239,17 @@ const ShopController = {
             return next(createError.BadRequest("Each image URL must be a string"));
           }
         }
+
+        //to do:
+        const cloudinaryUrls = [];
+
+        for (const url of imageUrls) {
+          const buffer = await downloadImage(url)
+          const filename = uuidv4();
+          const cloudinaryUrl = await uploadToCloudinary(buffer, filename);
+          cloudinaryUrls.push(cloudinaryUrl);
+        }
+
   
         const updatedImageCollection = await ShopService.addImageLinks(shop, imageUrls);
   
