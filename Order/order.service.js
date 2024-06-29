@@ -310,6 +310,16 @@ const OrderService = {
       await rawOrder.save()
       return true
     }
+    else if(currentOrderStatus.status == OrderStatus.CANCELLED && currentOrderStatus.complete != null)
+    {
+      return true
+    }
+    else if(currentOrderStatus.status == OrderStatus.CANCELLED && currentOrderStatus.complete == null)
+    {
+      rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
+      await rawOrder.save()
+      return true
+    }
     
     let newStatus = null
     if(specStatusCode == undefined)
@@ -358,17 +368,27 @@ const OrderService = {
 
     const successfulUpdatedList = []
 
-    rawOrders.forEach(async (rawOrder) =>
+    for(let i =0; i < rawOrders.length; i++)
     {
-      const currentOrderStatus = rawOrder.orderStatus[rawOrder.orderStatus.length - 1]
+      const currentOrderStatus = rawOrders[i].orderStatus[rawOrders[i].orderStatus.length - 1]
       if(currentOrderStatus.status == OrderStatus.COMPLETED && currentOrderStatus.complete != null)
       {
-        successfulUpdatedList.push(rawOrder._id.toString())
+        successfulUpdatedList.push(rawOrders[i]._id.toString())
       }
       if(currentOrderStatus.status == OrderStatus.COMPLETED && currentOrderStatus.complete == null)
       {
-        rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
-        await rawOrder.save()
+        rawOrders[i].orderStatus[rawOrders[i].orderStatus.length - 1].complete = completeTime
+        await rawOrders[i].save()
+      }
+      else if(currentOrderStatus.status == OrderStatus.CANCELLED && currentOrderStatus.complete != null)
+      {
+        successfulUpdatedList.push(rawOrders[i]._id.toString())
+      }
+      else if(currentOrderStatus.status == OrderStatus.CANCELLED && currentOrderStatus.complete == null)
+      {
+        rawOrders[i].orderStatus[rawOrders[i].orderStatus.length - 1].complete = completeTime
+        await rawOrders[i].save()
+        successfulUpdatedList.push(rawOrders[i]._id.toString())
       }
       else
       {
@@ -384,13 +404,13 @@ const OrderService = {
   
         if(newStatus != null)
         {
-          rawOrder.orderStatus[rawOrder.orderStatus.length - 1].complete = completeTime
-          rawOrder.orderStatus.push(newStatus)
-          await rawOrder.save()
-          successfulUpdatedList.push(rawOrder._id.toString())
+          rawOrders[i].orderStatus[rawOrders[i].orderStatus.length - 1].complete = completeTime
+          rawOrders[i].orderStatus.push(newStatus)
+          await rawOrders[i].save()
+          successfulUpdatedList.push(rawOrders[i]._id.toString())
         }
       }
-    })
+    }
     
     return successfulUpdatedList
   },
