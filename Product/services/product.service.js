@@ -180,7 +180,7 @@ const ProductService = {
       .populate("subCategoryType")
       .populate("shop")
       .select(
-        "_id name description attribute originalPrice finalPrice shop brand soldQuantity avgRating images"
+        "_id name attribute originalPrice finalPrice shop brand soldQuantity avgRating images"
       );
 
     console.log(
