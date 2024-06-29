@@ -131,11 +131,11 @@ const ProductService = {
     //console.log(filteredProducts)
     return { filteredProducts, total };
   },
-  async searchProductsByKeyword(keyword) {
-    const query = { $text: { $search: keyword } };
-    const filteredProducts = await Product.find(query);
-    return filteredProducts;
-  },
+  // async searchProductsByKeyword(keyword) {
+  //   const query = { $text: { $search: keyword } };
+  //   const filteredProducts = await Product.find(query);
+  //   return filteredProducts;
+  // },
 
   async searchProductsByKeyword(keyword) {
     if (!keyword || keyword === "") {
@@ -181,7 +181,7 @@ const ProductService = {
       .populate("shop")
       .select(
         "_id name attribute originalPrice finalPrice shop brand soldQuantity avgRating images"
-      );
+      ).limit(8);
 
     console.log(
       "Filtered products:",
