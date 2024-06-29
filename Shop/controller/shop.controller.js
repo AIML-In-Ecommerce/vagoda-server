@@ -1,7 +1,15 @@
 import createError from "http-errors";
 import ShopService from "../shop.service.js";
 import axios from "axios";
-import { uuid } from "uuidv4";
+import { v2 as cloudinary } from "cloudinary";
+
+import dotenv from "dotenv";
+dotenv.config();
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
+});
 
 const model = "shop";
 const Model = "Shop";
@@ -246,13 +254,13 @@ const ShopController = {
 
         for (const url of imageUrls) {
           const buffer = await downloadImage(url)
-          const filename = uuid();
+          const filename = `${Date.now()}`
           const cloudinaryUrl = await uploadToCloudinary(buffer, filename);
           cloudinaryUrls.push(cloudinaryUrl);
         }
 
   
-        const updatedImageCollection = await ShopService.addImageLinks(shop, imageUrls);
+        const updatedImageCollection = await ShopService.addImageLinks(shop, cloudinaryUrls);
   
         res.json({
           message: "Add image urls to shop successfully",
