@@ -204,11 +204,11 @@ const ShopController = {
         const useShopDetail = req.query.useShopDetail == "true"
 
         let object = null
-        if(shopId != null)
+        if(shopId != undefined)
         {
           object = await ShopService.getById(shopId, useShopDetail, useDesign)
         }
-        else if(accountId != null)
+        else if(accountId != undefined)
         {
           object = await ShopService.getByAccountId(accountId, useShopDetail, useDesign)
         }
