@@ -31,6 +31,10 @@ class OrderStatusGeneratorProvider
     getStatus(statusCode)
     {
         const generator = this.generators.get(statusCode)
+        if(generator == undefined)
+        {
+            return null
+        }
         return generator()
     }
 
