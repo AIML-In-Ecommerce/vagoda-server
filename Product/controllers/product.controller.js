@@ -201,7 +201,7 @@ const ProductController = {
       const words = object.name.trim().split(/\s+/);
       console.log(words);
       //const firstword = object.name.split(" ")[0];
-      let list = await ProductService.searchProductsByKeyword(words[0]);
+      let list = await ProductService.searchProductsByName(words[0]);
       list = list.filter((product) => product._id.toString() !== id);
       let index = 1;
       while (list.length > 10 && index < words.length) {
@@ -230,10 +230,31 @@ const ProductController = {
   },
   searchProductsByKeyword: async (req, res, next) => {
     try {
-      const keyword = req.query.keyword || "";
-      console.log(keyword);
+      const filterOptions = {
+        keyword: req.query.keyword || " ",
+        quantity: req.query.quantity,
+        sortBy: req.query.sortBy || "",
+        sortOrder: req.query.sortOrder || "",
+      };
+      filterOptions.quantity = parseInt(filterOptions.quantity, 10) || 8;
+      if (
+        !Number.isInteger(filterOptions.quantity) ||
+        filterOptions.quantity <= 0
+      ) {
+        filterOptions.quantity = 8;
+      }
+
+      const validSortByOptions = ["avgRating", "soldQuantity"];
+      if (
+        filterOptions.sortBy &&
+        !validSortByOptions.includes(filterOptions.sortBy)
+      ) {
+        return next(createError.BadRequest("Invalid sortBy option"));
+      }
+
+      console.log(filterOptions);
       const filteredProducts = await ProductService.searchProductsByKeyword(
-        keyword
+        filterOptions
       );
       res.json({
         message: "Search " + model + " by keyword successfully",
@@ -318,7 +339,6 @@ const ProductController = {
       });
     }
   },
-  
 };
 
 export default ProductController;

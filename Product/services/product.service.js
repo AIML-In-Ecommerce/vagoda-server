@@ -131,16 +131,17 @@ const ProductService = {
     //console.log(filteredProducts)
     return { filteredProducts, total };
   },
-  // async searchProductsByKeyword(keyword) {
-  //   const query = { $text: { $search: keyword } };
-  //   const filteredProducts = await Product.find(query);
-  //   return filteredProducts;
-  // },
+  async searchProductsByName(keyword) {
+    const query = { $text: { $search: keyword } };
+    const filteredProducts = await Product.find(query);
+    return filteredProducts;
+  },
 
-  async searchProductsByKeyword(keyword) {
-    if (!keyword || keyword === "") {
-      throw new Error("Keyword is required for searching");
-    }
+  async searchProductsByKeyword(filterOptions) {
+    const { keyword, quantity, sortBy, sortOrder } = filterOptions;
+    // if (!keyword || keyword === "") {
+    //   throw new Error("Keyword is required for searching");
+    // }
 
     const query = {
       $or: [
@@ -174,6 +175,11 @@ const ProductService = {
 
     console.log("Query:", JSON.stringify(query, null, 2));
 
+    const sortOptions = {};
+    if (sortBy) {
+      sortOptions[sortBy] = sortOrder.toLowerCase() === "asc" ? 1 : -1;
+    }
+
     const filteredProducts = await Product.find(query)
       .populate("category")
       .populate("subCategory")
@@ -181,12 +187,14 @@ const ProductService = {
       .populate("shop")
       .select(
         "_id name attribute originalPrice finalPrice shop brand soldQuantity avgRating images"
-      ).limit(8);
+      )
+      .sort(sortOptions)
+      .limit(quantity);
 
-    console.log(
-      "Filtered products:",
-      JSON.stringify(filteredProducts, null, 2)
-    );
+    // console.log(
+    //   "Filtered products:",
+    //   JSON.stringify(filteredProducts, null, 2)
+    // );
 
     const formattedProducts = filteredProducts.map((product) => ({
       _id: product._id,
@@ -206,11 +214,9 @@ const ProductService = {
   },
 
   async importProducts(data, shopId) {
-     
     console.log(data[0]["Hình ảnh   *"].split(",").map((url) => url.trim()));
-    const response = await axios.get("http://127.0.0.1:3005/categories")
+    const response = await axios.get("http://127.0.0.1:3005/categories");
     const ctgs = response.data.data;
-    
 
     // let ctg = item["Danh mục   *"].split("/"); // Nữ/Áo nữ/Áo thun
     // const category = categories.find((cat) => cat.name === ctg[0]);
@@ -224,19 +230,19 @@ const ProductService = {
 
     const products = data.map((item) => {
       let ctg = item["Danh mục   *"].split("/"); // Nữ/Áo nữ/Áo thun
-      console.log(ctg)
+      console.log(ctg);
       let categories = JSON.parse(JSON.stringify(ctgs));
       let category = categories.find((cat) => cat.name === ctg[0]);
       let subCategories = category.subCategories;
-      console.log("subctgs ",subCategories)
+      console.log("subctgs ", subCategories);
       let subCategory = subCategories.find((subCat) => subCat.name === ctg[1]);
-      console.log("subcategory ",subCategory)
+      console.log("subcategory ", subCategory);
       let subCategoryTypes = subCategory.subCategories;
       let subCategoryType = subCategoryTypes.find((sct) => sct.name === ctg[2]);
-  
+
       category.subCategories = null;
       subCategory.subCategories = null;
-  
+
       return {
         name: item["Tên sản phẩm *"],
         description: item["Mô tả   *"],
@@ -281,81 +287,75 @@ const ProductService = {
     return await Product.insertMany(products);
   },
 
-  async increaseSoldAmountOfAProduct(productId, quantity)
-  {
-    const rawProductInfo = await Product.findOne({_id: productId})
-    if(rawProductInfo == null)
-    {
-      return null
+  async increaseSoldAmountOfAProduct(productId, quantity) {
+    const rawProductInfo = await Product.findOne({ _id: productId });
+    if (rawProductInfo == null) {
+      return null;
     }
 
-    const absQuantity = Math.abs(quantity)
+    const absQuantity = Math.abs(quantity);
 
-    const newSoldAmount = rawProductInfo.soldQuantity + absQuantity
-    const newInventory = rawProductInfo.inventoryAmount - absQuantity
+    const newSoldAmount = rawProductInfo.soldQuantity + absQuantity;
+    const newInventory = rawProductInfo.inventoryAmount - absQuantity;
 
-    rawProductInfo.soldQuantity = newSoldAmount
-    rawProductInfo.inventoryAmount = newInventory
-    return (await rawProductInfo.save())._id.toString()
+    rawProductInfo.soldQuantity = newSoldAmount;
+    rawProductInfo.inventoryAmount = newInventory;
+    return (await rawProductInfo.save())._id.toString();
   },
 
-  async decreaseSoldAmountOfAProduct(productId, quantity)
-  {
-    const rawProductInfo = await Product.findOne({_id: productId})
-    if(rawProductInfo == null)
-    {
-      return null
+  async decreaseSoldAmountOfAProduct(productId, quantity) {
+    const rawProductInfo = await Product.findOne({ _id: productId });
+    if (rawProductInfo == null) {
+      return null;
     }
 
-    const absQuantity = Math.abs(quantity)
-    const newSoldAmount = rawProductInfo.soldQuantity - absQuantity
-    const newInventory = rawProductInfo.inventoryAmount + absQuantity
+    const absQuantity = Math.abs(quantity);
+    const newSoldAmount = rawProductInfo.soldQuantity - absQuantity;
+    const newInventory = rawProductInfo.inventoryAmount + absQuantity;
 
-    rawProductInfo.soldQuantity = newSoldAmount
-    rawProductInfo.inventoryAmount = newInventory
-    return (await rawProductInfo.save())._id.toString()
+    rawProductInfo.soldQuantity = newSoldAmount;
+    rawProductInfo.inventoryAmount = newInventory;
+    return (await rawProductInfo.save())._id.toString();
   },
 
-  async increaseSoldAmountOfManyProduct(updateInfos)
-  {
-    if(updateInfos == undefined)
-    {
-      return null
+  async increaseSoldAmountOfManyProduct(updateInfos) {
+    if (updateInfos == undefined) {
+      return null;
     }
 
-    const updatedProductIdList = []
+    const updatedProductIdList = [];
 
-    updateInfos.forEach(async (record) =>
-    {
-      const updatedProductId = await this.increaseSoldAmountOfAProduct(record.product, record.quantity)
-      if(updatedProductId != null)
-      {
-        updatedProductIdList.push(updatedProductId)
+    updateInfos.forEach(async (record) => {
+      const updatedProductId = await this.increaseSoldAmountOfAProduct(
+        record.product,
+        record.quantity
+      );
+      if (updatedProductId != null) {
+        updatedProductIdList.push(updatedProductId);
       }
-    })
+    });
 
-    return updatedProductIdList
+    return updatedProductIdList;
   },
 
-  async decreaseSoldAmountOfManyProduct(updateInfos)
-  {
-    if(updateInfos == undefined)
-    {
-      return null
+  async decreaseSoldAmountOfManyProduct(updateInfos) {
+    if (updateInfos == undefined) {
+      return null;
     }
 
-    const updatedProductIdList = []
+    const updatedProductIdList = [];
 
-    updateInfos.forEach(async (record) =>
-    {
-      const updatedProductId = await this.decreaseSoldAmountOfAProduct(record.product, record.quantity)
-      if(updatedProductId != null)
-      {
-        updatedProductIdList.push(updatedProductId)
+    updateInfos.forEach(async (record) => {
+      const updatedProductId = await this.decreaseSoldAmountOfAProduct(
+        record.product,
+        record.quantity
+      );
+      if (updatedProductId != null) {
+        updatedProductIdList.push(updatedProductId);
       }
-    })
+    });
 
-    return updatedProductIdList
+    return updatedProductIdList;
   },
 };
 
