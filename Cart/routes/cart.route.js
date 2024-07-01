@@ -17,7 +17,8 @@ router.get("/cart/welcome", (req, res, next) => {return res.json({
 
 // from buyer
 router.get("/cart/user", CartController.getCartByUserId)
-router.put("/cart/user", CartController.updateProducts)
+router.post("/cart/user/add", CartController.addToCart)
+router.put("/cart/user/update", CartController.updateProducts)
 router.put("/cart/user/clear", CartController.clearCart)
 
 

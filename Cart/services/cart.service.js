@@ -66,30 +66,19 @@ const CartService = {
       productInfos.set(productId, product)
     })
 
-    const products = rawCart.products.map((item) =>
+    const products = []
+    rawCart.products.forEach((item) =>
     {
-      const targetProduct = productInfos.get(item.product.toString())
+      //copy to ensure no repeat info of product since we can have many records having the same product's ID
+      const targetProduct = JSON.parse(JSON.stringify(productInfos.get(item.product.toString())))
 
-      // const newProductValue = 
-      // {
-      //   _id: targetProduct._id,
-      //   name: targetProduct.name,
-      //   originalPrice: targetProduct.originalPrice,
-      //   finalPrice: targetProduct.finalPrice,
-      //   image: targetProduct.images[0],
-      //   category: targetProduct.category,
-      //   subCategory: targetProduct.subCategory,
-      //   shop: targetProduct.shop,
-      //   status: targetProduct.status,
-      //   quantity: item.quantity,
-      // }
-
+      targetProduct.itemId = item._id.toString()
       targetProduct.quantity = item.quantity
       targetProduct.color = item.color
       targetProduct.size = item.size
 
       // return newProductValue
-      return targetProduct
+      products.push(targetProduct)
     })
 
     const finalResult = JSON.parse(JSON.stringify(rawCart))
@@ -120,56 +109,53 @@ const CartService = {
       return null
     }
 
-    const mapProductList = new Map()
-
-    rawCart.products.forEach((product) =>
+    const mapOfCurrentProducts = new Map()
+    rawCart.products.forEach((item, index) =>
     {
-      const clonedProduct = JSON.parse(JSON.stringify(product))
-      const color = clonedProduct.color == null ? NullColorAttributeKey : clonedProduct.color.color.value
-      const size = clonedProduct.size == null ? NullSizeAttributeKey : clonedProduct.size
-      const combinedKey = clonedProduct.product + "+" + color + "+" + size
-
-      mapProductList.set(combinedKey, clonedProduct)
+      const itemId = item._id.toString()
+      mapOfCurrentProducts.set(itemId, index)
     })
 
-    let clonedProductsList = []
-
-    productList.forEach((providedProduct) =>
+    productList.forEach((targetProduct) =>
     {
-      const color = providedProduct.color == null ? NullColorAttributeKey : providedProduct.color.color.value
-      const size = providedProduct.size == null ? NullSizeAttributeKey : providedProduct.size
-      const combinedKey = providedProduct.product + "+" + color + "+" + size
-
-      const targetProduct = mapProductList.get(combinedKey)
-      if(targetProduct != undefined)
+      const targetItemId = targetProduct.itemId
+      const targetIndex = mapOfCurrentProducts.get(targetItemId)
+      if(targetIndex != undefined)
       {
-        targetProduct.quantity = providedProduct.quantity
-        mapProductList.set(combinedKey, targetProduct)
-      }
-      else
-      {
-        //insert new product info
-        const clonedProduct = JSON.parse(JSON.stringify(providedProduct))
-        clonedProduct.color = providedProduct.color == null ? undefined : providedProduct.color
-        clonedProduct.size = providedProduct.size == null ? undefined : providedProduct.size
-        mapProductList.set(combinedKey, clonedProduct)
-      }
-
-    })
-
-    mapProductList.forEach((value, key) =>
-    {
-      if(value.quantity > 0)
-      {
-        clonedProductsList.push(value)
+        rawCart.products[targetIndex].color = targetProduct.color
+        rawCart.products[targetIndex].size = targetProduct.size
+        rawCart.products[targetIndex].quantity = targetProduct.quantity
       }
     })
+    
+    mapOfCurrentProducts.clear()
 
-    rawCart.products = clonedProductsList
+    const mapOfReduceDuplicatedItems = new Map()
+    rawCart.products.forEach((item) =>
+    {
+      if(item.quantity > 0)
+      {
+        const productId = item.product.toString()
+        const color = item.color != null ? item.color.color.value : NullColorAttributeKey
+        const size = item.size != null ? item.size : NullSizeAttributeKey
+        const combinedKey = productId + "+" + color + "+" + size
+  
+        const currentValue = mapOfReduceDuplicatedItems.get(combinedKey)
+        if(currentValue == undefined)
+        {
+          mapOfReduceDuplicatedItems.set(combinedKey, JSON.parse(JSON.stringify(item)))
+        }
+        else
+        {
+          currentValue.quantity += item.quantity
+          mapOfReduceDuplicatedItems.set(combinedKey, currentValue)
+        }
+      }
+    })    
 
-    await rawCart.save()
-
-    return rawCart.products;
+    const newProductList = Array.from(mapOfReduceDuplicatedItems.values())
+    rawCart.products = newProductList
+    return (await rawCart.save()).products
   },
 
   async clearCartByUserId(userId)
@@ -182,6 +168,57 @@ const CartService = {
 
     rawCart.products = []
     return await rawCart.save()
+  },
+
+  async addToCart(userId, providedProducts)
+  {
+    if(providedProducts == undefined)
+    {
+      return null
+    }
+
+    const rawCart = await Cart.findOne({user: userId})
+    if(rawCart == null)
+    {
+      return null
+    }
+
+    const mapOfCurrentProducts = new Map()
+
+    rawCart.products.forEach((item, index) =>
+    {
+      const productId = item.product.toString()
+      const color = item.color != null ? item.color.color.value : NullColorAttributeKey
+      const size = item.size != null ? item.size : NullSizeAttributeKey
+
+      const combinedKey = productId + "+" + color + "+" + size
+      mapOfCurrentProducts.set(combinedKey, index)
+    })
+
+    providedProducts.forEach((providedProduct) =>
+    {
+      const targetProductId = providedProduct.product
+      const targetColor = providedProduct.color != null ? providedProduct.color.color.value : NullColorAttributeKey
+      const targetSize = providedProduct.size != null ? providedProduct.size : NullSizeAttributeKey
+
+      const targetCombinedKey = targetProductId + "+" + targetColor + "+" + targetSize
+      const targetItemIndex = mapOfCurrentProducts.get(targetCombinedKey)
+      if(targetItemIndex != undefined)
+      {
+        rawCart.products[targetItemIndex].quantity += providedProduct.quantity
+      }
+      else
+      {
+        //init new item record
+        const clonedProduct = JSON.parse(JSON.stringify(providedProduct))
+        clonedProduct.color = providedProduct.color != null ? providedProduct.color : undefined
+        clonedProduct.size = providedProduct.size != null ? providedProduct.size : undefined
+        rawCart.products.push(clonedProduct)
+        mapOfCurrentProducts.set(targetCombinedKey, rawCart.products.length)
+      }
+    })
+    
+    return (await rawCart.save()).products
   },
 
 };

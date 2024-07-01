@@ -149,20 +149,17 @@ const CartController = {
       //if khac nhau ==> next(createError.Forbidden)
   
       const result = await CartService.updateProducts(userId, requestBody.products)
+      if(result == null)
+      {
+        return next(createError.MethodNotAllowed("Cannot update items in cart"))
+      }
 
-      if(result != null)
-      {
-        return res.json(
-          {
-            message: "Update cart successfully",
-            data: result
-          }
-        )
-      }
-      else
-      {
-        return next(createError.MethodNotAllowed("Cannot update the document"))
-      }
+      const productInfos = (await CartService.getByUserId(userId)).products
+
+      return res.json({
+        message: "Update items in cart successfully",
+        data: productInfos
+      })
       
     }
     catch(error)
@@ -204,6 +201,39 @@ const CartController = {
         return next(createError.MethodNotAllowed("Cannot clear the cart"))
       }
       
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  async addToCart(req, res, next)
+  {
+    try
+    {
+      const userId = req.query.userId
+
+      if(userId == undefined)
+      {
+        return next(createError.Unauthorized("User not found"))
+      }
+
+      const products = req.body.products
+
+      const updatedProducts = await CartService.addToCart(userId, products)
+      if(updatedProducts == null)
+      {
+        return next(createError.MethodNotAllowed("Cannot add products to cart"))
+      }
+
+      const productInfos = (await CartService.getByUserId(userId)).products
+
+      return res.json({
+        message: "Add products to cart successfully",
+        data: productInfos
+      })
     }
     catch(error)
     {

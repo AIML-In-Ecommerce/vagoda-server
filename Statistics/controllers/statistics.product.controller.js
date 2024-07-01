@@ -223,8 +223,9 @@ const StatisticsProductController =
             const startTime = req.body.startTime
             const endTime = req.body.endTime
             const amount = req.body.amount
+            const useProductInfo = req.body.useProductInfo ? req.body.useProductInfo : false
 
-            const statistics = await StatisticsProductService.getTopProductsInGlobalSales(amount, startTime, endTime)
+            const statistics = await StatisticsProductService.getTopProductsInGlobalSales(amount, startTime, endTime, useProductInfo)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))

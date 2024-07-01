@@ -46,6 +46,8 @@ router.post(
 router.get("/files", FileController.getAll);
 router.get("/files/filter", FileController.filterFiles)
 
+// router.get("/products/global_hot_sales", ProductCont0roller)
+
 //from system
 
 router.put("/system/product/sold_amount/increase", VerificationService.verifySystemRole, SystemProductController.increaseSoldAmountOfAProduct)
