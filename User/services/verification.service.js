@@ -41,6 +41,7 @@ const VerificationService =
         console.log("System validator")
         const base_path = process.env.BASE_PATH
         const origin = req.headers.origin
+        
         if(origin == undefined)
         {
             return next(createHttpError.Forbidden())

@@ -42,6 +42,11 @@ const VerificationService =
         const base_path = process.env.BASE_PATH
         const origin = req.headers.origin
 
+        if(origin == undefined)
+        {
+            console.log("not a request from the system")
+            return next(createHttpError.Forbidden())
+        }
         if(origin.includes(base_path) == false)
         {
             console.log("not a request from the system")

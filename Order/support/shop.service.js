@@ -63,7 +63,13 @@ const ShopService =
 
         try
         {
-            const response = await axios.post(url, requestBody)
+            const response = await axios.post(url, requestBody, 
+                {
+                    headers: {
+                        "origin": `${publicAPIURL}`
+                    }
+                }
+            )
             if(response.status == 200 || response.status == 201)
             {
                 const data = response.data
