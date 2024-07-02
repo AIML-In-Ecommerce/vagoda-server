@@ -8,6 +8,8 @@ import PromotionService from "../support/promotion.service.js"
 
 async function generateOrder(requiredData)
 {
+    const productNeedToBuy = requiredData.itemIds
+
     let execTime = new Date()
     if(requiredData.execTime != undefined)
     {
@@ -27,8 +29,18 @@ async function generateOrder(requiredData)
       return null
     }
 
-    const cartInfo = await CartService.getCartInfoByUserId(userId)
+    let cartInfo = await CartService.getCartInfoByUserId(userId)
     if(cartInfo == null || cartInfo.products.length == 0)
+    {
+      return null
+    }
+
+    if(productNeedToBuy != undefined && productNeedToBuy != null && productNeedToBuy.length > 0)
+    {
+      cartInfo.products = cartInfo.products.filter((value) => productNeedToBuy.includes(value._id))
+    }
+
+    if(cartInfo.products.length < 1)
     {
       return null
     }

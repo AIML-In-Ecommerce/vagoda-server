@@ -245,6 +245,31 @@ const StatisticsProductController =
         }
     },
 
+    async getFrequentlyRelatedItems(req, res, next)
+    {
+        try
+        {
+            const productId = req.body.productId
+            
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+
+            const statistics = await StatisticsProductService.getFrequentItemsetsAnIntervalOfTime(0.2, startTime, endTime)
+
+            return res.json(
+                {
+                    message: "",
+                    data: statistics
+                }
+            )
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
 }
 
 export default StatisticsProductController

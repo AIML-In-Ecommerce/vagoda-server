@@ -3,6 +3,7 @@ import ProductAccess from "../models/access/productAcess.model.js"
 import { Product } from "../models/product/product.model.js"
 import { CachePrefix, OrderStatus, ProductAccessType } from "../shared/enums.js"
 import StatisticsOrderService from "./statistics.order.service.js"
+import nodeFpgrowth from 'node-fpgrowth'
 
 const DEFAULT_MAX_TOP_PRODUCTS_IN_SALES = 10
 
@@ -684,6 +685,66 @@ const StatisticsProductService =
         })
 
         return finalResult
+    },
+
+    async getFrequentItemsetsAnIntervalOfTime(minSupport, startTime = undefined, endTime = undefined)
+    {
+        const targetOrderStatus = OrderStatus.PROCESSING
+        const orderStatistics = await StatisticsOrderService.getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime)
+        if(orderStatistics == null)
+        {
+            return null
+        }
+
+        const listOfProductIdSets = []
+        let currentIndex = 1
+        const mapOfProductIdsToIndex = new Map()
+
+
+        orderStatistics.statisticData.forEach((orderRecord) =>
+        {
+            const mapOfProducts = new Map()
+            orderRecord.products.forEach((product) =>
+            {
+                if(mapOfProducts.get(product.product) == undefined)
+                {
+                    mapOfProducts.set(product.product, {})
+                }
+                if(mapOfProductIdsToIndex.get(product.product) == undefined)
+                {
+                    mapOfProductIdsToIndex.set(product.product, currentIndex)
+                    currentIndex += 1
+                }
+            })
+
+            listOfProductIdSets.push(Array.from(mapOfProducts.keys()))
+        })
+
+        // for(let i = 0 ; i < listOfProductIdSets.length ; i++)
+        // {
+        //     const newMappedItemset = []
+        //     listOfProductIdSets[i].forEach((productId) =>
+        //     {
+        //         const mappedValue = mapOfProductIdsToIndex.get(productId)
+        //         newMappedItemset.push(mappedValue)
+        //     })
+        //     //since newMappedItemset is small, we can sort it here easily in ascending order
+        //     newMappedItemset.sort((a, b) => a- b)
+        //     listOfProductIdSets[i] = newMappedItemset
+        // }
+
+        const fpgrowth = new nodeFpgrowth.FPGrowth(minSupport)
+
+        const frequentItemsets = await fpgrowth.exec(listOfProductIdSets)
+
+        // mapOfProductIdsToIndex.forEach((value, key))
+        console.log(listOfProductIdSets)
+        console.log(frequentItemsets)
+        
+
+        return {
+
+        }
     },
 
 }

@@ -134,7 +134,7 @@ const ZaloPayController = {
         );
 
         const embed_data = JSON.parse(dataJson.embed_data)
-        targetOrderIds = embed_data.orderIds //list of order's id
+        targetOrderIds = embed_data.merchantinfo.orderIds //list of order's id
         targetZpTransId = dataJson.zp_trans_id
         targetUserId = dataJson.app_user
         targetPaidAt = new Date(dataJson.app_time)
