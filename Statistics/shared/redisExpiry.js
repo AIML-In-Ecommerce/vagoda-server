@@ -9,4 +9,9 @@ const CategoryInfosCacheExpiry =
     EXPIRY_OF_TOP_IN_SALES_SUB_CATEGORIES: 60*30, //30 minutes
 }
 
-export {ShopInfosCacheExpiry, CategoryInfosCacheExpiry}
+const AccessProductCacheExpiry = 
+{
+    EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS: 60*2 //minutes 
+}
+
+export {ShopInfosCacheExpiry, CategoryInfosCacheExpiry, AccessProductCacheExpiry}

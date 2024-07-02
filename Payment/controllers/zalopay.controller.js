@@ -134,7 +134,7 @@ const ZaloPayController = {
         );
 
         const embed_data = JSON.parse(dataJson.embed_data)
-        targetOrderIds = embed_data.orderIds //list of order's id
+        targetOrderIds = embed_data.merchantinfo.orderIds //list of order's id
         targetZpTransId = dataJson.zp_trans_id
         targetUserId = dataJson.app_user
         targetPaidAt = new Date(dataJson.app_time)
@@ -149,6 +149,10 @@ const ZaloPayController = {
       result.return_code = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
       result.return_message = ex.message;
     }
+
+    console.log({
+      targetUserId, targetOrderIds, targetZpTransId, targetPaidAt, targetAppTransId, targetZpUserId
+    })
 
     //gọi API update order status thành PENDING => đã thanh toán xong
     const updatedOrderResult = await OrderService.updateWaitingPaymentStatus(targetUserId, targetOrderIds, 

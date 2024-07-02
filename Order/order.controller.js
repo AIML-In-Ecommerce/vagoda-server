@@ -24,19 +24,21 @@ const OrderController = {
 
       if(userId == undefined)
       {
-        return res(createError.Unauthorized())
+        return next(createError.Unauthorized())
       }
 
       const list = await OrderService.getAllCustomerOrders(userId)
       if (list == null) {
         return next(createError.BadRequest(Model + " list not found"))
       }
-      res.json({
+
+      return res.json({
         message: "Get " + model + " list successfully",
         data: list,
       });
     } catch (error) {
-      next(createError.InternalServerError(error.message));
+      console.log(error)
+      return next(createError.InternalServerError(error.message));
     }
   },
 
@@ -47,7 +49,7 @@ const OrderController = {
 
       if(userId == undefined)
       {
-        return res(createError.Unauthorized())
+        return next(createError.Unauthorized())
       }
 
       const { orderId } = req.query;
@@ -62,12 +64,12 @@ const OrderController = {
         return next(createError.NotFound("No document found"))
       }
 
-      res.json({
+      return res.json({
         message: "Get" + model + "successfully",
         data: object,
       });
     } catch (error) {
-      next(createError.InternalServerError(error.message));
+      return next(createError.InternalServerError(error.message));
     }
   },
 
@@ -85,7 +87,7 @@ const OrderController = {
 
       if(userId == undefined)
       {
-        return res(createError.Unauthorized())
+        return next(createError.Unauthorized())
       }
 
       const data = req.body;
@@ -117,12 +119,13 @@ const OrderController = {
       //TODO: clear cart of user
       await CartService.clearCartByUserId(userId)
 
-      res.json({
+      return res.json({
         message: "Create" + model + "successfully",
         data: newOrders,
       });
     } catch (error) {
-      next(createError.InternalServerError(error.message));
+      console.log(error)
+      return next(createError.InternalServerError(error.message));
     }
   },
 
@@ -134,7 +137,7 @@ const OrderController = {
 
       if(userId == undefined)
       {
-        return res(createError.Unauthorized())
+        return next(createError.Unauthorized())
       }
 
       const isSuccessfullyCancelled = await OrderService.updateOrderStatus(orderId, undefined, userId, OrderStatus.CANCELLED)
@@ -144,12 +147,13 @@ const OrderController = {
 
       const updatedOrder = await OrderService.getById(orderId)
 
-      res.json({
+      return res.json({
         message: "Cancel order successfully",
         data: updatedOrder,
       });
     } catch (error) {
-      next(createError.InternalServerError(error.message));
+      console.log(error)
+      return next(createError.InternalServerError(error.message));
     }
   },
 
@@ -176,12 +180,13 @@ const OrderController = {
       if (!list) {
         return next(createError.BadRequest("OrderStatus" + " list not found"));
       }
-      res.json({
+      return res.json({
         message: "Get OrderStatus list successfully",
         data: list,
       });
     } catch (error) {
-      next(createError.InternalServerError(error.message));
+      console.log(error)
+      return next(createError.InternalServerError(error.message));
     }
   },
 
@@ -212,7 +217,7 @@ const OrderController = {
       }
       
       console.log("update order when payment service request (ZaloPay)")
-      const successfulUpdatedStatusList = await OrderService.updateManyOrderStatus(orderIds, undefined, userId, OrderStatus.PENDING)
+      const successfulUpdatedStatusList = await OrderService.updateManyOrderStatus(orderIds, paidAt, undefined, userId, OrderStatus.PENDING)
       // if(successfulUpdatedStatusList.length == 0)
       // {
       //   return next(createError.MethodNotAllowed("Cannot find order list. Cannot update order's status"))
@@ -245,6 +250,7 @@ const OrderController = {
     }
     catch(error)
     {
+      console.log(error)
       return next(createError.InternalServerError(error.message))
     }
   },
@@ -297,6 +303,7 @@ const OrderController = {
     }
     catch(error)
     {
+      console.log(error)
       return next(createError.InternalServerError(error.message))
     }
   },
@@ -340,6 +347,7 @@ const OrderController = {
     }
     catch(error)
     {
+      console.log(error)
       return next(createError.InternalServerError(error.message))
     }
   },
@@ -372,6 +380,7 @@ const OrderController = {
     }
     catch(error)
     {
+      console.log(error)
       return next(createError.InternalServerError(error.message))
     }
   },
@@ -397,12 +406,13 @@ const OrderController = {
         return next(createError.NotFound("No document found"))
       }
 
-      res.json({
+      return res.json({
         message: "Get" + model + "successfully",
         data: object,
       });
     } catch (error) {
-      next(createError.InternalServerError(error.message));
+      console.log(error)
+      return next(createError.InternalServerError(error.message));
     }
   },
 
@@ -436,6 +446,7 @@ const OrderController = {
     }
     catch(error)
     {
+      console.log(error)
       return next(createError.InternalServerError(error.message))
     }
   },
@@ -468,9 +479,10 @@ const OrderController = {
     }
     catch(error)
     {
+      console.log(error)
       return next(createError.InternalServerError(error.message))
     }
-  },
+  }, 
   // revenue
   getRevenue: async (req, res, next) => {
     console.log(new Date().getMonth())

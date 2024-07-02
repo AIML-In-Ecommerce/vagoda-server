@@ -8,6 +8,8 @@ import PromotionService from "../support/promotion.service.js"
 
 async function generateOrder(requiredData)
 {
+    const productNeedToBuy = requiredData.itemIds
+
     let execTime = new Date()
     if(requiredData.execTime != undefined)
     {
@@ -27,11 +29,23 @@ async function generateOrder(requiredData)
       return null
     }
 
-    const cartInfo = await CartService.getCartInfoByUserId(userId)
+    let cartInfo = await CartService.getCartInfoByUserId(userId)
     if(cartInfo == null || cartInfo.products.length == 0)
     {
       return null
     }
+
+    if(productNeedToBuy != undefined && productNeedToBuy != null && productNeedToBuy.length > 0)
+    {
+      const filteredProducts = cartInfo.products.filter((value) => productNeedToBuy.includes(value.itemId))
+      cartInfo.products = filteredProducts
+    }
+
+    if(cartInfo.products.length < 1)
+    {
+      return null
+    }
+
 
     const productsOnShop = new Map()
 
@@ -160,7 +174,8 @@ async function generateOrder(requiredData)
       //for global discount
       //since the global promotion doesnot have any target product's ID,
       //we only store global discount (promotion) in promotionInfoOnShops by the pair of <shopId, promotionInfo> 
-      const globalPromotion = promotionInfosOnShops.get(shopId)
+      const globalPromotion = promotionInfosOnShops != null ? promotionInfosOnShops.get(shopId + "+") : undefined
+
       if(globalPromotion != undefined)
       {
         const targetGlobalPromotion = fetchedPromotionInfos[globalPromotion.indexInFetchedPromotionInfos]

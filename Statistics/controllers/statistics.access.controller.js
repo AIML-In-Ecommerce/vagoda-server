@@ -2,6 +2,9 @@ import createError from 'http-errors'
 import StatisticsAccessService from '../services/statistics.access.service.js'
 import dotenv from  "dotenv"
 import { A_SESSION_USER_ID_IN_HEADERS, AuthorizedUserIdInHeader } from '../services/verification.service.js'
+import { CachePrefix } from '../shared/enums.js'
+import redisClient from '../configs/redis.config.js'
+import { AccessProductCacheExpiry } from '../shared/redisExpiry.js'
 dotenv.config()
 
 // const SESSION_ID_COOKIE_KEY = String(process.env.SESSION_COOKIE_KEY) || "ssid"
@@ -57,6 +60,19 @@ const StatisticsAccessController =
                 endTimeToCheck = new Date(endTime)
             }
 
+            const cacheKey = `${CachePrefix.USER_SEARCH_PRODUCT_PREFIX}${userId}`
+            const cacheValue = await redisClient.get(cacheKey)
+    
+            if(cacheValue != null)
+            {
+                console.log("get from cache")
+                const cacheProducts = JSON.parse(cacheValue)
+                return res.json({
+                    message: "Get products from cache successfully",
+                    data: cacheProducts
+                })
+            }
+
             let startTimeToCheck = new Date(endTimeToCheck.setDate(endTimeToCheck.getDate() - intervalOfDay))
 
             if(startTime != undefined)
@@ -64,11 +80,15 @@ const StatisticsAccessController =
                 startTimeToCheck = new Date(startTime)
             }
 
-            const productList = await StatisticsAccessService.getAccessProductsByBuyer(userId, amount, accessType, startTimeToCheck, endTimeToCheck)
+            const productList = await StatisticsAccessService.getAccessProductInfosByBuyer(userId, amount, accessType, startTimeToCheck, endTimeToCheck)
             if(productList == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get searched products"))
             }
+
+            await redisClient.set(cacheKey, JSON.stringify(productList), {
+                EX: AccessProductCacheExpiry.EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS
+            })
             
             return res.json(
                 {

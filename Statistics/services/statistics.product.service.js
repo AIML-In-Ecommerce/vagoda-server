@@ -3,6 +3,7 @@ import ProductAccess from "../models/access/productAcess.model.js"
 import { Product } from "../models/product/product.model.js"
 import { CachePrefix, OrderStatus, ProductAccessType } from "../shared/enums.js"
 import StatisticsOrderService from "./statistics.order.service.js"
+import nodeFpgrowth from 'node-fpgrowth'
 
 const DEFAULT_MAX_TOP_PRODUCTS_IN_SALES = 10
 
@@ -685,6 +686,66 @@ const StatisticsProductService =
 
         return finalResult
     },
+
+    async getFrequentItemsetsAnIntervalOfTime(minSupport, startTime = undefined, endTime = undefined)
+    {
+        const targetOrderStatus = OrderStatus.PROCESSING
+        const orderStatistics = await StatisticsOrderService.getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime)
+        if(orderStatistics == null)
+        {
+            return null
+        }
+
+        const mapOfProductsToIndex = new Map()
+        const listOfItemSets = []
+        const currentIndex = 0
+
+        orderStatistics.statisticData.forEach((orderRecord) =>
+        {
+            const mapOfProductsIds = new Map()
+            for(let i = 0; i < orderRecord.products.length ; i++)
+            {
+                const productId = orderRecord.products[i].product
+
+                if(mapOfProductsIds.get(productId) == undefined)
+                {
+                    mapOfProductsIds.set(productId, {})
+                }
+
+                if(mapOfProductsIds.get(productId) == undefined)
+                {
+                    mapOfProductsToIndex.set(productId, currentIndex)
+                    currentIndex += 1
+                }
+            }
+
+            listOfItemSets.push(Array.from(mapOfProductsIds.keys()))
+        })
+
+        const fpgrowth = new nodeFpgrowth.FPGrowth(minSupport)
+
+        const frequentItemsets = await fpgrowth.exec(listOfItemSets)
+
+        return frequentItemsets
+    },
+
+    async getFrequentItemsToSuggest(productId, startTime, endTime)
+    {
+        const frequentItemsets = await this.getFrequentItemsetsAnIntervalOfTime(0.2, startTime, endTime)
+        if(frequentItemsets == null)
+        {
+            return null
+        }
+
+        const itemsetsIncludeProductId = frequentItemsets.filter((itemset) => 
+        {
+            return itemset.items.includes(productId)
+        })
+
+        console.log(itemsetsIncludeProductId)
+        
+        return {}
+    },  
 
 }
 
