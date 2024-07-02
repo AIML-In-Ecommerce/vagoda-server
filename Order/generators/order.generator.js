@@ -37,13 +37,15 @@ async function generateOrder(requiredData)
 
     if(productNeedToBuy != undefined && productNeedToBuy != null && productNeedToBuy.length > 0)
     {
-      cartInfo.products = cartInfo.products.filter((value) => productNeedToBuy.includes(value._id))
+      const filteredProducts = cartInfo.products.filter((value) => productNeedToBuy.includes(value.itemId))
+      cartInfo.products = filteredProducts
     }
 
     if(cartInfo.products.length < 1)
     {
       return null
     }
+
 
     const productsOnShop = new Map()
 

@@ -254,7 +254,7 @@ const StatisticsProductController =
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 
-            const statistics = await StatisticsProductService.getFrequentItemsetsAnIntervalOfTime(0.2, startTime, endTime)
+            const statistics = await StatisticsProductService.getFrequentItemsToSuggest(productId, startTime, endTime)
 
             return res.json(
                 {

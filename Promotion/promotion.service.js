@@ -18,7 +18,7 @@ const PromotionService = {
     return await Promotion.findById(id);
   },
   async getByShopId(shopId) {
-    return await Promotion.find({ shopId: shopId });
+    return await Promotion.find({ shop: shopId });
   },
   // async getByShopId(shopId) {
   //   return await Promotion.find({ shopId });

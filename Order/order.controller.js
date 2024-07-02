@@ -217,7 +217,7 @@ const OrderController = {
       }
       
       console.log("update order when payment service request (ZaloPay)")
-      const successfulUpdatedStatusList = await OrderService.updateManyOrderStatus(orderIds, undefined, userId, OrderStatus.PENDING)
+      const successfulUpdatedStatusList = await OrderService.updateManyOrderStatus(orderIds, paidAt, undefined, userId, OrderStatus.PENDING)
       // if(successfulUpdatedStatusList.length == 0)
       // {
       //   return next(createError.MethodNotAllowed("Cannot find order list. Cannot update order's status"))
