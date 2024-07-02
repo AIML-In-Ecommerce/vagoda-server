@@ -150,6 +150,10 @@ const ZaloPayController = {
       result.return_message = ex.message;
     }
 
+    console.log({
+      targetUserId, targetOrderIds, targetZpTransId, targetPaidAt, targetAppTransId, targetZpUserId
+    })
+
     //gọi API update order status thành PENDING => đã thanh toán xong
     const updatedOrderResult = await OrderService.updateWaitingPaymentStatus(targetUserId, targetOrderIds, 
       targetZpTransId, targetPaidAt, targetAppTransId, targetZpUserId)

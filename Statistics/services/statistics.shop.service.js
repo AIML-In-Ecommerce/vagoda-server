@@ -52,7 +52,7 @@ const ShopStatisticsService =
             return null
         }
 
-        const productAccessStatistics =  await StatisticsAccessService.getAccessProductsWithShopId(shopId, undefined, undefined, startTime, endTime)
+        const productAccessStatistics =  await StatisticsAccessService.getAccessProductRecordsByShopId(shopId, startTime, endTime, undefined, undefined)
         if(productAccessStatistics == null)
         {
             console.log("Null productAccessStatistics in getConversionOfViewAndSale")
@@ -62,6 +62,7 @@ const ShopStatisticsService =
         let numberOfUserHasOrder = 0
         const userIdsInOrder = new Map()
 
+        //this can help to remove duplicated userId
         orderStatistics.statisticData.forEach((item) =>
         {
             const userId = item.user.toString()
@@ -70,14 +71,15 @@ const ShopStatisticsService =
 
         productAccessStatistics.forEach((record) =>
         {
-            const isExistedBuyerOrder = userIdsInOrder.get(record.user.toString())
-            if(isExistedBuyerOrder != undefined)
+            const isCountedFlag = userIdsInOrder.get(record.user.toString())
+            if(isCountedFlag != undefined && isCountedFlag == true)
             {
                 numberOfUserHasOrder += 1
+                userIdsInOrder.set(record.user.toString(), false)
             }
         })
 
-        const conversionRate = numberOfUserHasOrder / productAccessStatistics.length
+        const conversionRate = productAccessStatistics.length > 0 ? numberOfUserHasOrder / productAccessStatistics.length : null
         
         const finalResult = 
         {

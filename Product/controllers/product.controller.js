@@ -339,6 +339,30 @@ const ProductController = {
       });
     }
   },
+
+  async getFlashSalesProducts(req, res, next)
+  {
+    try
+    {
+      const flashSalesProducts = await ProductService.getAllFlashSalesProducts(undefined)
+      if(flashSalesProducts == null)
+      {
+        return next(createError.BadRequest("Cannot get flash sales products"))
+      }
+
+      return res.json({
+        message: "Get flash sales products successfully",
+        data: flashSalesProducts
+      })
+
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
 };
 
 export default ProductController;

@@ -160,7 +160,8 @@ async function generateOrder(requiredData)
       //for global discount
       //since the global promotion doesnot have any target product's ID,
       //we only store global discount (promotion) in promotionInfoOnShops by the pair of <shopId, promotionInfo> 
-      const globalPromotion = promotionInfosOnShops.get(shopId)
+      const globalPromotion = promotionInfosOnShops != null ? promotionInfosOnShops.get(shopId + "+") : undefined
+
       if(globalPromotion != undefined)
       {
         const targetGlobalPromotion = fetchedPromotionInfos[globalPromotion.indexInFetchedPromotionInfos]
