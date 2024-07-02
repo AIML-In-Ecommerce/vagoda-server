@@ -357,6 +357,21 @@ const ProductService = {
 
     return updatedProductIdList;
   },
+
+  async getAllFlashSalesProducts(amount)
+  {
+    const flashSalesProducts = await Product.find({
+      $expr: {
+        $lt: ['$finalPrice', '$originalPrice']
+      }
+    })
+    if(flashSalesProducts == null)
+    {
+      return null
+    }
+
+    return flashSalesProducts
+  }
 };
 
 export default ProductService;
