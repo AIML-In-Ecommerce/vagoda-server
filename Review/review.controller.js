@@ -149,6 +149,7 @@ const ReviewController = {
         sortBy: req.body.sortBy || "",
       };
       console.log(req.body);
+      console.log(filterOptions);
       if (filterOptions.index < 1) filterOptions.index = 1;
       const { filteredReviews, total } =
         await ReviewService.getFilteredReviews(filterOptions);
@@ -164,6 +165,24 @@ const ReviewController = {
       });
     } catch (error) {
       console.log(error);
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  // get all comment
+  getAllComment: async (req, res, next) => {
+    try {
+      const filter = req.query;
+      const list = await CommentService.getAll(filter, "");
+      if (!list) {
+        return next(createError.BadRequest("Comment list not found"));
+      }
+      res.json({
+        message: "Get comment list successfully",
+        status: 200,
+        data: list,
+        length: list.length,
+      });
+    } catch (error) {
       next(createError.InternalServerError(error.message));
     }
   },

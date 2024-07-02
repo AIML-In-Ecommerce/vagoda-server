@@ -586,7 +586,33 @@ const OrderService = {
 
 
     return finalResult
+  },
+  //revenue of a shop by month and year
+  async getRevenue(shopId, year){
+    try {
+      // get all order of a shop in year
+      const orders = await Order.find({shop: shopId, createdAt: {$gte: new Date(year, 0, 1), $lt: new Date(year + 1, 0, 1)}});
+      console.log("order length", orders.length)
+      //revenue of a shop by month
+      const revenue = new Array(12).fill(0);
+      console.log(revenue)
+      console.log(orders)
+      orders.forEach(order => {
+        console.log(order.createAt)
+        console.log(typeof order.createAt)
+        const month = new Date(order.createAt).getMonth();
+        console.log("get month", month)
+        revenue[month] += order.totalPrice;
+      });
+      return revenue;
+
+      
+    } catch (error) {
+      console.log(error);
+      return error
+    }
   }
+
 
 
 };

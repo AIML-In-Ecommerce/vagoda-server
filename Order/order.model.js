@@ -161,6 +161,10 @@ const OrderSchema = new Schema({
       },
     },
   ],
+  createAt: {
+    type: Date,
+    default: new Date(2024, 6, 15),
+  },
 });
 
 

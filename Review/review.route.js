@@ -24,6 +24,7 @@ router.post('/reviews/filter', ReviewController.getFilteredReviews)
 
 router.get('/productReviews/:productId', ReviewController.getByProductId);
 
+router.get('/comments', ReviewController.getAllComment);
 router.post('/comment', ReviewController.createComment);
 router.get('/avgRating/:productId', ReviewController.averageRating);
 

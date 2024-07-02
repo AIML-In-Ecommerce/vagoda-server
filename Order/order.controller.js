@@ -471,6 +471,74 @@ const OrderController = {
       return next(createError.InternalServerError(error.message))
     }
   },
+  // revenue
+  getRevenue: async (req, res, next) => {
+    console.log(new Date().getMonth())
+    try {
+      let m, y;
+      const { shop, year, month } = req.query;
+      if(!shop) {
+        return next(createError.BadRequest("Invalid shop!"))
+      }
+      if(!year) {
+        // convert month to number and check if it is valid and be a integer
+        m = parseInt(month);
+        if(isNaN(m) || m < 1 || m > 12) {
+          return next(createError.BadRequest("Invalid month!"))
+        }
+        if(m % 1 !== 0) {
+          return next(createError.BadRequest("Invalid month!"))
+        }
+        m--;
+        if(m > new Date().getMonth()) {
+          y = new Date().getFullYear()-1;
+        }
+        else {
+          y = new Date().getFullYear();
+        }
+      } else {
+        // convert year to number and check if it is valid and be a integer
+        const y = parseInt(year);
+        if(isNaN(y) || y < 2000 || y > new Date().getFullYear()) {
+          return next(createError.BadRequest("Invalid year!"))
+        }
+        if(y > new Date().getFullYear()) {
+          return next(createError.BadRequest("Invalid year!"))
+        }
+        if(y % 1 !== 0) {
+          return next(createError.BadRequest("Invalid year!"))
+        }
+        if(month) {
+          const m = parseInt(month);
+          if(isNaN(m) || m < 1 || m > 12) {
+            return next(createError.BadRequest("Invalid month!"))
+          }
+          if(m % 1 !== 0) {
+            return next(createError.BadRequest("Invalid month!"))
+          }
+          m--;
+        }
+      }
+      const revenue = await OrderService.getRevenue(shop, y);
+      if (!revenue) {
+        return next(createError.BadRequest("Something went wrong!"));
+      }
+      console.log("revenue", revenue)
+      if(m) {
+        res.json({
+          message: "Get revenue successfully",
+          data: revenue[m],
+        });
+      } else {
+        res.json({
+          message: "Get revenue successfully",
+          data: revenue,
+        });
+      }
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
 
 };
 

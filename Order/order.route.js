@@ -36,6 +36,7 @@ sellerRouter.put("/status/update_many", OrderController.updateManyOrderStatusByS
 sellerRouter.put("/status/cancel_one", OrderController.cancelOneOrderBySeller)
 sellerRouter.put("/status/cancel_many", OrderController.cancelManyOrderBySeller)
 
+sellerRouter.get('/revenue', OrderController.getRevenue)
 
 // from system
 systemRouter.post("/system/order/zalopay/update_callback", VerificationService.verifySystemRole, OrderController.updateOrderStatusWhenZaloPayCallback)
