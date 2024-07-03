@@ -489,19 +489,24 @@ const OrderController = {
     try {
       let m, y;
       const { shop, year, month } = req.query;
+      console.log(shop, year, month)
       if(!shop) {
         return next(createError.BadRequest("Invalid shop!"))
       }
       if(year != undefined) {
         // convert month to number and check if it is valid and be a integer
-        m = parseInt(month);
-        if(isNaN(m) || m < 1 || m > 12) {
-          return next(createError.BadRequest("Invalid month!"))
+        
+        if(month!= undefined){
+          m = parseInt(month);
+          console.log(m)
+          if(isNaN(m) || m < 1 || m > 12) {
+            return next(createError.BadRequest("Invalid month!"))
+          }
+          if(m % 1 !== 0) {
+            return next(createError.BadRequest("Invalid month!"))
+          }
+          m--;
         }
-        if(m % 1 !== 0) {
-          return next(createError.BadRequest("Invalid month!"))
-        }
-        m--;
         if(m > new Date().getMonth()) {
           y = new Date().getFullYear()-1;
         }
@@ -540,7 +545,7 @@ const OrderController = {
       if(m != undefined) {
         res.json({
           message: "Get revenue successfully",
-          data: revenue[0],
+          data: revenue[m],
         });
       } else {
         console.log("ccccccccccc")
