@@ -737,14 +737,28 @@ const StatisticsProductService =
             return null
         }
 
-        const itemsetsIncludeProductId = frequentItemsets.filter((itemset) => 
+        let itemsetsIncludeProductId = frequentItemsets.filter((itemset) => 
         {
-            return itemset.items.includes(productId)
+            return (itemset.items.includes(productId) && itemset.items.length == 2)
         })
 
-        console.log(itemsetsIncludeProductId)
+        itemsetsIncludeProductId = itemsetsIncludeProductId.map((itemset) =>
+        {
+           return  itemset.items.filter((value) => value != productId)
+        })
+
+        const productIds = []
+        itemsetsIncludeProductId.forEach((itemset) =>
+        {
+            itemset.forEach((item) => 
+            {
+                productIds.push(item)
+            })
+        })
         
-        return {}
+        const productInfos = await Product.find({_id: {$in: productIds}})
+
+        return productInfos
     },  
 
 }
