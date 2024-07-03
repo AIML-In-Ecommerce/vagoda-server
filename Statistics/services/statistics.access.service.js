@@ -145,7 +145,6 @@ const StatisticsAccessService =
                                                     // .limit(amount)
         }
 
-
         if(rawAccessedProducts == null)
         {
             return null

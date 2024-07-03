@@ -60,6 +60,8 @@ const StatisticsAccessController =
                 endTimeToCheck = new Date(endTime)
             }
 
+            console.log(endTimeToCheck)
+
             const cacheKey = `${CachePrefix.USER_SEARCH_PRODUCT_PREFIX}${userId}`
             const cacheValue = await redisClient.get(cacheKey)
     
@@ -73,7 +75,7 @@ const StatisticsAccessController =
                 })
             }
 
-            let startTimeToCheck = new Date(endTimeToCheck.setDate(endTimeToCheck.getDate() - intervalOfDay))
+            let startTimeToCheck = new Date(new Date(endTimeToCheck).setDate(endTimeToCheck.getDate() - intervalOfDay))
 
             if(startTime != undefined)
             {
@@ -86,9 +88,12 @@ const StatisticsAccessController =
                 return next(createError.MethodNotAllowed("Cannot get searched products"))
             }
 
-            await redisClient.set(cacheKey, JSON.stringify(productList), {
-                EX: AccessProductCacheExpiry.EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS
-            })
+            if(productList.length > 0)
+            {
+                await redisClient.set(cacheKey, JSON.stringify(productList), {
+                    EX: AccessProductCacheExpiry.EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS
+                })
+            }
             
             return res.json(
                 {
