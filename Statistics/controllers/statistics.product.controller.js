@@ -245,7 +245,7 @@ const StatisticsProductController =
         }
     },
 
-    async getFrequentlyRelatedItems(req, res, next)
+    async getProductsAbleToCombine(req, res, next)
     {
         try
         {
@@ -255,10 +255,14 @@ const StatisticsProductController =
             const endTime = req.body.endTime
 
             const statistics = await StatisticsProductService.getFrequentItemsToSuggest(productId, startTime, endTime)
+            if(statistics == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
 
             return res.json(
                 {
-                    message: "",
+                    message: "Get products can be used to combine successfully",
                     data: statistics
                 }
             )
