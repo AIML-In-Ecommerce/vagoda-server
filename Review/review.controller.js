@@ -120,6 +120,7 @@ const ReviewController = {
         data: object,
       });
     } catch (error) {
+      console.log(error)
       next(createError.InternalServerError(error.message));
     }
   },

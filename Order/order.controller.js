@@ -492,7 +492,7 @@ const OrderController = {
       if(!shop) {
         return next(createError.BadRequest("Invalid shop!"))
       }
-      if(!year) {
+      if(year != undefined) {
         // convert month to number and check if it is valid and be a integer
         m = parseInt(month);
         if(isNaN(m) || m < 1 || m > 12) {
@@ -510,7 +510,7 @@ const OrderController = {
         }
       } else {
         // convert year to number and check if it is valid and be a integer
-        const y = parseInt(year);
+        y = parseInt(year);
         if(isNaN(y) || y < 2000 || y > new Date().getFullYear()) {
           return next(createError.BadRequest("Invalid year!"))
         }
@@ -520,8 +520,8 @@ const OrderController = {
         if(y % 1 !== 0) {
           return next(createError.BadRequest("Invalid year!"))
         }
-        if(month) {
-          const m = parseInt(month);
+        if(month != undefined) {
+          m = parseInt(month);
           if(isNaN(m) || m < 1 || m > 12) {
             return next(createError.BadRequest("Invalid month!"))
           }
@@ -531,17 +531,19 @@ const OrderController = {
           m--;
         }
       }
+      console.log("aaaaaaaaaaaaaaaaaaaaaa", m, y)
       const revenue = await OrderService.getRevenue(shop, y);
       if (!revenue) {
         return next(createError.BadRequest("Something went wrong!"));
       }
       console.log("revenue", revenue)
-      if(m) {
+      if(m != undefined) {
         res.json({
           message: "Get revenue successfully",
-          data: revenue[m],
+          data: revenue[0],
         });
       } else {
+        console.log("ccccccccccc")
         res.json({
           message: "Get revenue successfully",
           data: revenue,

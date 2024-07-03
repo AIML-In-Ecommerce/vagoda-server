@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import User from "./user.model.js";
 import Shop from "./shop.model.js";
+import Review from "./review.model.js";
 import mongooseAutoPopulate from "mongoose-autopopulate";
 
 const Schema = mongoose.Schema;

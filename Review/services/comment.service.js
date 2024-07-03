@@ -1,4 +1,5 @@
 import Comment from "../models/comment.model.js";
+import Review from "../models/review.model.js";
 
 const CommentService = {
   async getAll(filter, projection) {
@@ -28,7 +29,7 @@ const CommentService = {
           }
         })
         .exec();
-
+      console.log(review.product.shop._id.toString(), objectData.shop.toString());
       if (review.product.shop._id.toString() === objectData.shop.toString()) {
         review.isResponseByShop = true;
         await review.save();
