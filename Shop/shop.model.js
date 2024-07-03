@@ -62,6 +62,10 @@ const ShopSchema = new Schema({
     ref: "Account",
     required: true,
   },
+  avatar: {
+    type: String,
+    default: "https://cdn-icons-png.flaticon.com/128/1653/1653671.png"
+  },
   location: {
     type: String,
     required: true,
