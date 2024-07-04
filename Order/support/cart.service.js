@@ -39,12 +39,15 @@ const CartService =
         }
     },
 
-    async clearCartByUserId(userId)
+    async clearCartByUserId(userId, targetItemIds)
     {
         const url = publicAPIURL + `/system/cart/user/clear`
+        const requestBody = {
+            targetItemIds: targetItemIds
+        }
         try
         {
-            const response = await axios.put(url, undefined ,{
+            const response = await axios.put(url, requestBody,{
                 headers:
                 {
                     "origin": `${publicAPIURL}`
@@ -71,6 +74,37 @@ const CartService =
         }
     },
 
+    async clearAllCartByUserId(userId)
+    {
+        const url = publicAPIURL + `/system/cart/user/clearAll`
+        try
+        {
+            const response = await axios.put(url, undefined ,{
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
+                },
+                params:
+                {
+                    userId: userId
+                }
+            })
+            if(response.status == 200)
+            {
+                const data = response.data
+                return data.data
+            }
+            else
+            {
+                return null
+            }
+        }
+        catch(error)
+        {
+            console.log("Axios error at clearAllCartByUserId")
+            return null
+        }
+    },
 }
 
 export default CartService
