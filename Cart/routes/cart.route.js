@@ -28,6 +28,7 @@ router.put("/system/cart/user", VerificationService.verifySystemRole, SystemCart
 router.post("/system/cart/create", VerificationService.verifySystemRole, SystemCartController.create);
 router.delete("/system/cart/delete", VerificationService.verifySystemRole, SystemCartController.delete);
 router.put("/system/cart/user/clear", VerificationService.verifySystemRole, SystemCartController.clearCart)
+router.put("/system/cart/user/clearAll", VerificationService.verifySystemRole, SystemCartController.clearAllCart)
 
 export default router;
 

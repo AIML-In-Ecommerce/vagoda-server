@@ -158,7 +158,7 @@ const CartService = {
     return (await rawCart.save()).products
   },
 
-  async clearCartByUserId(userId)
+  async clearAllCartByUserId(userId)
   {
     const rawCart = await Cart.findOne({user: userId})
     if(rawCart == null)
@@ -167,6 +167,20 @@ const CartService = {
     }
 
     rawCart.products = []
+    return await rawCart.save()
+  },
+
+  async clearCartByUserId(userId, targetItemIds)
+  {
+    const rawCart = await Cart.findOne({user: userId})
+    if(rawCart == null)
+    {
+      return null
+    }
+
+    const updatedProductsInCart = rawCart.products.filter((item) => (targetItemIds.includes(item._id.toString() == false)))
+    rawCart.products = updatedProductsInCart
+
     return await rawCart.save()
   },
 

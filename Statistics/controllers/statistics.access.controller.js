@@ -25,10 +25,14 @@ const StatisticsAccessController =
             const appTime = req.body.appTime
 
             const productList = await StatisticsAccessService.setAccessProductByBuyer(userId, productId, shopId, accessType, appTime)
+            if(productList == null)
+            {
+                return next(createError.BadRequest("Cannot record the access"))
+            }
             return res.json(
                 {
                     message: "Set product successfully",
-                    data: productList
+                    data: {}
                 }
             )
         }
@@ -51,7 +55,7 @@ const StatisticsAccessController =
             const startTime = req.query.startTime
             const endTime = req.query.endTime
 
-            const intervalOfDay = 7
+            const intervalOfDay = 14
 
             let endTimeToCheck = new Date()
 
@@ -60,20 +64,18 @@ const StatisticsAccessController =
                 endTimeToCheck = new Date(endTime)
             }
 
-            console.log(endTimeToCheck)
-
-            const cacheKey = `${CachePrefix.USER_SEARCH_PRODUCT_PREFIX}${userId}`
-            const cacheValue = await redisClient.get(cacheKey)
+            // const cacheKey = `${CachePrefix.USER_SEARCH_PRODUCT_PREFIX}${userId}`
+            // const cacheValue = await redisClient.get(cacheKey)
     
-            if(cacheValue != null)
-            {
-                console.log("get from cache")
-                const cacheProducts = JSON.parse(cacheValue)
-                return res.json({
-                    message: "Get products from cache successfully",
-                    data: cacheProducts
-                })
-            }
+            // if(cacheValue != null)
+            // {
+            //     console.log("get from cache")
+            //     const cacheProducts = JSON.parse(cacheValue)
+            //     return res.json({
+            //         message: "Get products from cache successfully",
+            //         data: cacheProducts
+            //     })
+            // }
 
             let startTimeToCheck = new Date(new Date(endTimeToCheck).setDate(endTimeToCheck.getDate() - intervalOfDay))
 
@@ -82,18 +84,19 @@ const StatisticsAccessController =
                 startTimeToCheck = new Date(startTime)
             }
 
+
             const productList = await StatisticsAccessService.getAccessProductInfosByBuyer(userId, amount, accessType, startTimeToCheck, endTimeToCheck)
             if(productList == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get searched products"))
             }
 
-            if(productList.length > 0)
-            {
-                await redisClient.set(cacheKey, JSON.stringify(productList), {
-                    EX: AccessProductCacheExpiry.EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS
-                })
-            }
+            // if(productList.length > 0)
+            // {
+            //     await redisClient.set(cacheKey, JSON.stringify(productList), {
+            //         EX: AccessProductCacheExpiry.EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS
+            //     })
+            // }
             
             return res.json(
                 {

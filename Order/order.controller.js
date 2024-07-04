@@ -117,7 +117,14 @@ const OrderController = {
       await PromotionService.updateUsedPromotionsQuantity(data.promotionIds)
 
       //TODO: clear cart of user
-      await CartService.clearCartByUserId(userId)
+      if(data.itemIds != undefined && data.itemIds != null && data.itemIds.length > 0)
+      {
+        await CartService.clearCartByUserId(userId, data.itemIds)
+      }
+      else
+      {
+        await CartService.clearAllCartByUserId(userId)
+      }
 
       return res.json({
         message: "Create" + model + "successfully",
@@ -282,17 +289,7 @@ const OrderController = {
       }
 
       const updatedNumber = successfulUpdatedList.length
-      const sampleNumber = data.orderIds.length      
-
-      if(updatedNumber != sampleNumber)
-      {
-        return res.json(
-          {
-            message: `Updated ${updatedNumber}/${sampleNumber} orders`,
-            data: successfulUpdatedList
-          }
-        )
-      }
+      const sampleNumber = orderIds.length
 
       return res.json(
         {
