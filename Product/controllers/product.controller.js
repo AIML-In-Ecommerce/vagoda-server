@@ -362,6 +362,24 @@ const ProductController = {
       return next(createError.InternalServerError(error.message))
     }
   },
+  async getRelatedProductsBySubCategory(req, res, next) {
+    try {
+      const { subCategories } = req.body;
+      if (!subCategories) {
+        return next(createError.BadRequest("Bad request!"));
+      }
+  
+      const relatedProducts = await ProductService.getRelatedProductsBySubCategory(subCategories);
+  
+      return res.json({
+        message: "Get related products successfully",
+        status: 200,
+        data: relatedProducts,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  }
 
 };
 

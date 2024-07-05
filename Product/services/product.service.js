@@ -371,7 +371,26 @@ const ProductService = {
     }
 
     return flashSalesProducts
-  }
+  },
+
+  async getRelatedProductsBySubCategory(subCategories) {
+    if (subCategories.length === 0) {
+    const topSellingProducts = await this.getTopSelling(4);
+      return topSellingProducts;
+    }
+    const relatedProducts = [];
+    
+    for (const subCategoryId of subCategories) {
+      const products = await Product.find({ subCategory: subCategoryId })
+        .sort({ soldQuantity: -1 })
+        .limit(4)
+        .select("-description");
+
+      relatedProducts.push(...products);
+    }
+
+    return relatedProducts;
+  },
 };
 
 export default ProductService;

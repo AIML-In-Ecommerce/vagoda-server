@@ -46,6 +46,8 @@ router.post(
 router.get("/files", FileController.getAll);
 router.get("/files/filter", FileController.filterFiles)
 
+router.post("/revelantCategoryProducts", ProductController.getRelatedProductsBySubCategory)
+
 router.get("/products/global_flash_sales", ProductController.getFlashSalesProducts)
 
 //from system
