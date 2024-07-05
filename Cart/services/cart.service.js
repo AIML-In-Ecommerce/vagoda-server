@@ -179,7 +179,7 @@ const CartService = {
       return null
     }
 
-    const updatedProductsInCart = rawCart.products.filter((item) => (targetItemIds.includes(item._id.toString() == false)))
+    const updatedProductsInCart = rawCart.products.filter((item) => (targetItemIds.includes(item._id.toString()) == false))
     rawCart.products = updatedProductsInCart
 
     return await rawCart.save()
