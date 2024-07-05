@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Cart } from "../models/cart.model.js";
 import ProductService from "../support/product.service.js";
+import SupportStringService from "../support/string.service.js";
 
 const NullColorAttributeKey = "_color_"
 const NullSizeAttributeKey = "_size_"
@@ -158,7 +159,7 @@ const CartService = {
     return (await rawCart.save()).products
   },
 
-  async clearCartByUserId(userId)
+  async clearAllCartByUserId(userId)
   {
     const rawCart = await Cart.findOne({user: userId})
     if(rawCart == null)
@@ -167,6 +168,20 @@ const CartService = {
     }
 
     rawCart.products = []
+    return await rawCart.save()
+  },
+
+  async clearCartByUserId(userId, targetItemIds)
+  {
+    const rawCart = await Cart.findOne({user: userId})
+    if(rawCart == null)
+    {
+      return null
+    }
+
+    const updatedProductsInCart = rawCart.products.filter((item) => (targetItemIds.includes(item._id.toString()) == false))
+    rawCart.products = updatedProductsInCart
+
     return await rawCart.save()
   },
 
@@ -182,6 +197,23 @@ const CartService = {
     {
       return null
     }
+
+    const mapOfTargetProductInfos = new Map()
+    providedProducts.forEach((record) =>
+    {
+      mapOfTargetProductInfos.set(record.product, -1)
+    })
+
+    const rawProductInfos = await ProductService.getProductByIds(Array.from(mapOfTargetProductInfos.keys()))
+    if(rawProductInfos == null)
+    {
+      return null
+    }
+
+    rawProductInfos.forEach((productInfo, index) => 
+    {
+      mapOfTargetProductInfos.set(productInfo._id, index)
+    })
 
     const mapOfCurrentProducts = new Map()
 
@@ -211,13 +243,187 @@ const CartService = {
       {
         //init new item record
         const clonedProduct = JSON.parse(JSON.stringify(providedProduct))
-        clonedProduct.color = providedProduct.color != null ? providedProduct.color : undefined
-        clonedProduct.size = providedProduct.size != null ? providedProduct.size : undefined
-        rawCart.products.push(clonedProduct)
-        mapOfCurrentProducts.set(targetCombinedKey, rawCart.products.length)
+
+        const targetProductInfoIndex  = mapOfTargetProductInfos.get(providedProduct.product)
+
+        //ensure that the system will insert valid/existed products
+        if(targetProductInfoIndex != undefined && targetProductInfoIndex != -1)
+        {
+          const rawTargetProductInfo = rawProductInfos[targetProductInfoIndex]
+
+          if(rawTargetProductInfo.attribute.colors.length < 1)
+          {
+            clonedProduct.color = undefined
+          }
+          else if(providedProduct.color == null)
+          {
+            clonedProduct.color = rawTargetProductInfo.attribute.colors[0]
+          }
+          else
+          {
+            clonedProduct.color = providedProduct.color
+          }
+
+          if(rawTargetProductInfo.attribute.size.length < 1)
+          {
+            clonedProduct.size = undefined
+          }
+          else if(providedProduct.size == null)
+          {
+            clonedProduct.size = rawTargetProductInfo.attribute.size[0]
+          }
+          else
+          {
+            clonedProduct.size = providedProduct.size
+          }
+
+          rawCart.products.push(clonedProduct)
+          mapOfCurrentProducts.set(targetCombinedKey, rawCart.products.length)
+        }
       }
     })
     
+    return (await rawCart.save()).products
+  },
+
+  async addToCartByStringDescriptions(userId, productId, color = undefined, size = undefined, quantity = undefined)
+  {
+    const rawCart = await Cart.findOne({user: userId})
+    if(rawCart == null)
+    {
+      return null
+    }
+
+    const rawProductInfos = await ProductService.getProductByIds([productId])
+    if(rawProductInfos == null)
+    {
+      return null
+    }
+
+    const targetProductInfo = rawProductInfos[0]
+
+    let colorToBeInserted = undefined
+    let sizeToBeInserted = undefined
+
+    if(targetProductInfo.attribute.colors.length < 1)
+    {
+      colorToBeInserted = undefined
+    }
+    else if(color != undefined && color != null && color.length > 0)
+    {
+      const mapOfReduceColorDescription = new Map()
+      targetProductInfo.attribute.colors.forEach((colorRecord, index) =>
+      {
+        const colorLabel = JSON.parse(JSON.stringify(colorRecord.color.label))
+        if(colorLabel != undefined)
+        {
+          let reducedString = SupportStringService.reduceVowelsInString(colorLabel, true)
+          reducedString = reducedString.toLowerCase()
+          mapOfReduceColorDescription.set(reducedString, index)
+        }
+      })
+
+      let reducedVowelColor = SupportStringService.reduceVowelsInString(color, true)
+      reducedVowelColor = reducedVowelColor.toLowerCase()
+
+      const targetIndex = mapOfReduceColorDescription.get(reducedVowelColor)
+      
+      if(targetIndex != undefined)
+      {
+        colorToBeInserted = targetProductInfo.attribute.colors[targetIndex]
+      }
+      else
+      {
+        colorToBeInserted = targetProductInfo.attribute.colors[0]
+      }
+    }
+    else
+    {
+      colorToBeInserted = targetProductInfo.attribute.colors[0]
+    }
+
+    if(targetProductInfo.attribute.size.length < 1)
+    {
+      sizeToBeInserted = undefined
+    }
+    else if(size != undefined && size != null & size.length > 0)
+    {
+      const mapOfReduceSizeDescription = new Map()
+      targetProductInfo.attribute.size.forEach((sizeRecord) =>
+      {
+        const sizeLabel = JSON.parse(JSON.stringify(sizeRecord, index))
+        if(sizeLabel != undefined)
+        {
+          let reduceString = SupportStringService.reduceVowelsInString(sizeLabel, true)
+          reduceString = reduceString.toLowerCase()
+          mapOfReduceSizeDescription.set(reduceString, index)
+        }
+      })
+
+      let reduceSizeVowel = SupportStringService.reduceVowelsInString(size, true)
+      reduceSizeVowel = reduceSizeVowel.toLowerCase()
+
+      const targetIndex = mapOfReduceSizeDescription.get(reduceSizeVowel)
+      if(targetIndex != undefined)
+      {
+        sizeToBeInserted = targetProductInfo.attribute.size[targetIndex]
+      }
+      else
+      {
+        sizeToBeInserted = targetProductInfo.attribute.size[0]
+      }
+    }
+    else
+    {
+      sizeToBeInserted = targetProductInfo.attribute.size[0]
+    }
+
+    let quantityToBeInserted = 1
+    if(quantity != undefined && quantity != null && (Number(quantity) > 0))
+    {
+      quantityToBeInserted = Number(quantity)
+    }
+
+    const cartItemToBeInserted = {
+      product: productId,
+      color: colorToBeInserted,
+      size: sizeToBeInserted,
+      quantity: quantityToBeInserted
+    }
+
+    //a map contains indexes of product's info in rawCart
+    const mapOfCurrentProducts = new Map()
+
+    rawCart.products.forEach((item, index) =>
+    {
+      const productId = item.product.toString()
+      const color = item.color != null ? item.color.color.value : NullColorAttributeKey
+      const size = item.size != null ? item.size : NullSizeAttributeKey
+
+      const combinedKey = productId + "+" + color + "+" + size
+      mapOfCurrentProducts.set(combinedKey, index)
+    })
+
+    const getCombinedKey = () => 
+    {
+      const color = cartItemToBeInserted.color != null ? cartItemToBeInserted.color.color.value : NullColorAttributeKey
+      const size = cartItemToBeInserted.size != null ? cartItemToBeInserted.size : NullSizeAttributeKey
+      const productId = cartItemToBeInserted.product
+
+      return productId + "+" + color + "+" + size
+    }
+
+    const existedItemIndexInCart = mapOfCurrentProducts.get(getCombinedKey())
+    if(existedItemIndexInCart == undefined)
+    {
+      //create new
+      rawCart.products.push(cartItemToBeInserted)
+    }
+    else
+    {
+      rawCart.products[existedItemIndexInCart].quantity += cartItemToBeInserted.quantity
+    }
+
     return (await rawCart.save()).products
   },
 

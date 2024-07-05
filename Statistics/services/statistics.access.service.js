@@ -12,23 +12,34 @@ const StatisticsAccessService =
     async setAccessProductByBuyer(buyerId, productId, shopId, accessType, execTime)
     {
         const searchTime = new Date(execTime)
+        const startTime = new Date(new Date(searchTime).setDate(searchTime.getDate() - 14))
+
         const cacheKey = `${CachePrefix.USER_SEARCH_PRODUCT_PREFIX}${buyerId}`
         const currentCacheProductList = await redisClient.get(cacheKey)
 
-        const productInfo = await Product.findById(productId)
+        let accessProductInfos = await this.getAccessProductInfosByBuyer(buyerId, undefined, accessType, startTime, searchTime)
+        accessProductInfos = JSON.parse(JSON.stringify(accessProductInfos))
+
+        const productInfo = JSON.parse(JSON.stringify(await Product.findById(productId)))
+
+
         if(productInfo == null)
         {
             return null
         }
+
+        //can create a new record
         if(currentCacheProductList == null)
         {
-            const newSearchedProductList = [productInfo]
-            // const newSearchedProductList = [productId]
             const newRecordProps = generateProductAccessRecordProp(productId, searchTime, accessType, shopId, buyerId, undefined)
-            await redisClient.set(cacheKey, JSON.stringify(newSearchedProductList), {EX: AccessProductCacheExpiry.EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS})
             const newSearchedProductAccessRecord = new ProductAccess(newRecordProps)
             await newSearchedProductAccessRecord.save()
-            return newSearchedProductList
+
+            const cacheProducts = [productInfo]
+
+            await redisClient.set(cacheKey, JSON.stringify(cacheProducts), {EX: AccessProductCacheExpiry.EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS})
+
+            return accessProductInfos
         }
 
         //a list of product
@@ -48,33 +59,35 @@ const StatisticsAccessService =
 
         if(isExisted == true)
         {
-            return productList
+            return accessProductInfos
         }
 
         //if not -> store info to ProductAccessModel
         const newRecordProps = generateProductAccessRecordProp(productId, searchTime, accessType, shopId, buyerId, undefined)
 
-        productList.push(productInfo)
         const newRecord = new ProductAccess(newRecordProps)
         await newRecord.save()
 
+        productList.push(productInfo)
+
         await redisClient.set(cacheKey, JSON.stringify(productList), {EX: AccessProductCacheExpiry.EXPIRY_TIME_OF_CACHE_SEARCHED_PRODUCTS})
 
-        return productList
+        return accessProductInfos
     },
 
     async getAccessProductInfosByBuyer(buyerId, amount, accessType = undefined, startTime = undefined, endTime = undefined)
     {
         const rawAccessedProducts = await this.getAccessProductRecordsByAuthUser(buyerId, startTime, endTime, amount, accessType)
 
-        let accessProductIds = []
+        let accessProductIds = new Map()
 
         rawAccessedProducts.forEach((record) =>
         {
-            accessProductIds.push(record.product)
+            accessProductIds.set(record.product, {})
         })
 
-        const productList = await Product.find({_id: {$in: accessProductIds}})
+        const uniqueProductIds = Array.from(accessProductIds.keys())
+        const productList = await Product.find({_id: {$in: uniqueProductIds}})
 
         return productList
     },
@@ -83,18 +96,16 @@ const StatisticsAccessService =
     {
 
         const rawAccessedProducts = await this.getAccessProductRecordsByShopId(shopId, startTime, endTime, amount, accessType)
-        let accessProductIds = []
-
+        let accessProductIds = new Map()
+        
         rawAccessedProducts.forEach((record) =>
         {
-            const timeToCheck = record.time.getTime()
-            if(timeToCheck >= startTimeToCheck && timeToCheck <= endTimeToCheck)
-            {
-                accessProductIds.push(record._id.toString())
-            }
+            accessProductIds.set(record.product, {})
         })
 
-        const productList = await Product.find({_id: {$in: accessProductIds}})
+        const uniqueProductIds = Array.from(accessProductIds.keys())
+        const productList = await Product.find({_id: {$in: uniqueProductIds}})
+
         return productList
     },
 
