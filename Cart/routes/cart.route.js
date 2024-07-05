@@ -2,6 +2,7 @@ import express from "express"
 import CartController from "../controller/cart.controller.js";
 import VerificationService from "../services/verification.service.js";
 import SystemCartController from "../controller/system.cart.controller.js";
+import ExternalCartController from "../controller/external.cart.controller.js";
 
 const router = express.Router();
 
@@ -20,6 +21,10 @@ router.get("/cart/user", CartController.getCartByUserId)
 router.post("/cart/user/add", CartController.addToCart)
 router.put("/cart/user/update", CartController.updateProducts)
 router.put("/cart/user/clear", CartController.clearCart)
+
+//from external services
+
+router.get("/cart/external/add_by_description", ExternalCartController.addToCart)
 
 
 // from system
