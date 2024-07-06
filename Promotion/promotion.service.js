@@ -119,21 +119,35 @@ const PromotionService = {
       {
         const promotionId = promotion._id.toString()
 
-        promotion.targetProducts.forEach((productId) =>
+        //if the targetProducts.length == 0 =>  this promotion can be apply for all products of this shop
+        //then we only need to store the promotion with the great status of sentinel_requiredConditionCount's value
+        if(promotion.targetProducts.length == 0)
         {
-          const targetProductId = productId.toString()
-          const currentValues = mapOfProductCanUsePromotion.get(targetProductId)
-          if(currentValues == undefined)
+          const currentRelevantPromotion = relevantPromotions.get(promotionId)
+          if(currentRelevantPromotion != undefined)
           {
-            //initialize the first value
-            mapOfProductCanUsePromotion.set(targetProductId, [promotionId])
+            currentRelevantPromotion.requiredConditionCount = sentinel_requiredConditionCount
+            relevantPromotions.set(promotionId, currentRelevantPromotion)
           }
-          else
-          {
-            currentValues.push(promotionId)
-            mapOfProductCanUsePromotion.set(targetProductId, currentValues)
-          }
-        })
+        }
+        else
+        {
+          promotion.targetProducts.forEach((productId) =>
+            {
+              const targetProductId = productId.toString()
+              const currentValues = mapOfProductCanUsePromotion.get(targetProductId)
+              if(currentValues == undefined)
+              {
+                //initialize the first value
+                mapOfProductCanUsePromotion.set(targetProductId, [promotionId])
+              }
+              else
+              {
+                currentValues.push(promotionId)
+                mapOfProductCanUsePromotion.set(targetProductId, currentValues)
+              }
+            })
+        }
       })
 
       targetProducts.forEach((targetProductId) =>
