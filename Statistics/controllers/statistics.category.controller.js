@@ -14,6 +14,7 @@ const StatisticsCategoryController =
             const amount = req.body.amount
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const useCompensation = req.body.useCompensation ? req.body.useCompensation : false
 
             const cacheKey = `${CachePrefix.GLOBAL_TOP_IN_SALES_SUBCATEGORY_PREFIX}`
             //get from cache
@@ -40,7 +41,7 @@ const StatisticsCategoryController =
                 console.error(error)
             }
 
-            let statistics = await StatisticsCategoryService.getTopInSalesSubCategories(amount, startTime, endTime)
+            let statistics = await StatisticsCategoryService.getTopInSalesSubCategories(amount, startTime, endTime, useCompensation)
             if(statistics == null)
             {
                 return next(createHttpError.BadRequest("Cannot get the statistics"))

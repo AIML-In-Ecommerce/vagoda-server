@@ -584,7 +584,7 @@ const StatisticsProductService =
         return finalResult
     },
 
-    async getTopProductsInGlobalSales(amount = undefined, startTime = undefined, endTime = undefined, useProductInfo = false)
+    async getTopProductsInGlobalSales(amount = undefined, startTime = undefined, endTime = undefined, useProductInfo = false, useCompensation = false)
     {
         const targetOrderStatus = OrderStatus.PROCESSING
         const orderStatistics = await StatisticsOrderService.getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime)
@@ -639,15 +639,6 @@ const StatisticsProductService =
 
         synthesizedProductCount.sort((a, b) => b.count - a.count)
 
-        if(amount != undefined)
-        {
-            synthesizedProductCount = synthesizedProductCount.slice(0, amount)
-        }
-        // else
-        // {
-        //     synthesizedProductCount = synthesizedProductCount.slice(0, DEFAULT_MAX_TOP_PRODUCTS_IN_SALES)
-        // }
-
         const productIds = synthesizedProductCount.map((item) =>
         {
             return item._id
@@ -663,7 +654,7 @@ const StatisticsProductService =
         })
 
         //use productId in productIds array to ensure that we can get sorted products infos
-        const finalResult = productIds.map((productId) =>
+        let finalResult = productIds.map((productId) =>
         {
             const productInfo = mapOfProductInfos.get(productId)
             const countValue = productCount.get(productId)
@@ -683,6 +674,41 @@ const StatisticsProductService =
 
             return record
         })
+
+
+        let compensationProducts = []
+
+        if(useCompensation == true)
+        {
+            const rawCompensationProductsInfos = await Product.find({_id: {$nin: Array.from(productCount.keys())}})
+
+            compensationProducts = rawCompensationProductsInfos.map((record) =>
+            {
+                const clonedRecord = JSON.parse(JSON.stringify(record))
+
+                const result = 
+                {
+                    _id: clonedRecord._id,
+                    title: clonedRecord.name,
+                    value: 0,
+                    count: 0
+                }
+
+                if(useProductInfo == true)
+                {
+                    result.productInfo = clonedRecord
+                }
+
+                return result
+            })
+        }
+
+        finalResult = finalResult.concat(compensationProducts)
+
+        if(amount != undefined)
+        {
+            finalResult = finalResult.slice(0, amount)
+        }
 
         return finalResult
     },

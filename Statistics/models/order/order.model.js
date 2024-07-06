@@ -147,6 +147,6 @@ OrderSchema.path("paymentMethod").discriminator(PaymentMethod.ZALOPAY, ZaloPayPa
 //in case of using multiple databases, we will switch database before access model
 // mongoose.connection.useDb("orderDB")
 
-const Order = mongoose.model("Orders", OrderSchema);
+const Order = mongoose.model("Order", OrderSchema);
 
 export default Order;

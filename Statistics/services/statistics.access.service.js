@@ -171,7 +171,7 @@ const StatisticsAccessService =
 
     async getAccessProductRecordsByShopId(shopId, startTime, endTime, amount = undefined, accessType = undefined)
     {
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
 
         if(startTime != undefined)

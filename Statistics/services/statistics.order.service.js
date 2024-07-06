@@ -126,9 +126,6 @@ const StatisticsOrderService =
             endTimeToCheck = new Date(endTime)
         }
 
-        console.log(startTimeToCheck)
-        console.log(endTimeToCheck)
-
         const rawOrders =  await Order.find({shop: shopId, 
             orderStatus: {
                 $elemMatch: {
@@ -179,7 +176,7 @@ const StatisticsOrderService =
 
                 totalRevenue += order.totalPrice
                 totalProfit += order.profit
-
+                
                 statisticData.push(data)
             }
         })
