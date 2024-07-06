@@ -7,6 +7,8 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import cloudinary from "cloudinary";
 import FileService from "../services/file.service.js";
+import pkg from 'body-parser';
+const { json } = pkg;
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -282,7 +284,11 @@ const ProductController = {
       const sheetName = workbook.SheetNames[1];
       console.log("sheetName", sheetName);
       const worksheet = workbook.Sheets[sheetName];
-      const data = xlsx.utils.sheet_to_json(worksheet);
+      let data = xlsx.utils.sheet_to_json(worksheet,{blankrows: false});
+      //remove blank row in data
+      data = data.filter((item) => {
+        return item["Tên sản phẩm *"] !== undefined;
+      });
       console.log("data", data);
       const shopId = req.body.shopId;
       const result = await cloudinary.v2.uploader.upload(filePath, {
