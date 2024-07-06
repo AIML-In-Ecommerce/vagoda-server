@@ -214,7 +214,7 @@ const StatisticsOrderService =
         const orderAggregatePipline = [
             {
                 $match: {
-                    shop: mongoose.Schema.Types.ObjectId(shopId)
+                    shop: mongoose.Types.ObjectId(shopId)
                 }
             },
             {

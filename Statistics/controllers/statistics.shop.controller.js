@@ -253,6 +253,36 @@ const ShopStatisticsController =
         }
     },
 
+    async getTopCityInSales(req, res, next)
+    {
+        try
+        {
+            const shopId = req.query.shopId
+
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+            const amount = req.body.amount ? req.body.amount : undefined
+
+            const statistics = ShopStatisticsService.getTopCityInSales(shopId, startTime, endTime, amount)
+            if(statistics == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
+
+            return res.json(
+                {
+                    message: "Get top cities in sales successfully",
+                    data: statistics
+                }
+            )
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
 }
 
 export default ShopStatisticsController

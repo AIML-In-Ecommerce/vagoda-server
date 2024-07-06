@@ -352,6 +352,63 @@ const ShopStatisticsService =
         return finalResult
     },
 
+    async getTopCityInSales(shopId, startTime = undefined, endTime = undefined, amount = undefined)
+    {
+        const rawSalesStatistics = await StatisticsOrderService.getSalesByShop(shopId, startTime, endTime)
+        if(rawSalesStatistics == null)
+        {
+            return null
+        }
+
+        const mapOfCityOrDistrictsSales = new Map()
+
+        rawSalesStatistics.statisticData.forEach((orderRecord) =>
+        {
+            const idDistrict = orderRecord.shippingAddress.idDistrict
+
+            const currentValue = mapOfCityOrDistrictsSales.get(idDistrict)
+            if(currentValue == undefined)
+            {
+                //initialize a new value
+                const revenue = orderRecord.totalPrice
+                const profit = orderRecord.profit
+                const statisticData = [orderRecord]
+
+                const initValue = {
+                    idDistrict: idDistrict,
+                    revenue: revenue,
+                    profit: profit,
+                    count: 1,
+                    statisticData: statisticData
+                }
+
+                mapOfCityOrDistrictsSales.set(idDistrict, initValue)
+            }
+            else
+            {
+                const revenue = orderRecord.totalPrice
+                const profit = orderRecord.profit
+                currentValue.revenue += revenue
+                currentValue.profit += profit
+                currentValue.count += 1
+                currentValue.statisticData.push(orderRecord)
+
+                mapOfCityOrDistrictsSales.set(idDistrict, currentValue)
+            }
+        })
+
+        const finalResult = {
+            totalRevenue: rawSalesStatistics.totalRevenue,
+            totalProfit: rawSalesStatistics.totalProfit,
+            avgRevenue: rawSalesStatistics.avgRevenue,
+            avgProfit: rawSalesStatistics.avgProfit,
+            totalOrders: rawSalesStatistics.totalOrders,
+            statisticData: Array.from(mapOfCityOrDistrictsSales.values())
+        }
+
+        return finalResult
+    },
+
 }
 
 export default ShopStatisticsService
