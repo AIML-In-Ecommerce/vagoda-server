@@ -158,6 +158,55 @@ const ShopStatisticsService =
         return finalResult
     },
 
+    async getReturningRateOfShop(shopId, startTime, endTime)
+    {
+        const targetOrderStatus = OrderStatus.WAITING_ONLINE_PAYMENT
+        const rawTargetOrderStatistics = await StatisticsOrderService.getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
+        if(rawTargetOrderStatistics == null)
+        {
+            return null
+        }
+
+        let previousEndTime = new Date(2000, 0, 1)
+
+        if(startTime != undefined)
+        {
+            previousEndTime = new Date(new Date(startTime).setSeconds((new Date(startTime).getSeconds() - 1)))
+        }
+
+        const rawAllOrderStatistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, undefined, previousEndTime)
+        if(rawAllOrderStatistics == null)
+        {
+            return null
+        }
+
+        console.log(rawAllOrderStatistics)
+
+        const mapOfReturningUserToOrders = new Map()
+
+        rawAllOrderStatistics.statisticData.forEach((orderRecord) =>
+        {
+            const userId = orderRecord.user
+            mapOfReturningUserToOrders.set(userId, [])
+        })
+
+        rawTargetOrderStatistics.statisticData.forEach((orderRecord, index) =>
+        {
+            const userId = orderRecord.user
+            const listOfOrderIndex = mapOfReturningUserToOrders.get(userId)
+            if(listOfOrderIndex != undefined)
+            {
+                //this is a user who returns to make a transaction
+                listOfOrderIndex.push(index)
+                mapOfReturningUserToOrders.set(userId, listOfOrderIndex)
+            }
+        })
+
+        console.log(mapOfReturningUserToOrders)
+
+        return {}
+    },  
+
 }
 
 export default ShopStatisticsService

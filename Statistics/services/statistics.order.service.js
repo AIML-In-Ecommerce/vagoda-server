@@ -19,7 +19,7 @@ const StatisticsOrderService =
     async getOrderByShopWithStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
     {
         let endTimeToCheck = new Date()
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
 
         if(startTime != undefined)
         {
@@ -115,16 +115,19 @@ const StatisticsOrderService =
      */
     async getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
     {
-        let endTimeToCheck = new Date().getTime()
-        let startTimeToCheck = 0
+        let endTimeToCheck = new Date()
+        let startTimeToCheck = new Date(2000, 0, 1)
         if(startTime != undefined)
         {
-            startTimeToCheck = new Date(startTime).getTime()
+            startTimeToCheck = new Date(startTime)
         }
         if(endTime != undefined)
         {
-            endTimeToCheck = new Date(endTime).getTime()
+            endTimeToCheck = new Date(endTime)
         }
+
+        console.log(startTimeToCheck)
+        console.log(endTimeToCheck)
 
         const rawOrders =  await Order.find({shop: shopId, 
             orderStatus: {
@@ -200,15 +203,15 @@ const StatisticsOrderService =
     async getOrderByShopWithLatestStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
     {
         let endTimeToCheck = new Date()
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
 
         if(startTime != undefined)
         {
-            startTimeToCheck = new Date(startTime).getTime()
+            startTimeToCheck = new Date(startTime)
         }
         if(endTime != undefined)
         {
-            endTimeToCheck = new Date(endTime).getTime()
+            endTimeToCheck = new Date(endTime)
         }
 
         const orderAggregatePipline = [
@@ -314,7 +317,7 @@ const StatisticsOrderService =
         }
 
         let endTimeToCheck = new Date()
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
 
         if(startTime != undefined)
         {
@@ -411,7 +414,7 @@ const StatisticsOrderService =
         }
 
         let endTimeToCheck = new Date()
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
 
         if(startTime != undefined)
         {
@@ -501,7 +504,7 @@ const StatisticsOrderService =
     async getOrdersWithOnWaitingForStatus(shopId, targetOrderStatus, startTime = undefined, endTime = undefined)
     {
         let endTimeToCheck = new Date()
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
 
         if(endTimeToCheck != undefined)
         {
@@ -667,7 +670,7 @@ const StatisticsOrderService =
     async getSalesByShop(shopId, startTime = undefined, endTime = undefined)
     {
         let endTimeToCheck = new Date()
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
 
         if(startTime != undefined)
         {
@@ -737,7 +740,7 @@ const StatisticsOrderService =
 
     async getGlobalCompletedOrdersWithStatus(targetOrderStatus, startTime, endTime)
     {
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
         
         if(startTime != undefined && startTime != null)
@@ -817,7 +820,7 @@ const StatisticsOrderService =
 
     async getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime)
     {
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
         
         if(startTime != undefined && startTime != null)

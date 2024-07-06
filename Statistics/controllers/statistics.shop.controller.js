@@ -187,6 +187,40 @@ const ShopStatisticsController =
         }
     },
 
+    async getReturningRateOfShop(req, res, next)
+    {
+        try
+        {
+            const shopId = req.query.shopId
+
+            if(shopId == undefined || shopId == null)
+            {
+                return next(createError.BadRequest("Missing required parameter"))
+            }
+
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+
+            const statistics = await ShopStatisticsService.getReturningRateOfShop(shopId, startTime, endTime)
+            if(statistics == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
+
+            return res.json(
+                {
+                    message: "Get the returning statistics successfully",
+                    data: statistics
+                }
+            )
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
 }
 
 export default ShopStatisticsController
