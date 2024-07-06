@@ -15,5 +15,7 @@ router.post("/sales/total",  ShopStatisticsController.getTotalSales)
 router.post("/revenue/total",  ShopStatisticsController.getTotalRevenue)
 router.post("/conversion/view_and_sales",  ShopStatisticsController.getConversionOfViewAndSales)
 router.post("/operational_quanlity_score",  ShopStatisticsController.getOperationalQuanlityScore)
+router.post("/returning_rate", ShopStatisticsController.getReturningRateOfShop)
+router.post("/web_traffic", ShopStatisticsController.getWebTrafficOfShop)
 
 export default router
