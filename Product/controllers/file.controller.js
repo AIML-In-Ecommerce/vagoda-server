@@ -56,7 +56,10 @@ const FileController = {
   },
   async filterFiles(req, res) {
     try {
-      const { name, status, startDate, endDate } = req.query;
+      const { shopId, name, status, startDate, endDate } = req.query;
+      if(!shopId){
+        return res.status(400).json({ message: "ShopId is required" });
+      }
 
       const start = startDate ? new Date(startDate) : null;
       const end = endDate ? new Date(endDate) : null;

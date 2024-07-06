@@ -21,8 +21,11 @@ const FileService = {
     const newObject = new File(objectData);
     return await newObject.save();
   },
-  async filterByNameStatusDate(name, status, startDate, endDate) {
+  async filterByNameStatusDate(shopId, name, status, startDate, endDate) {
     const filter = {};
+    if(shopId){
+      filter.shop = shopId
+    }
 
     if (name) {
       filter.name = { $regex: name, $options: 'i' }; // Tìm kiếm theo tên file (không phân biệt chữ hoa/chữ thường)

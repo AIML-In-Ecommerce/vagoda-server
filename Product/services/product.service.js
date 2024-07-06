@@ -229,6 +229,8 @@ const ProductService = {
     // subCategory.subCategoryTypes = null;
 
     const products = data.map((item) => {
+      console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+      console.log(item["Danh mục   *"])
       let ctg = item["Danh mục   *"].split("/"); // Nữ/Áo nữ/Áo thun
       console.log(ctg);
       let categories = JSON.parse(JSON.stringify(ctgs));
