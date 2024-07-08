@@ -50,15 +50,15 @@ const ShopController = {
     }
   },
 
-  
+    
   getShopByIdList: async (req, res, next) =>
   {
     try
     {
       const requestBody = req.body
       const shopIds = requestBody.ids
-      const useDesign = requestBody.useDesign
-      const useShopDetail = requestBody.useShopDetail
+      const useDesign = requestBody.useDesign == "true"
+      const useShopDetail = requestBody.useShopDetail == "true"
 
       const listOfShops = await ShopService.getByIds(shopIds, useShopDetail, useDesign)
 
@@ -71,41 +71,14 @@ const ShopController = {
         {
           message: "Get list of shops successfully",
           data: listOfShops
-        });
-      } catch (error) {
-        next(createError.InternalServerError(error.message));
-      }
-    },
-
-    
-    getShopByIdList: async (req, res, next) =>
-    {
-      try
-      {
-        const requestBody = req.body
-        const shopIds = requestBody.ids
-        const useDesign = requestBody.useDesign
-        const useShopDetail = requestBody.useShopDetail
-
-        const listOfShops = await ShopService.getByIds(shopIds, useShopDetail, useDesign)
-
-        if(!listOfShops)
-        {
-          return next(createError.BadRequest(Model + " list not found"));
         }
-
-        res.json(
-          {
-            message: "Get list of shops successfully",
-            data: listOfShops
-          }
-        )
-      }
-      catch(err)
-      {
-        return next(createError.InternalServerError(err.message))
-      }
-    },
+      )
+    }
+    catch(err)
+    {
+      return next(createError.InternalServerError(err.message))
+    }
+  },
 
     getById: async (req, res, next) => {
       try {

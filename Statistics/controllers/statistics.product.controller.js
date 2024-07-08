@@ -275,6 +275,20 @@ const StatisticsProductController =
         }
     },
 
+    async getReviewsOfProductsInRanges(req, res, next)
+    {
+        try
+        {
+            // const shop
+
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
 }
 
 export default StatisticsProductController

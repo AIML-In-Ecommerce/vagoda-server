@@ -187,6 +187,29 @@ const ReviewController = {
       next(createError.InternalServerError(error.message));
     }
   },
+
+  getProductReviewsContent: async (req, res, next) =>
+  {
+    try {
+      const { productId } = req.params;
+      const list = await ReviewService.getByProductId(productId);
+      if (!list) {
+        return next(createError.BadRequest(Model + " list not found"));
+      }
+      const listOfContents = list.map((record) =>
+      {
+        return record.content
+      })
+
+      res.json({
+        message: "Get " + model + " list by productId successfully",
+        status: 200,
+        data: listOfContents,
+      });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  }
 };
 
 export default ReviewController;

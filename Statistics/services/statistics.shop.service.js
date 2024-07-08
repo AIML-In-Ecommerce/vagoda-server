@@ -312,7 +312,7 @@ const ShopStatisticsService =
                 key = "SESSION:" + record.sessionUser
             }
 
-            const currentCount = mapOfAccessUsers.get(key)
+            let currentCount = mapOfAccessUsers.get(key)
             if(currentCount == undefined)
             {
                 //initialize a new value

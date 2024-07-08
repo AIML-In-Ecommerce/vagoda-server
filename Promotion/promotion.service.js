@@ -1,4 +1,5 @@
 import Promotion from "./promotion.model.js";
+import SupportShopService from "./support/shop.service.js";
 
 const PromotionService = {
   async getAll(filter, projection) {
@@ -15,10 +16,52 @@ const PromotionService = {
   },
 
   async getById(id) {
-    return await Promotion.findById(id);
+    const rawPromotion = await Promotion.findById(id);
+    if(rawPromotion == null)
+    {
+      return null
+    }
+
+    let clonedPromotion = JSON.parse(JSON.stringify(rawPromotion))
+
+    const shopInfo = await SupportShopService.getShopInfoByShopId(clonedPromotion.shop, true, false)
+    if(shopInfo != null)
+    {
+      clonedPromotion.shop = {
+        _id: shopInfo._id,
+        name: shopInfo.name,
+        avatarUrl: shopInfo.shopInfoDesign.avatarUrl
+      }
+    }
+
+    return clonedPromotion
   },
   async getByShopId(shopId) {
-    return await Promotion.find({ shop: shopId });
+    const rawPromotions = await Promotion.find({ shop: shopId });
+    if(rawPromotions == null)
+    {
+      return null
+    }
+
+    const clonedPromotions = JSON.parse(JSON.stringify(rawPromotions))
+
+    const shopInfo = await SupportShopService.getShopInfoByShopId(shopId, true, false)
+
+    if(shopInfo != null)
+    {
+      for(let i = 0; i < clonedPromotions.length; i++)
+      {
+        const convertedShopInfo = {
+          _id: shopInfo._id,
+          name: shopInfo.name,
+          avatarUrl: shopInfo.shopInfoDesign.avatarUrl
+        }
+
+        clonedPromotions[i].shop = convertedShopInfo
+      }
+    }
+
+    return clonedPromotions
   },
   // async getByShopId(shopId) {
   //   return await Promotion.find({ shopId });
@@ -26,11 +69,41 @@ const PromotionService = {
     
   async create(objectData) {
     const newObject = new Promotion(objectData);
-    return await newObject.save();
+    const rawPromotion = await newObject.save();
+    if(rawPromotion == null)
+    {
+      return null
+    }
+    const clonedPromotion = JSON.parse(JSON.stringify(rawPromotion))
+
+    const shopInfo = await SupportShopService.getShopInfoByShopId(clonedPromotion.shop, true, false)
+    if(shopInfo != null)
+    {
+      clonedPromotion.shop = {
+        _id: shopInfo._id,
+        name: shopInfo.name,
+        avatarUrl: shopInfo.shopInfoDesign.avatarUrl
+      }
+    }
+
+    return clonedPromotion
   },
 
   async update(id, updateData) {
-    return await Promotion.findByIdAndUpdate(id, updateData, { new: true });
+    const rawPromotion = await Promotion.findByIdAndUpdate(id, updateData, { new: true });
+
+    const clonedPromotion = JSON.parse(JSON.stringify(rawPromotion))
+    const shopInfo = await SupportShopService.getShopInfoByShopId(clonedPromotion.shop, true, false)
+    if(shopInfo != null)
+    {
+      clonedPromotion.shop = {
+        _id: shopInfo._id,
+        name: shopInfo.name,
+        avatarUrl: shopInfo.shopInfoDesign.avatarUrl
+      }
+    }
+
+    return clonedPromotion
   },
 
   async delete(id) {
@@ -39,6 +112,26 @@ const PromotionService = {
 
   async getListByIds(ids) {
     const list = await Promotion.find({ _id: { $in: ids } });
+    if(list == null)
+    {
+      return null
+    }
+
+    // const shopInfo = await SupportShopService.getShopInfoByShopId(shopId, true, false)
+
+    // if(shopInfo != null)
+    // {
+    //   for(let i = 0; i < clonedPromotions.length; i++)
+    //   {
+    //     const convertedShopInfo = {
+    //       _id: shopInfo._id,
+    //       name: shopInfo.name,
+    //       avatarUrl: shopInfo.shopInfoDesign.avatarUrl
+    //     }
+
+    //     clonedPromotions[i].shop = convertedShopInfo
+    //   }
+    // }
     return list;
   },
 

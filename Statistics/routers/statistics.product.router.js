@@ -20,5 +20,7 @@ router.post("/views_viewers", StatisticsProductController.getViewsAndViewersOfPr
 router.post("/add_to_cart", StatisticsProductController.getAddToCartAmountOfProducts)
 router.post("/ratio/add_to_cart", StatisticsProductController.getAddToCartRatio)
 router.post("/amount_of_buyers", StatisticsProductController.getAmountOfBuyersOfProducts)
+router.post("/reviews", StatisticsProductController.getReviewsOfProductsInRanges)
+
 
 export default router
