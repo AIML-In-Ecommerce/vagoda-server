@@ -230,6 +230,11 @@ const ShopStatisticsController =
         {
             const shopId = req.query.shopId
 
+            if(shopId == undefined || shopId == null)
+            {
+                return next(createError.BadRequest("Missing required parameters"))
+            }
+
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 

@@ -28,6 +28,10 @@ router.get('/comments', ReviewController.getAllComment);
 router.post('/comment', ReviewController.createComment);
 router.get('/avgRating/:productId', ReviewController.averageRating);
 
+//from ai service
+
+router.get("/ai/productReviews/:productId", ReviewController.getByProductId)
+
 export default router;
 
 /**
