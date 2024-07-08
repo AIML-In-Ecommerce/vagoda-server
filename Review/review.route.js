@@ -30,7 +30,7 @@ router.get('/avgRating/:productId', ReviewController.averageRating);
 
 //from ai service
 
-router.get("/ai/productReviews/:productId", ReviewController.getByProductId)
+router.get("/ai/productReviews/:productId", ReviewController.getProductReviewsContent)
 
 export default router;
 
