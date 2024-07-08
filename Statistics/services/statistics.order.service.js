@@ -210,11 +210,13 @@ const StatisticsOrderService =
         {
             endTimeToCheck = new Date(endTime)
         }
+        
+        const castedShopId = mongoose.Types.ObjectId.createFromHexString(shopId)
 
         const orderAggregatePipline = [
             {
                 $match: {
-                    shop: mongoose.Types.ObjectId(shopId)
+                    shop: castedShopId
                 }
             },
             {
