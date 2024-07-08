@@ -1,7 +1,33 @@
 import mongoose from "mongoose";
-import { OrderStatus, PaymentMethod } from "../../shared/enums.js"
+import { OrderStatus, PaymentMethod } from '../../shared/enums.js'
 
 const Schema = mongoose.Schema;
+
+const CoordinateOrderSchema = new Schema({
+  lng: {type: Number},
+  lat: {type: Number}
+})
+
+const PromotionInOrderSchema = new Schema({
+  _id: {type: mongoose.Schema.Types.ObjectId},
+  name: {type: String},
+  type: {type: String},
+  value: {type: Number},
+})
+
+const ColorInProductInOrderSchema = new Schema({
+  link: {
+    type: String
+  },
+  color: {
+    label: {
+      type: String,
+    },
+    value: {
+      type: String
+    }
+  }
+}, {_id: false})
 
 
 //create discriminator
@@ -51,11 +77,18 @@ const OrderSchema = new Schema({
         type: Number,
         required: true,
       },
+      color: {
+        type: ColorInProductInOrderSchema,
+        default: null
+      },
+      size: {
+        type: String,
+        default: null
+      }
     },
   ],
   promotion: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Promotion",
+    type: PromotionInOrderSchema,
     default: null
   },
   paymentMethod: {
@@ -99,12 +132,8 @@ const OrderSchema = new Schema({
         type: String,
       },
       coordinate: {
-        lng: {
-          type: Number,
-        },
-        lat: {
-          type: Number,
-        },
+        type: CoordinateOrderSchema,
+        default: null,
       },
       label: {
         type: String,
@@ -138,14 +167,16 @@ const OrderSchema = new Schema({
       },
     },
   ],
+  createAt: {
+    type: Date,
+    default: new Date(Date.now()),
+  },
 });
 
 
 OrderSchema.path("paymentMethod").discriminator(PaymentMethod.COD, CODPaymentSchema)
 OrderSchema.path("paymentMethod").discriminator(PaymentMethod.ZALOPAY, ZaloPayPaymentSchema)
 
-//in case of using multiple databases, we will switch database before access model
-// mongoose.connection.useDb("orderDB")
 
 const Order = mongoose.model("Order", OrderSchema);
 

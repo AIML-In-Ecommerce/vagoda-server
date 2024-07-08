@@ -1,5 +1,6 @@
 
 import { Product } from "../models/product/product.model.js"
+import SubCategory from "../models/product/subCategory.model.js"
 import { OrderStatus } from "../shared/enums.js"
 import StatisticsOrderService from "./statistics.order.service.js"
 import StatisticsProductService from "./statistics.product.service.js"
@@ -19,7 +20,7 @@ const StatisticsCategoryService =
         return {}
     },
 
-    async getTopInSalesSubCategories(amount, startTime, endTime)
+    async getTopInSalesSubCategories(amount, startTime, endTime, useCompensation = false)
     {
         //re-calculate top sales of sub-category 
         const topProductsInGlobalSalesStatistics = await StatisticsProductService.getTopProductsInGlobalSales(undefined, startTime, endTime)
@@ -93,6 +94,31 @@ const StatisticsCategoryService =
         let listOfSubCategories = Array.from(mapOfSubCategoryCount.values())
 
         listOfSubCategories.sort((a,b) => b.sold - a.sold)
+
+        let compensationSubCategories = []
+
+        if(useCompensation == true)
+        {
+            const rawSubCategories = await SubCategory.find({_id: {$nin: Array.from(mapOfSubCategoryCount.keys())}})
+
+            rawSubCategories.forEach((record) =>
+            {
+                const clonedSubCategory = JSON.parse(JSON.stringify(record))
+
+                clonedSubCategory.productIds = []
+                clonedSubCategory.sold = 0
+                clonedSubCategory.revenue = 0
+
+                compensationSubCategories.push(clonedSubCategory)
+            })
+        }
+
+        listOfSubCategories = listOfSubCategories.concat(compensationSubCategories)
+
+        if(amount != undefined)
+        {
+            listOfSubCategories = listOfSubCategories.slice(0, amount)
+        }
 
         return listOfSubCategories
     },

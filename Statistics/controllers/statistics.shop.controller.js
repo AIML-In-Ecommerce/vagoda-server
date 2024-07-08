@@ -122,6 +122,7 @@ const ShopStatisticsController =
             const amount = req.body.amount
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const useCompensation = req.body.useCompensation ? req.body.useCompensation : false
 
             const cacheKey = `${CachePrefix.GLOBAL_TOP_SHOPS_HAS_PRODUCTS_IN_TOP_SALES}`
             //get from cache
@@ -149,7 +150,7 @@ const ShopStatisticsController =
             }
 
 
-            let statistics = await ShopStatisticsService.getTopGlobalShopsHaveProductsInTopSales(amount, startTime, endTime)
+            let statistics = await ShopStatisticsService.getTopGlobalShopsHaveProductsInTopSales(amount, startTime, endTime, useCompensation)
             if(statistics == null)
             {
                 return next(createError.BadRequest("Cannot get the statistics"))
@@ -184,6 +185,101 @@ const ShopStatisticsController =
         {
             console.log(error)
             return next(createError.InternalServerError(error))
+        }
+    },
+
+    async getReturningRateOfShop(req, res, next)
+    {
+        try
+        {
+            const shopId = req.query.shopId
+
+            if(shopId == undefined || shopId == null)
+            {
+                return next(createError.BadRequest("Missing required parameter"))
+            }
+
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+
+            const statistics = await ShopStatisticsService.getReturningRateOfShop(shopId, startTime, endTime)
+            if(statistics == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
+
+            console.log("test: ", statistics)
+
+            return res.json(
+                {
+                    message: "Get the returning statistics successfully",
+                    data: statistics
+                }
+            )
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
+    async getWebTrafficOfShop(req, res, next)
+    {
+        try
+        {
+            const shopId = req.query.shopId
+
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+
+            const statistics = await ShopStatisticsService.getWebTrafficOfShop(shopId, startTime, endTime)
+            if(statistics == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
+
+            return res.json(
+                {
+                    message: "Get web traffic of shop successfully",
+                    data: statistics
+                }
+            )
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
+    async getTopCityInSales(req, res, next)
+    {
+        try
+        {
+            const shopId = req.query.shopId
+
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+            const amount = req.body.amount ? req.body.amount : undefined
+
+            const statistics = ShopStatisticsService.getTopCityInSales(shopId, startTime, endTime, amount)
+            if(statistics == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
+
+            return res.json(
+                {
+                    message: "Get top cities in sales successfully",
+                    data: statistics
+                }
+            )
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
         }
     },
 

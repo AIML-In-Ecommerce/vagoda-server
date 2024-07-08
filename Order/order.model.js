@@ -8,6 +8,13 @@ const CoordinateOrderSchema = new Schema({
   lat: {type: Number}
 })
 
+const PromotionInOrderSchema = new Schema({
+  _id: {type: mongoose.Schema.Types.ObjectId},
+  name: {type: String},
+  type: {type: String},
+  value: {type: Number},
+})
+
 const ColorInProductInOrderSchema = new Schema({
   link: {
     type: String
@@ -81,8 +88,7 @@ const OrderSchema = new Schema({
     },
   ],
   promotion: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Promotion",
+    type: PromotionInOrderSchema,
     default: null
   },
   paymentMethod: {

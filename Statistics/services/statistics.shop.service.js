@@ -4,6 +4,8 @@ import StatisticsOrderService from './statistics.order.service.js'
 import StatisticsAccessService from './statistics.access.service.js'
 import StatisticsProductService from './statistics.product.service.js'
 import ShopSupportService from '../support/shop.support.js'
+import { access } from 'fs'
+import Shop from '../models/shop/shop.model.js'
 
 
 const ShopStatisticsService =
@@ -96,7 +98,7 @@ const ShopStatisticsService =
         return finalResult
     },
 
-    async getTopGlobalShopsHaveProductsInTopSales(amount = undefined, startTime = undefined, endTime = undefined)
+    async getTopGlobalShopsHaveProductsInTopSales(amount = undefined, startTime = undefined, endTime = undefined, useCompensation = false)
     {
         //if cachedInfos == null ==> re-calculate the statistics
         const topProductsInGlobalSales = await StatisticsProductService.getTopProductsInGlobalSales(undefined, startTime, endTime, true)
@@ -154,6 +156,255 @@ const ShopStatisticsService =
         let finalResult = Array.from(shopInfosStatistics.values())
 
         finalResult.sort((a, b) => b.sold - a.sold)
+
+        let compensationShops = []
+
+        if(useCompensation == true)
+        {
+            const rawCompensationShops = await Shop.find({_id: {$nin: Array.from(shopInfosStatistics.keys())}})
+            compensationShops = rawCompensationShops.map((record) =>
+            {
+                const clonedRecord = JSON.parse(JSON.stringify(record))
+
+                const result = {
+                    shopId: clonedRecord._id,
+                    shopInfo: clonedRecord,
+                    revenue: 0,
+                    sold: 0,
+                    productIds: []
+                }
+
+                return result
+            })
+        }
+
+        finalResult = finalResult.concat(compensationShops)
+
+        if(amount != undefined)
+        {
+            finalResult = finalResult.slice(0, amount)
+        }
+
+        return finalResult
+    },
+
+    async getReturningRateOfShop(shopId, startTime, endTime)
+    {
+        const targetOrderStatus = OrderStatus.PENDING
+        const rawTargetOrderStatistics = await StatisticsOrderService.getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
+        if(rawTargetOrderStatistics == null)
+        {
+            return null
+        }
+
+        let previousEndTime = new Date(2000, 0, 1)
+
+        if(startTime != undefined)
+        {
+            previousEndTime = new Date(new Date(startTime).setSeconds((new Date(startTime).getSeconds() - 1)))
+        }
+
+        const allRawOrderStatistics = await StatisticsOrderService.getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, undefined, previousEndTime)
+        if(allRawOrderStatistics == null)
+        {
+            return null
+        }
+
+
+        const mapOfReturningUserToOrders = new Map()
+
+        allRawOrderStatistics.statisticData.forEach((orderRecord) =>
+        {
+            const userId = orderRecord.user
+            mapOfReturningUserToOrders.set(userId, [])
+        })
+
+        let totalOrdersOfReturningUsers = 0
+
+        rawTargetOrderStatistics.statisticData.forEach((orderRecord, index) =>
+        {
+            const userId = orderRecord.user
+            const listOfOrderIndex = mapOfReturningUserToOrders.get(userId)
+            if(listOfOrderIndex != undefined)
+            {
+                //this is a user who returns to make a transaction
+                listOfOrderIndex.push(index)
+                totalOrdersOfReturningUsers += 1 
+                mapOfReturningUserToOrders.set(userId, listOfOrderIndex)
+            }
+        })
+
+        let totalUsers = 0
+        let totalOrders = rawTargetOrderStatistics.statisticData.length
+        let totalRevenue = 0
+        let totalProfit = 0
+        const listOfReturningUsers = []
+
+        mapOfReturningUserToOrders.forEach((value, key) =>
+        {
+            totalUsers += 1
+
+            if(value.length > 0)
+            {
+                //this is a returning user
+                let revenue = 0
+                let profit = 0
+                const orders = value.map((orderRecordIndex) =>
+                {
+                    const orderRecord = rawTargetOrderStatistics.statisticData[orderRecordIndex]
+                    revenue += orderRecord.totalPrice
+                    profit += orderRecord.profit
+                    return orderRecord
+                })
+                
+                totalRevenue += revenue
+                totalProfit += profit
+
+                const returningUserRecord = {
+                    user: key,
+                    revenue: revenue,
+                    profit: profit,
+                    orders: orders
+                }
+
+                listOfReturningUsers.push(returningUserRecord)
+            }
+        })
+
+        const returningRate = totalUsers > 0 ? listOfReturningUsers.length / totalUsers : null
+
+        const finalResult = 
+        {
+            revenue: totalRevenue,
+            profit: totalProfit,
+            totalOrders: totalOrders,
+            totalUsers: totalUsers,
+            totalReturningUsers: listOfReturningUsers.length,
+            returningRate: returningRate,
+            statisticData: listOfReturningUsers
+        }
+
+        return finalResult
+    },  
+
+    async getWebTrafficOfShop(shopId, startTime, endTime)
+    {
+        const rawProductAccessRecords = await StatisticsAccessService.getAccessProductRecordsByShopId(shopId, startTime, endTime, undefined, undefined)
+        if(rawProductAccessRecords == null)
+        {
+            return null
+        }
+
+        let totalAccess = 0
+        const mapOfAccessUsers = new Map()
+
+        rawProductAccessRecords.forEach((record) =>
+        {
+            totalAccess += 1
+
+            let key = ""
+            if(record.user != null)
+            {
+                key = "AUTH:" + record.user.toString()
+            }
+            else if(record.sessionUser != null)
+            {
+                key = "SESSION:" + record.sessionUser
+            }
+
+            const currentCount = mapOfAccessUsers.get(key)
+            if(currentCount == undefined)
+            {
+                //initialize a new value
+                const initCount = 1
+                mapOfAccessUsers.set(key, initCount)
+            }
+            else
+            {
+                currentCount += 1
+                mapOfAccessUsers.set(key, currentCount)
+            }
+        })
+
+        const statisticData = []
+
+        mapOfAccessUsers.forEach((value, key) =>
+        {
+            const keys = key.split(":")
+            const userType = keys[0]
+            const user = key[1]
+            const userAccessRecord = 
+            {
+                user: user,
+                userType: userType,
+                access: value
+            }
+
+            statisticData.push(userAccessRecord)
+        })
+
+        const finalResult = {
+            totalAccess: totalAccess,
+            totalUsers: statisticData.length,
+            statisticData: statisticData
+        }
+
+        return finalResult
+    },
+
+    async getTopCityInSales(shopId, startTime = undefined, endTime = undefined, amount = undefined)
+    {
+        const rawSalesStatistics = await StatisticsOrderService.getSalesByShop(shopId, startTime, endTime)
+        if(rawSalesStatistics == null)
+        {
+            return null
+        }
+
+        const mapOfCityOrDistrictsSales = new Map()
+
+        rawSalesStatistics.statisticData.forEach((orderRecord) =>
+        {
+            const idDistrict = orderRecord.shippingAddress.idDistrict
+
+            const currentValue = mapOfCityOrDistrictsSales.get(idDistrict)
+            if(currentValue == undefined)
+            {
+                //initialize a new value
+                const revenue = orderRecord.totalPrice
+                const profit = orderRecord.profit
+                const statisticData = [orderRecord]
+
+                const initValue = {
+                    idDistrict: idDistrict,
+                    revenue: revenue,
+                    profit: profit,
+                    count: 1,
+                    statisticData: statisticData
+                }
+
+                mapOfCityOrDistrictsSales.set(idDistrict, initValue)
+            }
+            else
+            {
+                const revenue = orderRecord.totalPrice
+                const profit = orderRecord.profit
+                currentValue.revenue += revenue
+                currentValue.profit += profit
+                currentValue.count += 1
+                currentValue.statisticData.push(orderRecord)
+
+                mapOfCityOrDistrictsSales.set(idDistrict, currentValue)
+            }
+        })
+
+        const finalResult = {
+            totalRevenue: rawSalesStatistics.totalRevenue,
+            totalProfit: rawSalesStatistics.totalProfit,
+            avgRevenue: rawSalesStatistics.avgRevenue,
+            avgProfit: rawSalesStatistics.avgProfit,
+            totalOrders: rawSalesStatistics.totalOrders,
+            statisticData: Array.from(mapOfCityOrDistrictsSales.values())
+        }
 
         return finalResult
     },
