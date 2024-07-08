@@ -115,6 +115,26 @@ const ProductSchema = new Schema({
     warranty: { type: String },
     manufacturingPlace: { type: String },
   },
+  reviewSynthesis: {
+    positiveCount: {
+      type: Number,
+      default: 0,
+    },
+    negativeCount: {
+      type: Number,
+      default: 0,
+    },
+    normalCount: {
+      type: Number,
+      default: 0,
+    },
+    positiveSummary: {
+      type: String,
+    },
+    negativeSummary: {
+      type: String,
+    },
+  }
 });
 ProductSchema.plugin(mongooseAutoPopulate);
 export const Product = mongoose.model("Product", ProductSchema);
