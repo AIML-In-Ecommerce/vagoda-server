@@ -100,7 +100,8 @@ const ProductService = {
         { subCategoryType: { $in: subCategoryTypes } },
       ];
     }
-    if (shopId) query.shop = shopId;
+    if (shopId !== "") query.shop = shopId;
+
     if (minPrice !== 0 || maxPrice !== Number.MAX_VALUE)
       query.finalPrice = {
         $gte: minPrice, // Greater than or equal to minPrice
