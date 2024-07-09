@@ -1,6 +1,7 @@
 import redisClient from "../configs/redis.config.js"
 import ProductAccess from "../models/access/productAcess.model.js"
 import { Product } from "../models/product/product.model.js"
+import Review from "../models/review/review.model.js"
 import { CachePrefix, OrderStatus, ProductAccessType } from "../shared/enums.js"
 import StatisticsOrderService from "./statistics.order.service.js"
 import nodeFpgrowth from 'node-fpgrowth'
@@ -785,7 +786,276 @@ const StatisticsProductService =
         const productInfos = await Product.find({_id: {$in: productIds}})
 
         return productInfos
-    },  
+    },
+
+    async getReviewsOfProductsInRanges(shopId, targetProductIds = undefined, ratingRanges = undefined, startTime = undefined, endTime = undefined, useProductInfo = undefined, useReviewInfo = false)
+    {
+        let rawProducts = null
+        let startTimeToCheck = new Date(2000, 0, 1)
+        let endTimeToCheck = new Date()
+
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        let useRanges = false
+
+        if(targetProductIds != undefined && targetProductIds != null && targetProductIds.length > 0)
+        {
+            rawProducts = await Product.find({shop: shopId, _id: {$in: targetProductIds}})
+        }
+        else
+        {
+            rawProducts = await Product.find({shop: shopId})
+        }
+
+        if(ratingRanges != undefined || ratingRanges != null || Array.isArray(ratingRanges) == true)
+        {
+            useRanges = true
+            //sort ratingRanges
+            for(let i = 0; i < ratingRanges.length; i++)
+            {
+                ratingRanges[i].sort((a, b) => a - b)
+            }
+        }
+
+        const mapOfProductInfoIndex = new Map()
+        
+        rawProducts.forEach((productInfo, index) =>
+        {
+            mapOfProductInfoIndex.set(productInfo._id.toString(), index)
+        })
+
+        const mapOfReviewIndexAccordingToRating = new Map()
+
+        const rawReviews = await Review.find({product: {$in: Array.from(mapOfProductInfoIndex.keys())}, 
+                createdAt: {
+                    $gte: startTimeToCheck,
+                    $lte: endTimeToCheck
+                }
+            })
+
+        
+        rawReviews.forEach((review, index) =>
+        {
+            const rating = review.rating
+            const currentListOfReviewIndex = mapOfReviewIndexAccordingToRating.get(rating)
+            if(currentListOfReviewIndex == undefined)
+            {
+                mapOfReviewIndexAccordingToRating.set(rating, [index])
+            }
+            else
+            {
+                currentListOfReviewIndex.push(index)
+                mapOfReviewIndexAccordingToRating.set(rating, currentListOfReviewIndex)
+            }
+        })
+
+        const availableRatings = Array.from(mapOfReviewIndexAccordingToRating.keys()).sort((a,b) => a - b)
+
+        /**
+         * targetRatingAccordingToAvalableRatings is an array that store relevant ranges of rating reviews
+         * for example, [ [ 1, 2 ], [ 4, 5 ] ] means
+         * the first provided ranges (input range at the index 0) of ratingRanges should count reviews whose rating are 1 and 2,
+         * the second provided range (input range at the index 1) of ratingRanges should count reviews whose rating are 4 and 5
+         */
+        let targetRatingAccordingToAvalableRatings = null
+        if(useRanges == true)
+        {
+            targetRatingAccordingToAvalableRatings = []
+            ratingRanges.forEach((range) =>
+            {
+                const lowerBoundary = range[0] ? range[0] : 0
+                const upperBoundary = range[1] ? range[1] : availableRatings[availableRatings.length - 1]
+
+                let targetStartRangeIndex = 0
+                let targetEndRangeIndex = availableRatings.length - 1
+
+                for(let i=0; i < availableRatings.length; i++)
+                {
+                    if(availableRatings[i] >= lowerBoundary)
+                    {
+                        targetStartRangeIndex = i
+                        break
+                    }
+                }
+
+                for(let i=availableRatings.length - 1; i >= 0; i--)
+                {
+                    if(availableRatings[i] <= upperBoundary)
+                    {
+                        targetEndRangeIndex = i
+                        break
+                    }
+                }
+
+                const relevantRatingRanges = availableRatings.slice(targetStartRangeIndex, targetEndRangeIndex + 1)
+                targetRatingAccordingToAvalableRatings.push(relevantRatingRanges)
+            })
+        }
+
+        const finalResult = []
+
+        if(useRanges)
+        {
+            targetRatingAccordingToAvalableRatings.forEach((relevantRatings, index) =>
+            {
+                const range = ratingRanges[index]
+                const mapOfProductReviews = new Map()
+                let totalReviews = 0
+                // let targetProductInfo = null
+
+                relevantRatings.forEach((rating) =>
+                {
+                    const targetReviewIndexs = mapOfReviewIndexAccordingToRating.get(rating)
+                    if(targetReviewIndexs)
+                    {
+                        totalReviews += targetReviewIndexs.length
+                        const getRecord = () =>
+                        {
+                            if(useReviewInfo == true)
+                            {
+                                targetReviewIndexs.forEach((index) =>
+                                {
+                                    const targetReview = JSON.parse(JSON.stringify(rawReviews[index]))
+                                    const currentCount = mapOfProductReviews.get(targetReview.product)
+                                    if(currentCount == undefined)
+                                    {
+                                        mapOfProductReviews.set(targetReview.product, {
+                                            product: targetReview.product,
+                                            count: 1,
+                                            reviews: [targetReview]
+                                        })
+                                    }
+                                    else
+                                    {
+                                        currentCount.count = currentCount.count + 1
+                                        currentCount.reviews.push(targetReview)
+                                        mapOfProductReviews.set(targetReview.product, currentCount)
+                                    }
+                                })
+                            }
+                            else
+                            {
+                                targetReviewIndexs.forEach((index) =>
+                                {
+                                    const targetReview = JSON.parse(JSON.stringify(rawReviews[index]))
+                                    const currentCount = mapOfProductReviews.get(targetReview.product)
+                                    if(currentCount == undefined)
+                                    {
+                                        mapOfProductReviews.set(targetReview.product, {
+                                            product: targetReview.product,
+                                            count: 1,
+                                            reviews: [targetReview._id]
+                                        })
+                                    }
+                                    else
+                                    {
+                                        currentCount.count = currentCount.count + 1
+                                        currentCount.reviews.push(targetReview._id)
+                                        mapOfProductReviews.set(targetReview.product, currentCount)
+                                    }
+                                })
+                            }
+                        }
+                        getRecord()
+                    }
+                })
+
+            const resultRecord = {
+                range: range,
+                totalReviews: totalReviews,
+                statisticData: Array.from(mapOfProductReviews.values())
+            }
+
+            finalResult.push(resultRecord)
+            })
+        }
+        else
+        {
+            availableRatings.forEach((rating) =>
+            {
+                const range = [rating, rating]
+                const mapOfProductReviews = new Map()
+                let totalReviews = 0
+                const reviewIndexs = mapOfReviewIndexAccordingToRating.get(rating)
+                if(reviewIndexs != undefined)
+                {
+                    totalReviews = reviewIndexs.length
+                    const getRecord = () =>
+                    {
+                        if(useReviewInfo == true)
+                        {
+                            reviewIndexs.forEach((reviewIndex) =>
+                            {
+                                const targetReview = JSON.parse(JSON.stringify(rawReviews[reviewIndex]))
+                                const currentCount = mapOfProductReviews.get(targetReview.product)
+                                if(currentCount == undefined)
+                                {
+                                    const initCount = {
+                                        product: targetReview.product,
+                                        count: 1,
+                                        reviews: [targetReview]
+                                    }
+    
+                                    mapOfProductReviews.set(targetReview.product, initCount)
+                                }
+                                else
+                                {
+                                    currentCount.count = currentCount.count + 1
+                                    currentCount.reviews.push(targetReview)
+                                    mapOfProductReviews.set(targetReview.product, currentCount)
+                                }
+                            })
+                        }
+                        else
+                        {
+                            reviewIndexs.forEach((reviewIndex) =>
+                            {
+                                const targetReview = JSON.parse(JSON.stringify(rawReviews[reviewIndex]))
+                                const currentCount = mapOfProductReviews.get(targetReview.product)
+                                if(currentCount == undefined)
+                                {
+                                    const initCount = {
+                                        product: targetReview.product,
+                                        count: 1,
+                                        reviews: [targetReview._id]
+                                    }
+    
+                                    mapOfProductReviews.set(targetReview.product, initCount)
+                                }
+                                else
+                                {
+                                    currentCount.count = currentCount.count + 1
+                                    currentCount.reviews.push(targetReview._id)
+                                    mapOfProductReviews.set(targetReview.product, currentCount)
+                                }
+                            })
+                        }
+                    }
+
+                    getRecord()
+                }
+
+                const resultRecord = {
+                    range: range,
+                    totalReviews: totalReviews,
+                    statisticData: Array.from(mapOfProductReviews.values())
+                }
+
+                finalResult.push(resultRecord)
+            })
+        }
+
+        // console.log(finalResult)
+
+        return finalResult
+    },
 
 }
 

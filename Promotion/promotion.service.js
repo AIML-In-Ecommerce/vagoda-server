@@ -117,22 +117,36 @@ const PromotionService = {
       return null
     }
 
-    // const shopInfo = await SupportShopService.getShopInfoByShopId(shopId, true, false)
+    const clonedPromotions = JSON.parse(JSON.stringify(list))
 
-    // if(shopInfo != null)
-    // {
-    //   for(let i = 0; i < clonedPromotions.length; i++)
-    //   {
-    //     const convertedShopInfo = {
-    //       _id: shopInfo._id,
-    //       name: shopInfo.name,
-    //       avatarUrl: shopInfo.shopInfoDesign.avatarUrl
-    //     }
+    const shopInfos = await SupportShopService.getShopInfoByShopId(shopId, true, false)
 
-    //     clonedPromotions[i].shop = convertedShopInfo
-    //   }
-    // }
-    return list;
+    const mapOfShopInfoIndex = new Map()
+
+    if(shopInfos != null)
+    {
+      shopInfos.forEach((shopInfo, index) =>
+      {
+        mapOfShopInfoIndex.set(shopInfo._id, index)
+      })
+    }
+
+    for(let i = 0; i < clonedPromotions.length; i++)
+    {
+      const shopId = clonedPromotions[i].shop
+      const shopInfoIndex = mapOfShopInfoIndex.get(shopId)
+      if(shopInfoIndex != undefined)
+      {
+        const targetShopInfo = shopInfos[shopInfoIndex]
+        clonedPromotions[i].shop = {
+          _id: targetShopInfo._id,
+          name: targetShopInfo.name,
+          avatarUrl: targetShopInfo.shopInfoDesign.avatarUrl
+        }
+      }
+    }
+    
+    return clonedPromotions;
   },
 
   async getPromotionBySelectionFromBuyer(shopIds, lowerBoundaryForOrder, targetProducts, inActive = false)
@@ -288,11 +302,40 @@ const PromotionService = {
       }
     })
 
+    const targetShopInfos = await SupportShopService.getShopInfosByShopIds(Array.from(groupOfPromotionsOfShops.keys()), true, false)
+
+    let mapOfShopInfos = null
+    if(targetShopInfos != null)
+    {
+      mapOfShopInfos = new Map()
+
+      targetShopInfos.forEach((shopInfo, index) =>
+        {
+          mapOfShopInfos.set(shopInfo._id, index)
+        })
+    }
+
     //convert into list of promotions according to list of shop's ID
     const finalResult = []
 
     groupOfPromotionsOfShops.forEach((value, key) =>
     {
+      if(mapOfShopInfos != null)
+      {
+        for(let i = 0; i < value.length; i++)
+        {
+          const targetShopInfoIndex = mapOfShopInfos.get(value[i].shop)
+          if(targetShopInfoIndex != undefined)
+          {
+            const targetShopInfo = targetShopInfos[targetShopInfoIndex]
+            value[i].shop = {
+              _id: targetShopInfo._id,
+              name: targetShopInfo.name,
+              avatarUrl: targetShopInfo.shopInfoDesign.avatarUrl
+            }
+          }
+        }
+      }
       const recordOfResult = {
         shopId: key,
         promotions: value
@@ -345,7 +388,23 @@ const PromotionService = {
       return null
     }
 
-    return rawPromotions
+    const clonedPromotions = JSON.parse(JSON.stringify(rawPromotions))
+
+    const shopInfo = await SupportShopService.getShopInfoByShopId(shopId, true, false)
+
+    if(shopInfo != null)
+    {
+      for(let i = 0; i < clonedPromotions.length; i++)
+      {
+        clonedPromotions[i].shop = {
+          _id: shopInfo._id,
+          name: shopInfo.name,
+          avatarUrl: shopInfo.shopInfoDesign.avatarUrl
+        }
+      }
+    }
+
+    return clonedPromotions
   },
 
   async updateCancelPromotionsQuantity(promotionIds)

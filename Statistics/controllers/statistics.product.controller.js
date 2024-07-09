@@ -279,8 +279,31 @@ const StatisticsProductController =
     {
         try
         {
-            // const shop
+            const shopId = req.query.shopId
+            if(shopId == undefined || shopId == null)
+            {
+                return next(createError.BadRequest("Missing required parameter"))
+            }
 
+            const ratingRanges = req.body.ratingRanges
+            const targetProductIds = req.body.targetProductIds
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+            const useProductInfo = req.body.useProductInfo
+            const useReviewInfo = req.body.useReviewInfo
+
+            const statistics = await StatisticsProductService.getReviewsOfProductsInRanges(shopId, targetProductIds, ratingRanges, startTime, endTime, useProductInfo, useReviewInfo)
+            if(statistics == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
+
+            return res.json(
+                {
+                    message: "Get review statistics successfully",
+                    data: statistics
+                }
+            )
         }
         catch(error)
         {

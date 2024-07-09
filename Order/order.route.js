@@ -42,6 +42,9 @@ sellerRouter.get('/revenue', OrderController.getRevenue)
 systemRouter.post("/system/order/zalopay/update_callback", VerificationService.verifySystemRole, OrderController.updateOrderStatusWhenZaloPayCallback)
 
 
+//general router
+
+router.get("/get_item", OrderController.getProductInOrder)
 
 router.use("/buyer", buyerRouter)
 router.use("/seller", sellerRouter)

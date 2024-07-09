@@ -30,18 +30,46 @@ const StatisticsOrderService =
             endTimeToCheck = new Date(endTime)
         }
 
-        // const rawOrders =  await Order.find({shop: shopId})
-        const rawOrders =  await Order.find({shop: shopId, 
-            orderStatus: {
-                $elemMatch: {
-                    status: targetOrderStatus,
-                    time: {
-                        $gte: startTimeToCheck,
-                        $lte: endTimeToCheck
+        const castedShopId = mongoose.Types.ObjectId.createFromHexString(shopId)
+
+        const pipline = [
+            {
+                $match: {
+                    shop: castedShopId,
+                    orderStatus: {
+                    $elemMatch: {
+                        status: targetOrderStatus,
+                        time: {
+                            $gte: startTimeToCheck,
+                            $lte: endTimeToCheck
+                        }
                     }
+                  }
                 }
-            }
-        })
+            },
+            {
+                $addFields: {
+                    confirmStatus: {
+                        $arrayElemAt: ["$orderStatus", {
+                        $indexOfArray: ["$orderStatus.status", targetOrderStatus]
+                    }]
+                  }
+                }
+            },
+            {
+                $project: {
+                    orderStatus: 0
+                }
+            },
+            {
+                $sort: {
+                    "confirmStatus.time": 1
+                }
+            },
+        ]
+
+        // const rawOrders =  await Order.find({shop: shopId})
+        const rawOrders =  await Order.aggregate(pipline)
         
         if(rawOrders == null)
         {
@@ -54,31 +82,9 @@ const StatisticsOrderService =
 
         rawOrders.forEach((order) =>
         {
-            let confirmedOrderStatus = null
-            //as an initialized order has the number of status
-            for(let i = order.orderStatus.length - 1; i >= 0; i--)
-            {
-                const checkingOrderStatus = order.orderStatus[i]
-                // const timeOfConfirm = checkingOrderStatus.time.getTime()
- 
-                // if(checkingOrderStatus.status == targetOrderStatus &&
-                //     (timeOfConfirm >= startTimeToCheck && timeOfConfirm <= endTimeToCheck))
-                // {
-                //     confirmedOrderStatus = checkingOrderStatus
-                //     break;
-                // }
-                if(checkingOrderStatus.status == targetOrderStatus)
-                {
-                    confirmedOrderStatus = checkingOrderStatus
-                    break;
-                }
-            }
-
-            if(confirmedOrderStatus != null)
+            if(rawOrders.confirmedStatus != undefined)
             {
                 const data = JSON.parse(JSON.stringify(order))
-                data.orderStatus = undefined
-                data.confirmedTime = confirmedOrderStatus
 
                 totalRevenue += order.totalPrice
                 totalProfit += order.profit
@@ -680,7 +686,46 @@ const StatisticsOrderService =
             endTimeToCheck = new Date(endTime)
         }
 
-        const rawOrders =  await Order.find({shop: shopId})
+        const targetOrderStatus = OrderStatus.PROCESSING
+
+        const castedShopId = mongoose.Types.ObjectId.createFromHexString(shopId)
+        const pipline = [
+            {
+                $match: {
+                    shop: castedShopId,
+                    orderStatus: {
+                        $elemMatch: {
+                            status: targetOrderStatus,
+                            time: {
+                                $gte: startTimeToCheck,
+                                $lte: endTimeToCheck
+                            }
+                    }
+                  }
+                }
+            },
+            {
+                $addFields: {
+                    confirmStatus: {
+                        $arrayElemAt: ["$orderStatus", {
+                            $indexOfArray: ["$orderStatus.status", targetOrderStatus]
+                    }]
+                  }
+                }
+            },
+            {
+                $project: {
+                    orderStatus: 0
+                }
+            },
+            {
+                $sort: {
+                    "confirmStatus.time": 1
+                }
+            },
+        ]
+
+        const rawOrders =  await Order.aggregate(pipline)
 
         if(rawOrders == null)
         {
@@ -694,31 +739,37 @@ const StatisticsOrderService =
 
         rawOrders.forEach((order) =>
         {
-            let lowerBoundStatus = null
-            //as an initialized order has the number of status
-            for(let i = order.orderStatus.length - 1; i >= 0; i--)
-            {
-                const checkingOrderStatus = order.orderStatus[i]
-                if(checkingOrderStatus.status == OrderStatus.PROCESSING)
-                {
-                    lowerBoundStatus = checkingOrderStatus
-                    break
-                }
-            }
+            // let lowerBoundStatus = null
+            // //as an initialized order has the number of status
+            // for(let i = order.orderStatus.length - 1; i >= 0; i--)
+            // {
+            //     const checkingOrderStatus = order.orderStatus[i]
+            //     if(checkingOrderStatus.status == OrderStatus.PROCESSING)
+            //     {
+            //         lowerBoundStatus = checkingOrderStatus
+            //         break
+            //     }
+            // }
 
-            const upperBoundStatus = order.orderStatus[order.orderStatus.length - 1]
+            // const upperBoundStatus = order.orderStatus[order.orderStatus.length - 1]
 
-            if(lowerBoundStatus != null)
-            {
-                if((lowerBoundStatus.time > endTimeToCheck) == false && (upperBoundStatus.time < startTimeToCheck) == false)
-                {
-                    const data = JSON.parse(JSON.stringify(order))
-                    totalRevenue += order.totalPrice
-                    totalProfit += order.profit
+            // if(lowerBoundStatus != null)
+            // {
+            //     if((lowerBoundStatus.time > endTimeToCheck) == false && (upperBoundStatus.time < startTimeToCheck) == false)
+            //     {
+            //         const data = JSON.parse(JSON.stringify(order))
+            //         totalRevenue += order.totalPrice
+            //         totalProfit += order.profit
     
-                    statisticData.push(data)
-                }
-            }
+            //         statisticData.push(data)
+            //     }
+            // }
+
+            const data = JSON.parse(JSON.stringify(order))
+            totalRevenue += order.totalPrice
+            totalProfit += order.profit
+
+            statisticData.push(data)
         })
 
         const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length

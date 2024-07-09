@@ -556,6 +556,36 @@ const OrderController = {
     }
   },
 
+  async getProductInOrder(req, res, next)
+  {
+    try
+    {
+      const orderId = req.query.orderId
+      const itemId = req.query.itemId
+
+      if(orderId == undefined || orderId == null || itemId == undefined || itemId == null)
+      {
+        return next(createError.BadRequest("Missing required parameters"))
+      }
+
+      const itemInfo = await OrderService.getItemInOrder(orderId, itemId)
+      if(itemInfo == null)
+      {
+        return next(createError.NotFound("Cannot find the item"))
+      }
+      
+      return res.json({
+        message: "Get item's info successfully",
+        data: itemInfo
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
 };
 
 export default OrderController;
