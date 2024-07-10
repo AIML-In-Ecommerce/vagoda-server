@@ -6,13 +6,27 @@ import StatisticsProductService from './statistics.product.service.js'
 import ShopSupportService from '../support/shop.support.js'
 import { access } from 'fs'
 import Shop from '../models/shop/shop.model.js'
+import { FromDateStringToUTCTime } from '../support/datestring.js'
+import { count, time } from 'console'
 
 
 const ShopStatisticsService =
 {
 
-    async getShopTotalSales(shopId, startTime = undefined, endTime = undefined)
+    async getShopTotalSales(shopId, startTime = undefined, endTime = undefined, step = undefined)
     {
+        let startTimeToCheck = new Date(2000, 0, 1)
+        let endTimeToCheck = new Date()
+
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
         // const targetOrderStatus = OrderStatus.PROCESSING
         const statistics = await StatisticsOrderService.getSalesByShop(shopId, startTime, endTime)
 
@@ -21,6 +35,100 @@ const ShopStatisticsService =
             return null
         }
 
+        if(step == undefined || statistics.statisticData.length == 0)
+        {
+            const finalResult = 
+            {
+                totalOrders: statistics.totalOrders,
+                totalRevenue: statistics.totalRevenue,
+                totalProfit: statistics.totalProfit,
+                avgRevenue: statistics.avgRevenue,
+                avgProfit: statistics.avgProfit,
+                statisticsData: statistics.statisticData
+            }
+    
+            return finalResult
+        }
+
+        const getTargetIntervals = (start, end) =>
+        {
+            const result = []
+            const worker = new FromDateStringToUTCTime()
+            let moment = start
+            while(moment < end)
+            {
+                let nextMoment = worker.getNextMoment(step, moment)
+                if(nextMoment > end)
+                {
+                    nextMoment = end
+                }
+                const interval = [moment, nextMoment]
+                result.push(interval)
+                moment = nextMoment
+            }
+
+            return result
+        }
+
+        const targetIntervals = getTargetIntervals(startTimeToCheck, endTimeToCheck)
+
+        //record of result will be:
+        /**
+         * {
+         *      interval: [start; end]
+         *      revenue: number
+         *      count: number,
+         *      statisticData: Order[]
+         * }
+         */
+        const getStatisticForEachInterval = () =>
+        {
+            const mapOfIntervals = new Map()
+            targetIntervals.forEach((interval, index) =>
+            {
+                mapOfIntervals.set(index, {
+                    interval: interval,
+                    revenue: 0,
+                    profit: 0,
+                    count: 0,
+                    statisticData: []
+                })
+            })
+
+            let boundaryToChange = targetIntervals[0][1]
+            let indexOfOrder = 0
+            let indexOfInterval = 0
+
+            // statistics.statisticData is an array of order which was sorted by the moment to check the target status
+            for(; indexOfOrder < statistics.statisticData.length && indexOfInterval < targetIntervals.length; )
+            {
+                const targetOrderToCheck = statistics.statisticData[indexOfOrder]
+                const timeToCheck = new Date(targetOrderToCheck.confirmStatus.time)
+
+                if(timeToCheck > boundaryToChange)
+                {
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] && 
+                    timeToCheck <= targetIntervals[indexOfInterval][1]
+                )
+                {
+                    const currentStatistics = mapOfIntervals.get(indexOfInterval)
+                    currentStatistics.revenue += targetOrderToCheck.totalPrice
+                    currentStatistics.profit += targetOrderToCheck.profit
+                    currentStatistics.count += 1
+                    currentStatistics.statisticData.push(targetOrderToCheck)
+
+                    indexOfOrder += 1
+                }
+            }
+
+            return Array.from(mapOfIntervals.values())
+        }
+
+        const statisticsDataForEachInterval = getStatisticForEachInterval()
+
         const finalResult = 
         {
             totalOrders: statistics.totalOrders,
@@ -28,25 +136,132 @@ const ShopStatisticsService =
             totalProfit: statistics.totalProfit,
             avgRevenue: statistics.avgRevenue,
             avgProfit: statistics.avgProfit,
-            statisticsData: statistics.statisticData
+            statisticsData: statisticsDataForEachInterval
         }
 
         return finalResult
     },
 
-    async getRevenueOfShop(shopId, startTime, endTime)
+    async getRevenueOfShop(shopId, startTime, endTime, step)
     {
         const targetOrderStatus = OrderStatus.COMPLETED
         const statistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
-        return statistics
+
+        if(step == undefined || statistics.statisticData.length == 0)
+        {
+            return statistics
+        }
+
+        let startTimeToCheck = new Date(2000, 0, 1)
+        let endTimeToCheck = new Date()
+
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        const getTargetIntervals = (start, end) =>
+            {
+                const result = []
+                const worker = new FromDateStringToUTCTime()
+                let moment = start
+                while(moment < end)
+                {
+                    let nextMoment = worker.getNextMoment(step, moment)
+                    if(nextMoment > end)
+                    {
+                        nextMoment = end
+                    }
+                    const interval = [moment, nextMoment]
+                    result.push(interval)
+                    moment = nextMoment
+                }
+    
+                return result
+            }
+    
+        const targetIntervals = getTargetIntervals(startTimeToCheck, endTimeToCheck)
+
+        //record of result will be:
+        /**
+         * {
+         *      interval: [start; end]
+         *      revenue: number
+         *      count: number,
+         *      statisticData: Order[]
+         * }
+         */
+        const getStatisticForEachInterval = () =>
+        {
+            const mapOfIntervals = new Map()
+            targetIntervals.forEach((interval, index) =>
+            {
+                mapOfIntervals.set(index, {
+                    interval: interval,
+                    revenue: 0,
+                    profit: 0,
+                    count: 0,
+                    statisticData: []
+                })
+            })
+
+            let boundaryToChange = targetIntervals[0][1]
+            let indexOfOrder = 0
+            let indexOfInterval = 0
+
+            // statistics.statisticData is an array of order which was sorted by the moment to check the target status
+            for(; indexOfOrder < statistics.statisticData.length && indexOfInterval < targetIntervals.length; )
+            {
+                const targetOrderToCheck = statistics.statisticData[indexOfOrder]
+                const timeToCheck = new Date(targetOrderToCheck.confirmStatus.time)
+
+                if(timeToCheck > boundaryToChange)
+                {
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] && 
+                    timeToCheck <= targetIntervals[indexOfInterval][1]
+                )
+                {
+                    const currentStatistics = mapOfIntervals.get(indexOfInterval)
+                    currentStatistics.revenue += targetOrderToCheck.totalPrice
+                    currentStatistics.profit += targetOrderToCheck.profit
+                    currentStatistics.count += 1
+                    currentStatistics.statisticData.push(targetOrderToCheck)
+
+                    indexOfOrder += 1
+                }
+            }
+
+            return Array.from(mapOfIntervals.values())
+        }
+
+        const statisticsDataForEachInterval = getStatisticForEachInterval()
+
+        const finalResult = 
+        {
+            totalOrders: statistics.totalOrders,
+            totalRevenue: statistics.totalRevenue,
+            totalProfit: statistics.totalProfit,
+            avgRevenue: statistics.avgRevenue,
+            avgProfit: statistics.avgProfit,
+            statisticsData: statisticsDataForEachInterval
+        }
+
+        return finalResult
     },
 
-    async getConversionOfViewAndSale(shopId, startTime = undefined, endTime = undefined)
+    async getConversionOfViewAndSale(shopId, startTime = undefined, endTime = undefined, step = undefined)
     {
         // let endTimeToCheck = new Date().getTime()
         // let startTimeToCheck = 0
 
-        const targetOrderStatus = OrderStatus.PROCESSING
+        const targetOrderStatus = OrderStatus.PENDING
         const orderStatistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
         if(orderStatistics == null)
         {
@@ -54,45 +269,196 @@ const ShopStatisticsService =
             return null
         }
 
-        const productAccessStatistics =  await StatisticsAccessService.getAccessProductRecordsByShopId(shopId, startTime, endTime, undefined, undefined)
+        const productAccessStatistics =  await StatisticsAccessService.getAccessProductRecordsByShopId(shopId, startTime, endTime, undefined, undefined, true)
         if(productAccessStatistics == null)
         {
             console.log("Null productAccessStatistics in getConversionOfViewAndSale")
             return null
         }
 
-        let numberOfUserHasOrder = 0
-        const userIdsInOrder = new Map()
-
-        //this can help to remove duplicated userId
-        orderStatistics.statisticData.forEach((item) =>
+        if(step == undefined)
         {
-            const userId = item.user.toString()
-            userIdsInOrder.set(userId, true)
-        })
-
-        productAccessStatistics.forEach((record) =>
-        {
-            const isCountedFlag = userIdsInOrder.get(record.user.toString())
-            if(isCountedFlag != undefined && isCountedFlag == true)
+            let numberOfUserHasOrder = 0
+            const userIdsInOrder = new Map()
+    
+            //this can help to remove duplicated userId
+            orderStatistics.statisticData.forEach((item) =>
             {
-                numberOfUserHasOrder += 1
-                userIdsInOrder.set(record.user.toString(), false)
-            }
-        })
+                const userId = item.user.toString()
+                userIdsInOrder.set(userId, false)
+            })
+    
+            productAccessStatistics.forEach((record) =>
+            {
+                const isCountedFlag = userIdsInOrder.get(record.user)
+                if(isCountedFlag != undefined && isCountedFlag == false)
+                {
+                    numberOfUserHasOrder += 1
+                    userIdsInOrder.set(record.user, true)
+                }
+                else
+                {
+                    userIdsInOrder.set(record.user, false)
+                }
+            })
 
-        const conversionRate = productAccessStatistics.length > 0 ? numberOfUserHasOrder / productAccessStatistics.length : null
-        
-        const finalResult = 
+            const totalUserWhoAccess = Array.from(userIdsInOrder.keys()).length
+    
+            const conversionRate = totalUserWhoAccess > 0 ? numberOfUserHasOrder / totalUserWhoAccess : null
+            
+            const finalResult = 
+            {
+                totalRevenue: orderStatistics.totalRevenue,
+                totalProfit: orderStatistics.totalProfit,
+                avgRevenue: orderStatistics.avgRevenue,
+                avgProfit: orderStatistics.avgProfit,
+                totalOrders: orderStatistics.totalOrders,
+                totalAccess: productAccessStatistics.length,
+                conversionRate: conversionRate,
+                statisticData: orderStatistics.statisticData
+            }
+    
+            return finalResult
+        }
+
+        let startTimeToCheck = new Date(2000, 0, 1)
+        let endTimeToCheck = new Date()
+
+        //else
+        if(startTime != undefined)
         {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        const getTargetIntervals = (start, end) =>
+            {
+                const result = []
+                const worker = new FromDateStringToUTCTime()
+                let moment = start
+                while(moment < end)
+                {
+                    let nextMoment = worker.getNextMoment(step, moment)
+                    if(nextMoment > end)
+                    {
+                        nextMoment = end
+                    }
+                    const interval = [moment, nextMoment]
+                    result.push(interval)
+                    moment = nextMoment
+                }
+    
+                return result
+            }
+    
+        const targetIntervals = getTargetIntervals(startTimeToCheck, endTimeToCheck)
+
+        let intervalsHaveConversionRate = 0
+        let totalConversionRate = 0
+
+        const getStatisticForEachInterval = () =>
+        {
+            const mapOfIntervals = new Map()
+
+            targetIntervals.forEach((interval, index) =>
+            {
+                mapOfIntervals.set(index, {
+                    interval: interval,
+                    access: 0,
+                    orders: 0,
+                    revenue: 0,
+                    profit: 0,
+                    conversionRate: null,
+                    statisticData: []
+                })
+            })
+
+            let boundaryToChange = targetIntervals[0][1]
+            let indexOfOrder = 0
+            let indexOfInterval = 0
+            let indexOfAccess = 0
+
+            // statistics.statisticData is an array of order which was sorted by the moment to check the target status
+            for(; indexOfOrder < orderStatistics.statisticData.length && indexOfInterval < targetIntervals.length; )
+            {
+                const targetOrderToCheck = orderStatistics.statisticData[indexOfOrder]
+                const timeToCheck = new Date(targetOrderToCheck.confirmStatus.time)
+
+                if(timeToCheck > boundaryToChange)
+                {
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] && 
+                    timeToCheck <= targetIntervals[indexOfInterval][1]
+                )
+                {
+                    const currentStatistics = mapOfIntervals.get(indexOfInterval)
+                    currentStatistics.revenue += targetOrderToCheck.totalPrice
+                    currentStatistics.profit += targetOrderToCheck.profit
+                    currentStatistics.orders += 1
+                    currentStatistics.statisticData.push(targetOrderToCheck)
+                    mapOfIntervals.set(indexOfInterval, currentStatistics)
+                    indexOfOrder += 1
+                }
+            }
+
+            //reset the state
+            boundaryToChange = targetIntervals[0][1]
+            indexOfInterval = 0
+            for(; indexOfAccess < productAccessStatistics.length && indexOfInterval < targetIntervals.length; )
+            {
+                const targetAccessRecord = productAccessStatistics[indexOfAccess]
+                const timeToCheck = new Date(targetAccessRecord.time)
+
+                if(timeToCheck > boundaryToChange)
+                {
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] && 
+                    timeToCheck <= targetIntervals[indexOfInterval][1]
+                )
+                {
+                    const currentStatistics = mapOfIntervals.get(indexOfInterval)
+                    currentStatistics.access += 1
+                    mapOfIntervals.set(indexOfInterval, currentStatistics)
+
+                    indexOfAccess += 1
+                }
+            }
+
+            mapOfIntervals.forEach((statistic, key) =>
+            {
+                const conversionRate = statistic.access > 0 ? statistic.orders / statistic.access : null
+                if(conversionRate != null)
+                {
+                    intervalsHaveConversionRate += 1
+                    totalConversionRate += conversionRate
+                }
+
+                statistic.conversionRate = conversionRate
+            })
+
+            return Array.from(mapOfIntervals.values())
+        }
+
+        const statisticData = getStatisticForEachInterval()
+
+        const avgConversionRate = intervalsHaveConversionRate > 0 ? totalConversionRate / intervalsHaveConversionRate : null
+        
+        const finalResult = {
             totalRevenue: orderStatistics.totalRevenue,
             totalProfit: orderStatistics.totalProfit,
             avgRevenue: orderStatistics.avgRevenue,
             avgProfit: orderStatistics.avgProfit,
             totalOrders: orderStatistics.totalOrders,
             totalAccess: productAccessStatistics.length,
-            conversionRate: conversionRate,
-            statisticData: orderStatistics.statisticData
+            conversionRate: avgConversionRate,
+            statisticData: statisticData
         }
 
         return finalResult
@@ -287,68 +653,209 @@ const ShopStatisticsService =
         return finalResult
     },  
 
-    async getWebTrafficOfShop(shopId, startTime, endTime)
+    async getWebTrafficOfShop(shopId, startTime, endTime, step = undefined)
     {
-        const rawProductAccessRecords = await StatisticsAccessService.getAccessProductRecordsByShopId(shopId, startTime, endTime, undefined, undefined)
+        const rawProductAccessRecords = await StatisticsAccessService.getAccessProductRecordsByShopId(shopId, startTime, endTime, undefined, undefined, true)
         if(rawProductAccessRecords == null)
         {
             return null
         }
 
-        let totalAccess = 0
-        const mapOfAccessUsers = new Map()
-
-        rawProductAccessRecords.forEach((record) =>
+        if(step == undefined || rawProductAccessRecords.length == 0)
         {
-            totalAccess += 1
-
-            let key = ""
-            if(record.user != null)
+            let totalAccess = 0
+            const mapOfAccessUsers = new Map()
+    
+            rawProductAccessRecords.forEach((record) =>
             {
-                key = "AUTH:" + record.user.toString()
-            }
-            else if(record.sessionUser != null)
+                totalAccess += 1
+    
+                let key = ""
+                if(record.user != null)
+                {
+                    key = "AUTH:" + record.user
+                }
+                else if(record.sessionUser != null)
+                {
+                    key = "SESSION:" + record.sessionUser
+                }
+    
+                let currentCount = mapOfAccessUsers.get(key)
+                if(currentCount == undefined)
+                {
+                    //initialize a new value
+                    const initCount = [record]
+                    mapOfAccessUsers.set(key, initCount)
+                }
+                else
+                {
+                    currentCount.push(record)
+                    mapOfAccessUsers.set(key, currentCount)
+                }
+            })
+    
+            const statisticData = []
+    
+            mapOfAccessUsers.forEach((value, key) =>
             {
-                key = "SESSION:" + record.sessionUser
+                const keys = key.split(":")
+                const userType = keys[0]
+                const user = key[1]
+                const userAccessRecord = 
+                {
+                    user: user,
+                    userType: userType,
+                    access: value
+                }
+    
+                statisticData.push(userAccessRecord)
+            })
+    
+            const finalResult = {
+                totalAccess: totalAccess,
+                totalUsers: statisticData.length,
+                statisticData: statisticData
             }
-
-            let currentCount = mapOfAccessUsers.get(key)
-            if(currentCount == undefined)
-            {
-                //initialize a new value
-                const initCount = 1
-                mapOfAccessUsers.set(key, initCount)
-            }
-            else
-            {
-                currentCount += 1
-                mapOfAccessUsers.set(key, currentCount)
-            }
-        })
-
-        const statisticData = []
-
-        mapOfAccessUsers.forEach((value, key) =>
-        {
-            const keys = key.split(":")
-            const userType = keys[0]
-            const user = key[1]
-            const userAccessRecord = 
-            {
-                user: user,
-                userType: userType,
-                access: value
-            }
-
-            statisticData.push(userAccessRecord)
-        })
-
-        const finalResult = {
-            totalAccess: totalAccess,
-            totalUsers: statisticData.length,
-            statisticData: statisticData
+    
+            return finalResult
         }
 
+        let startTimeToCheck = new Date(2000, 0, 1)
+        let endTimeToCheck = new Date()
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        const getTargetIntervals = (start, end) =>
+            {
+                const result = []
+                const worker = new FromDateStringToUTCTime()
+                let moment = start
+                while(moment < end)
+                {
+                    let nextMoment = worker.getNextMoment(step, moment)
+                    if(nextMoment > end)
+                    {
+                        nextMoment = end
+                    }
+                    const interval = [moment, nextMoment]
+                    result.push(interval)
+                    moment = nextMoment
+                }
+    
+                return result
+            }
+    
+        const targetIntervals = getTargetIntervals(startTimeToCheck, endTimeToCheck)
+
+        const mapOfAllUser = new Map()
+
+        const getStatisticForEachInterval = () =>
+        {
+            const mapOfIntervals = new Map()
+            
+            targetIntervals.forEach((interval, index) =>
+            {
+                mapOfIntervals.set(index, {
+                    interval: interval,
+                    access: 0,
+                    users: 0,
+                    mapOfAccessUsers: new Map() //user-access map 
+                })
+            })
+
+            let indexOfInterval = 0
+            let boundaryToChange = targetIntervals[0][1]
+            let indexOfAccess = 0
+
+            for(; indexOfAccess < rawProductAccessRecords.length && indexOfInterval < targetIntervals.length; )
+            {
+                const targetAccessRecord = rawProductAccessRecords[indexOfAccess]
+                const timeToCheck = new Date(targetAccessRecord.time)
+
+                if(timeToCheck > boundaryToChange)
+                {
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] &&
+                    timeToCheck <= targetIntervals[indexOfInterval][1]
+                )
+                {
+                    const currentStatistics = mapOfIntervals.get(indexOfInterval)
+
+                    currentStatistics.access += 1
+
+                    let key = ""
+                    if(targetAccessRecord.user != null)
+                    {
+                        key = "AUTH:" + targetAccessRecord.user
+                    }
+                    else if(targetAccessRecord.sessionUser != null)
+                    {
+                        key = "SESSION:" + targetAccessRecord.sessionUser
+                    }
+        
+                    let currentCount = currentStatistics.mapOfAccessUsers.get(key)
+                    if(currentCount == undefined)
+                    {
+                        //initialize a new value
+                        const initCount = [targetAccessRecord]
+                        currentStatistics.mapOfAccessUsers.set(key, initCount)
+                    }
+                    else
+                    {
+                        currentCount.push(targetAccessRecord)
+                        currentStatistics.mapOfAccessUsers.set(key, currentCount)
+                    }
+
+                    indexOfAccess += 1
+                }
+            }
+
+            //count access by mapOfUsers attributes
+            mapOfIntervals.forEach((statistics, keyIndex) =>
+            {
+                const statisticData = []
+                let users = 0
+                statistics.mapOfAccessUsers.forEach((value, key) =>{
+                    users += 1
+
+                    const keys = key.split(":")
+                    const userType = keys[0]
+                    const user = key[1]
+                    const userAccessRecord = 
+                    {
+                        user: user,
+                        userType: userType,
+                        access: value
+                    }
+                    statisticData.push(userAccessRecord)
+
+                    mapOfAllUser.set(user, {})
+                })
+
+                statistics.users = users
+                statistics.statisticData = statisticData
+                statistics.mapOfAccessUsers = undefined
+            })
+
+            return Array.from(mapOfIntervals.values())
+        }
+
+        const statisticData = getStatisticForEachInterval()
+
+        const finalResult = {
+            totalAccess: rawProductAccessRecords.length,
+            totalUsers: Array.from(mapOfAllUser.keys()).length,
+            statisticData: statisticData
+        }
+        
         return finalResult
     },
 

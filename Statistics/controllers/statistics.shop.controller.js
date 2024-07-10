@@ -15,11 +15,12 @@ const ShopStatisticsController =
         {
             // const shopId = req.headers[`${AuthorizedUserIdInHeader}`]
             const shopId = req.query.shopId
-
+            
+            const step = req.body.step
             const startTime = req.body.startTime
             const endTime = req.body.endTime
 
-            const statistic = await ShopStatisticsService.getShopTotalSales(shopId, startTime, endTime)
+            const statistic = await ShopStatisticsService.getShopTotalSales(shopId, startTime, endTime, step)
             if(statistic == null)
             {
                 return next(createError.BadRequest("Invalid parameters"))
@@ -46,8 +47,9 @@ const ShopStatisticsController =
             
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statistics = await ShopStatisticsService.getRevenueOfShop(shopId, startTime, endTime)
+            const statistics = await ShopStatisticsService.getRevenueOfShop(shopId, startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the revenue statistics"))
@@ -76,8 +78,9 @@ const ShopStatisticsController =
 
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statistics = await ShopStatisticsService.getConversionOfViewAndSale(shopId, startTime, endTime)
+            const statistics = await ShopStatisticsService.getConversionOfViewAndSale(shopId, startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get statistics data"))
@@ -237,8 +240,9 @@ const ShopStatisticsController =
 
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statistics = await ShopStatisticsService.getWebTrafficOfShop(shopId, startTime, endTime)
+            const statistics = await ShopStatisticsService.getWebTrafficOfShop(shopId, startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))

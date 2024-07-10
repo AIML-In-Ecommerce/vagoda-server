@@ -57,8 +57,8 @@ const ShopController = {
     {
       const requestBody = req.body
       const shopIds = requestBody.ids
-      const useDesign = requestBody.useDesign == "true"
-      const useShopDetail = requestBody.useShopDetail == "true"
+      const useDesign = requestBody.useDesign
+      const useShopDetail = requestBody.useShopDetail
 
       const listOfShops = await ShopService.getByIds(shopIds, useShopDetail, useDesign)
 

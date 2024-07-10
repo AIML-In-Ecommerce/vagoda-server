@@ -612,8 +612,48 @@ const OrderService = {
       console.log(error);
       return error
     }
-  }
+  },
 
+  async getItemInOrder(orderId, itemId)
+  {
+    const rawOrder = await Order.findOne({_id: orderId})
+    if(rawOrder == null)
+    {
+      return null
+    }
+
+    let targetItem = null
+
+    for(let i = 0; i < rawOrder.products.length; i++)
+    {
+      if(rawOrder.products[i]._id.toString() == itemId)
+      {
+        targetItem = JSON.parse(JSON.stringify(rawOrder.products[i]))
+        break
+      }
+    }
+
+    if(targetItem == null)
+    {
+      return null
+    }
+
+    const productInfos = await ProductService.getProductByIds([targetItem.product])
+    if(productInfos == null)
+    {
+      return null
+    }
+    
+    const targetProductInfo = productInfos[0]
+
+    targetProductInfo.itemId = itemId
+    targetProductInfo.color = targetItem.color
+    targetProductInfo.size = targetItem.size
+    targetProductInfo.quantity = targetItem.quantity
+    targetProductInfo.purchasedPrice = targetItem.purchasedPrice
+
+    return targetProductInfo
+  },
 
 
 };

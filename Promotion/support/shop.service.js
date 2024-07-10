@@ -17,6 +17,10 @@ const SupportShopService =
                     shopId: shopId,
                     useDesign: useDesign,
                     useShopDetail: useShopDetail
+                },
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
                 }
             })
 
@@ -40,14 +44,18 @@ const SupportShopService =
     async getShopInfosByShopIds(shopIds, useDesign, useShopDetail)
     {
         const url = `${publicAPIURL}/system/shops`
-        
+        const requestBody = 
+        {
+            ids: shopIds,
+            useDesign: useDesign,
+            useShopDetail: useShopDetail
+        }
         try
         {
-            const response = await axios.get(url, {
-                params: {
-                    ids: shopIds,
-                    useDesign: useDesign,
-                    useShopDetail: useShopDetail
+            const response = await axios.post(url, requestBody, {
+                headers:
+                {
+                    "origin": `${publicAPIURL}`
                 }
             })
 

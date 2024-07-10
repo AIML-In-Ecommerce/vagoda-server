@@ -122,10 +122,17 @@ const StatisticsAccessService =
         await newRecord.save()
     },
 
-    async getAccessProductRecordsByAuthUser(buyerId, startTime, endTime, amount = undefined, accessType = undefined)
+    async getAccessProductRecordsByAuthUser(buyerId, startTime, endTime, amount = undefined, accessType = undefined, isAscending = false)
     {
         let startTimeToCheck = new Date(2000, 1, 1)
         let endTimeToCheck = new Date()
+
+        let sortState = -1
+
+        if(isAscending == true)
+        {
+            sortState = 1
+        }
 
         if(startTime != undefined)
         {
@@ -146,13 +153,13 @@ const StatisticsAccessService =
         if(accessType != undefined)
         {
             rawAccessedProducts = await ProductAccess.find({user: buyerId, accessType: accessType, time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
-                                                    .sort({time: -1})
+                                                    .sort({time: sortState})
                                                     // .limit(amount)
         }
         else
         {
             rawAccessedProducts = await ProductAccess.find({user: buyerId, time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
-                                                    .sort({time: -1})
+                                                    .sort({time: sortState})
                                                     // .limit(amount)
         }
 
@@ -169,10 +176,17 @@ const StatisticsAccessService =
         return JSON.parse(JSON.stringify(rawAccessedProducts))
     },
 
-    async getAccessProductRecordsByShopId(shopId, startTime, endTime, amount = undefined, accessType = undefined)
+    async getAccessProductRecordsByShopId(shopId, startTime, endTime, amount = undefined, accessType = undefined, isAscending = false)
     {
         let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
+
+        let sortState = -1
+
+        if(isAscending == true)
+        {
+            sortState = 1
+        }
 
         if(startTime != undefined)
         {
@@ -192,13 +206,13 @@ const StatisticsAccessService =
         if(accessType != undefined)
         {
             rawAccessedProducts = await ProductAccess.find({shop: shopId, accessType: accessType, time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
-                                                        .sort({time: -1})
+                                                        .sort({time: sortState})
                                                         // .limit(amount)
         }
         else
         {
             rawAccessedProducts = await ProductAccess.find({shop: shopId, time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
-                                                        .sort({time: -1})
+                                                        .sort({time: sortState})
                                                         // .limit(amount)
         }
 
