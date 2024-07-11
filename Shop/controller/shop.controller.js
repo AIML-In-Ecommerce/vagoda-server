@@ -95,6 +95,7 @@ const ShopController = {
           data: object,
         });
       } catch (error) {
+        console.log(error)
         next(createError.InternalServerError(error.message));
       }
     },
@@ -268,6 +269,37 @@ const ShopController = {
         });
       } catch (error) {
         next(createError.InternalServerError(error.message));
+      }
+    },
+
+    async getShopDetail(req, res, next)
+    {
+      try
+      {
+        const shopId = req.query.shopId
+        if(shopId == undefined || shopId == null)
+        {
+          return next(createError.BadRequest("Missing required parameter"))
+        }
+
+
+        const data = await ShopService.getById(shopId, true, false)
+        if(data == null)
+        {
+          return next(createError.NotFound("Shop info not found"))
+        }
+
+        const shopDetail = data.shopDetail
+
+        return res.json({
+          message: "Get shop detail successfully",
+          data: shopDetail
+        })
+      }
+      catch(error)
+      {
+        console.log(error)
+        return next(createError.InternalServerError(error.message))
       }
     },
 

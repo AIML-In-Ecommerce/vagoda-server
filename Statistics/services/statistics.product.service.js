@@ -135,62 +135,6 @@ const StatisticsProductService =
             return null
         }
 
-        if(step == undefined || completedOrderStatistics.statisticData.length == 0)
-        {
-            const mapOfProductsCount = new Map()
-            productIds.forEach((productId) =>
-            {
-                mapOfProductsCount.set(productId, {
-                    count: 0,
-                    revenue: 0
-                })
-            })
-    
-            completedOrderStatistics.statisticData.forEach((order) =>
-            {
-                const products = order.products
-    
-                products.forEach((product) =>
-                {
-                    //since the order object is now a pure object, so we donot have to use product._id.toString()
-                    const productId = product._id
-                    const currentValue = mapOfProductsCount.get(productId)
-                    if(currentValue != undefined)
-                    {
-                        const newCount = currentValue.count + product.quantity
-                        const newRevenue = currentValue.revenue + product.quantity*product*purchasedPrice
-                        mapOfProductsCount.set(productId, {
-                            cout: newCount,
-                            revenue: newRevenue
-                        })
-                    }
-                })
-            })
-    
-            const detailData = []
-            let totalSoldProduct = 0
-    
-            mapOfProductsCount.forEach((value, key) =>
-            {
-                totalSoldProduct += value.count
-    
-                const record = {
-                    productId: key,
-                    count: value.count,
-                    revenue: value.revenue
-                }
-    
-                detailData.push(record)
-            })
-    
-            const finalResult = {
-                totalSoldProducts: totalSoldProduct,
-                statisticData: detailData
-            }
-    
-            return finalResult
-        }
-
         let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
         if(startTime != undefined)
@@ -202,7 +146,16 @@ const StatisticsProductService =
             endTimeToCheck = new Date(endTime)
         }
 
-        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        let targetIntervals = []
+        if(step == undefined || completedOrderStatistics.statisticData.length == 0)
+        {
+            targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        }
+        else
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
+
         let totalSoldProducts = 0
 
         const getStatisticForEachInterval = () =>
@@ -308,67 +261,6 @@ const StatisticsProductService =
             return null
         }
 
-        if(step == undefined || completedOrderStatistics.statisticData.length == 0)
-        {
-            const mapOfProductsCount = new Map()
-
-            completedOrderStatistics.statisticData.forEach((order) =>
-            {
-                const products = order.products
-    
-                products.forEach((product) =>
-                {
-                    const productId = product._id
-                    const currentValue = mapOfProductsCount.get(productId)
-                    if(currentValue != undefined)
-                    {
-                        const newCount = currentValue.count + product.quantity
-                        const newRevenue = currentValue.revenue + product.quantity*product.purchasedPrice
-    
-                        mapOfProductsCount.set(productId, {
-                            count: newCount,
-                            revenue: newRevenue
-                        })
-                    }
-                    else
-                    {
-                        //have to create the initialized value
-                        const count = product.quantity
-                        const revenue = product.quantity*product.purchasedPrice
-    
-                        mapOfProductsCount.set(productId, {
-                            count: count,
-                            revenue: revenue
-                        })
-                    }
-                })
-            })
-    
-            let totalSoldProduct = 0
-            const detailData = []
-    
-            mapOfProductsCount.forEach((value, key) =>
-            {
-                totalSoldProduct += value.count
-    
-                const record = {
-                    productId: key,
-                    count: value.count,
-                    revenue: value.revenue
-                }
-    
-                detailData.push(record)
-            })
-    
-            const finalResult = 
-            {
-                totalSoldProducts: totalSoldProduct,
-                detail: detailData
-            }
-    
-            return finalResult
-        }
-
         let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
         if(startTime != undefined)
@@ -380,7 +272,17 @@ const StatisticsProductService =
             endTimeToCheck = new Date(endTime)
         }
 
-        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        let targetIntervals = []
+
+        if(step == undefined || completedOrderStatistics.statisticData.length == 0)
+        {
+            targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        }
+        else
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
+
         let totalSoldProducts = 0
 
         const getStatisticForEachInterval = () =>

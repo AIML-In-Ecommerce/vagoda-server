@@ -33,22 +33,16 @@ const ShopStatisticsService =
             return null
         }
 
+        let targetIntervals = []
+
         if(step == undefined || statistics.statisticData.length == 0)
         {
-            const finalResult = 
-            {
-                totalOrders: statistics.totalOrders,
-                totalRevenue: statistics.totalRevenue,
-                totalProfit: statistics.totalProfit,
-                avgRevenue: statistics.avgRevenue,
-                avgProfit: statistics.avgProfit,
-                statisticsData: statistics.statisticData
-            }
-    
-            return finalResult
+            targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
-
-        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        else
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
 
         //record of result will be:
         /**
@@ -134,11 +128,6 @@ const ShopStatisticsService =
         const targetOrderStatus = OrderStatus.COMPLETED
         const statistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime, true)
 
-        if(step == undefined || statistics.statisticData.length == 0)
-        {
-            return statistics
-        }
-
         let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
 
@@ -151,7 +140,16 @@ const ShopStatisticsService =
             endTimeToCheck = new Date(endTime)
         }
     
-        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        let targetIntervals = []
+
+        if(step == undefined || statistics.statisticData.length == 0)
+        {
+            targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        }
+        else
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
 
         //record of result will be:
         /**
@@ -252,51 +250,6 @@ const ShopStatisticsService =
             return null
         }
 
-        if(step == undefined)
-        {
-            let numberOfUserHasOrder = 0
-            const userIdsInOrder = new Map()
-    
-            //this can help to remove duplicated userId
-            orderStatistics.statisticData.forEach((item) =>
-            {
-                const userId = item.user.toString()
-                userIdsInOrder.set(userId, false)
-            })
-    
-            productAccessStatistics.forEach((record) =>
-            {
-                const isCountedFlag = userIdsInOrder.get(record.user)
-                if(isCountedFlag != undefined && isCountedFlag == false)
-                {
-                    numberOfUserHasOrder += 1
-                    userIdsInOrder.set(record.user, true)
-                }
-                else
-                {
-                    userIdsInOrder.set(record.user, false)
-                }
-            })
-
-            const totalUserWhoAccess = Array.from(userIdsInOrder.keys()).length
-    
-            const conversionRate = totalUserWhoAccess > 0 ? numberOfUserHasOrder / totalUserWhoAccess : null
-            
-            const finalResult = 
-            {
-                totalRevenue: orderStatistics.totalRevenue,
-                totalProfit: orderStatistics.totalProfit,
-                avgRevenue: orderStatistics.avgRevenue,
-                avgProfit: orderStatistics.avgProfit,
-                totalOrders: orderStatistics.totalOrders,
-                totalAccess: productAccessStatistics.length,
-                conversionRate: conversionRate,
-                statisticData: orderStatistics.statisticData
-            }
-    
-            return finalResult
-        }
-
         let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
 
@@ -310,7 +263,16 @@ const ShopStatisticsService =
             endTimeToCheck = new Date(endTime)
         }
     
-        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        let targetIntervals = []
+
+        if(step == undefined)
+        {
+            targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        }
+        else
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
 
         let intervalsHaveConversionRate = 0
         let totalConversionRate = 0
@@ -327,6 +289,8 @@ const ShopStatisticsService =
                     orders: 0,
                     revenue: 0,
                     profit: 0,
+                    mapOfUsers: new Map(),
+                    mapOfAccessUsers: new Map(),
                     conversionRate: null,
                     statisticData: []
                 })
@@ -357,6 +321,9 @@ const ShopStatisticsService =
                     currentStatistics.profit += targetOrderToCheck.profit
                     currentStatistics.orders += 1
                     currentStatistics.statisticData.push(targetOrderToCheck)
+
+                    currentStatistics.mapOfUsers.set(targetOrderToCheck.user, true)
+
                     mapOfIntervals.set(indexOfInterval, currentStatistics)
                     indexOfOrder += 1
                 }
@@ -373,6 +340,15 @@ const ShopStatisticsService =
             {
                 const targetAccessRecord = productAccessStatistics[indexOfAccess]
                 const timeToCheck = new Date(targetAccessRecord.time)
+                let userAccessId = null
+                if(targetAccessRecord.user != null)
+                {
+                    userAccessId = targetAccessRecord.user
+                }
+                else if(targetAccessRecord.sessionUser != null)
+                {
+                    userAccessId = targetAccessRecord.sessionUser
+                }
 
                 if(timeToCheck > boundaryToChange)
                 {
@@ -385,6 +361,12 @@ const ShopStatisticsService =
                 {
                     const currentStatistics = mapOfIntervals.get(indexOfInterval)
                     currentStatistics.access += 1
+
+                    if(userAccessId != null)
+                    {
+                        currentStatistics.mapOfAccessUsers.set(userAccessId, true)
+                    }
+                    
                     mapOfIntervals.set(indexOfInterval, currentStatistics)
 
                     indexOfAccess += 1
@@ -394,16 +376,25 @@ const ShopStatisticsService =
             const result = targetIntervals.map((interval, index) =>
             {
                 const statistic = mapOfIntervals.get(index)
-                const conversionRate = statistic.access > 0 ? statistic.orders / statistic.access : null
+                const usersHaveOrders = Array.from(statistic.mapOfUsers.keys())
+                const usersAccessed = Array.from(statistic.mapOfAccessUsers.keys())
+
+                const conversionRate = usersAccessed.length > 0 ? usersHaveOrders.length / usersAccessed.length : null
                 if(conversionRate != null)
                 {
                     intervalsHaveConversionRate += 1
                     totalConversionRate += conversionRate
                 }
 
+                statistic.usersHaveOrders = usersHaveOrders
+                statistic.usersAccessed = usersAccessed
                 statistic.conversionRate = conversionRate
+                statistic.mapOfUsers = undefined
+                statistic.mapOfAccessUsers = undefined
 
                 mapOfIntervals.set(index, statistic)
+
+                return statistic
             })
 
             return result
@@ -624,65 +615,6 @@ const ShopStatisticsService =
             return null
         }
 
-        if(step == undefined || rawProductAccessRecords.length == 0)
-        {
-            let totalAccess = 0
-            const mapOfAccessUsers = new Map()
-    
-            rawProductAccessRecords.forEach((record) =>
-            {
-                totalAccess += 1
-    
-                let key = ""
-                if(record.user != null)
-                {
-                    key = "AUTH:" + record.user
-                }
-                else if(record.sessionUser != null)
-                {
-                    key = "SESSION:" + record.sessionUser
-                }
-    
-                let currentCount = mapOfAccessUsers.get(key)
-                if(currentCount == undefined)
-                {
-                    //initialize a new value
-                    const initCount = [record]
-                    mapOfAccessUsers.set(key, initCount)
-                }
-                else
-                {
-                    currentCount.push(record)
-                    mapOfAccessUsers.set(key, currentCount)
-                }
-            })
-    
-            const statisticData = []
-    
-            mapOfAccessUsers.forEach((value, key) =>
-            {
-                const keys = key.split(":")
-                const userType = keys[0]
-                const user = keys[1]
-                const userAccessRecord = 
-                {
-                    user: user,
-                    userType: userType,
-                    access: value
-                }
-    
-                statisticData.push(userAccessRecord)
-            })
-    
-            const finalResult = {
-                totalAccess: totalAccess,
-                totalUsers: statisticData.length,
-                statisticData: statisticData
-            }
-    
-            return finalResult
-        }
-
         let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
         if(startTime != undefined)
@@ -694,7 +626,16 @@ const ShopStatisticsService =
             endTimeToCheck = new Date(endTime)
         }
     
-        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        let targetIntervals = []
+
+        if(step == undefined || rawProductAccessRecords.length == 0)
+        {
+            targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        }
+        else
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
 
         const mapOfAllUser = new Map()
 

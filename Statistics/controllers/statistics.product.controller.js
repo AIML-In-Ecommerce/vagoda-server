@@ -140,10 +140,11 @@ const StatisticsProductController =
             const productIds = req.body.productIds
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
             const targetAccessType = ProductAccessType.ADD_TO_CART
 
-            const statistics = await StatisticsProductService.getViewsAndViewersOfProducts(shopId, productIds, targetAccessType ,startTime, endTime)
+            const statistics = await StatisticsProductService.getViewsAndViewersOfProducts(shopId, productIds, targetAccessType ,startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))

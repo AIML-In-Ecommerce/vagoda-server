@@ -50,6 +50,10 @@ const ShopDetailSchema = new Schema({
     type: Number,
     default: 0.0000
   },
+  operationalQuanlity: {
+    type: Number,
+    default: 5
+  }
 });
 
 const ShopSchema = new Schema({

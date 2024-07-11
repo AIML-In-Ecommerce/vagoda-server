@@ -25,6 +25,7 @@ router.put("/shop/removeImgCollection/:shop", ShopController.removeImageLinks)
 
 router.get("/shop_info", ShopController.getShopBySelection)
 router.post("/shops", ShopController.getShopByIdList)
+router.get("/shop_info/shopDetail", ShopController.getShopDetail)
 
 
 // from system
