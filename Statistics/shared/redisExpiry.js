@@ -1,12 +1,12 @@
 
 const ShopInfosCacheExpiry = 
 {
-    EXPIRY_OF_TOP_SHOPS_HAS_PRODUCTS_IN_TOP_SALES: 60*30
+    EXPIRY_OF_TOP_SHOPS_HAS_PRODUCTS_IN_TOP_SALES: 60*5
 }
 
 const CategoryInfosCacheExpiry = 
 {
-    EXPIRY_OF_TOP_IN_SALES_SUB_CATEGORIES: 60*30, //30 minutes
+    EXPIRY_OF_TOP_IN_SALES_SUB_CATEGORIES: 60*5, //30 minutes
 }
 
 const AccessProductCacheExpiry = 

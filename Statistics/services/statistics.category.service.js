@@ -56,7 +56,7 @@ const StatisticsCategoryService =
             if(currentValueOfSubCategoryCount != undefined)
             {
                 currentValueOfSubCategoryCount.productIds.push(productId)
-                mapOfSubCategoryCount.set(currentValueOfSubCategoryCount)
+                mapOfSubCategoryCount.set(subCategory._id, currentValueOfSubCategoryCount)
             }
             else
             {
