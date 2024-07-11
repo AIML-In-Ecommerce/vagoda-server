@@ -23,7 +23,7 @@ const StatisticsCategoryService =
     async getTopInSalesSubCategories(amount, startTime, endTime, useCompensation = false)
     {
         //re-calculate top sales of sub-category 
-        const topProductsInGlobalSalesStatistics = await StatisticsProductService.getTopProductsInGlobalSales(undefined, startTime, endTime)
+        const topProductsInGlobalSalesStatistics = await StatisticsProductService.getTopProductsInGlobalSales(undefined, startTime, endTime, false, useCompensation, false)
         if(topProductsInGlobalSalesStatistics == null)
         {
             return null

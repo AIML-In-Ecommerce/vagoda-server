@@ -15,8 +15,10 @@ const StatisticsProductController =
             const startTime = req.body.startTime
             const endTime = req.body.endTime
             const amount = req.body.amount
+            const keepMissingItem = req.body.keepMissingItem
+            const useProductInfo = req.body.useProductInfo
 
-            const statistics = await StatisticsProductService.getTopProductInSalesBySeller(shopId, amount, startTime, endTime, false)
+            const statistics = await StatisticsProductService.getTopProductInSalesBySeller(shopId, amount, startTime, endTime, useProductInfo, keepMissingItem)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -45,8 +47,9 @@ const StatisticsProductController =
             const productIds = req.body.productIds
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statistics = await StatisticsProductService.getSoldAmountOfProductsInAnIntervalOfTime(shopId, productIds, startTime, endTime)
+            const statistics = await StatisticsProductService.getSoldAmountOfProductsInAnIntervalOfTime(shopId, productIds, startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.NotFound("No info to get the statistics"))
@@ -74,8 +77,9 @@ const StatisticsProductController =
 
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statisticData = await StatisticsProductService.getSoldAmountOfAllProductsInAnIntervalOfTime(shopId, startTime, endTime)
+            const statisticData = await StatisticsProductService.getSoldAmountOfAllProductsInAnIntervalOfTime(shopId, startTime, endTime, step)
             if(statisticData == null)
             {
                 return next(createError.NotFound("No info to get the statistics"))
@@ -105,8 +109,9 @@ const StatisticsProductController =
             const targetAccessType = req.body.accessType
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statistics = await StatisticsProductService.getViewsAndViewersOfProducts(shopId, productIds, targetAccessType ,startTime, endTime)
+            const statistics = await StatisticsProductService.getViewsAndViewersOfProducts(shopId, productIds, targetAccessType ,startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -225,8 +230,9 @@ const StatisticsProductController =
             const amount = req.body.amount
             const useProductInfo = req.body.useProductInfo ? req.body.useProductInfo : false
             const useCompensation = req.body.useCompensation ? req.body.useCompensation : false
+            const keepMissingItem = req.body.keepMissingItem
 
-            const statistics = await StatisticsProductService.getTopProductsInGlobalSales(amount, startTime, endTime, useProductInfo, useCompensation)
+            const statistics = await StatisticsProductService.getTopProductsInGlobalSales(amount, startTime, endTime, useProductInfo, useCompensation, keepMissingItem)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))

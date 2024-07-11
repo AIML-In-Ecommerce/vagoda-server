@@ -15,8 +15,9 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const isAscending = req.body.isAscending
     
-            const statisticsResult = await StatisticsOrderService.getOrderByShopWithStatus(shopId, orderStatus, startTime, endTime)    
+            const statisticsResult = await StatisticsOrderService.getOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, isAscending)    
             if(statisticsResult == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -46,8 +47,9 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const isAscending = req.body.isAscending
     
-            const statisticsResult = await StatisticsOrderService.getOrderByShopWithLatestStatus(shopId, orderStatus, startTime, endTime)    
+            const statisticsResult = await StatisticsOrderService.getOrderByShopWithLatestStatus(shopId, orderStatus, startTime, endTime, isAscending)    
             if(statisticsResult == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -76,8 +78,9 @@ const StatisticsOrderController =
 
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statistics = await StatisticsOrderService.getTotalReceivedOrders(shopId, startTime, endTime)
+            const statistics = await StatisticsOrderService.getTotalReceivedOrders(shopId, startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -104,8 +107,9 @@ const StatisticsOrderController =
 
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getLatePendingAndProcessingOrdersBySeller(shopId, startTime, endTime)
+            const statistics = await StatisticsOrderService.getLatePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending)
             if(statistics == null)
             {
                 return next(createError("Cannot get the statistics"))
@@ -134,8 +138,9 @@ const StatisticsOrderController =
 
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getOnTimePendingAndProcessingOrdersBySeller(shopId, startTime, endTime)
+            const statistics = await StatisticsOrderService.getOnTimePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending)
             if(statistics == null)
             {
                 return next(createError("Cannot get the statistics"))
@@ -165,8 +170,9 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getOrdersWithOnWaitingForStatus(shopId, orderStatus, startTime, endTime)
+            const statistics = await StatisticsOrderService.getOrdersWithOnWaitingForStatus(shopId, orderStatus, startTime, endTime, isAscending)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -186,7 +192,6 @@ const StatisticsOrderController =
         }
     },
 
-
     async getLateOrdersByShopWithStatus(req, res, next)
     {
         try
@@ -197,8 +202,9 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getLateOrderByShopWithStatus(shopId, orderStatus, startTime, endTime)
+            const statistics = await StatisticsOrderService.getLateOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, isAscending)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -228,8 +234,9 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getOnTimeOrderByShopWithStatus(shopId, orderStatus, startTime, endTime)
+            const statistics = await StatisticsOrderService.getOnTimeOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, isAscending)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))

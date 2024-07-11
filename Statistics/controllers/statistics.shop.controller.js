@@ -211,8 +211,6 @@ const ShopStatisticsController =
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
             }
 
-            console.log("test: ", statistics)
-
             return res.json(
                 {
                     message: "Get the returning statistics successfully",

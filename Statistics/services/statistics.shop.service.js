@@ -4,10 +4,8 @@ import StatisticsOrderService from './statistics.order.service.js'
 import StatisticsAccessService from './statistics.access.service.js'
 import StatisticsProductService from './statistics.product.service.js'
 import ShopSupportService from '../support/shop.support.js'
-import { access } from 'fs'
 import Shop from '../models/shop/shop.model.js'
-import { FromDateStringToUTCTime } from '../support/datestring.js'
-import { count, time } from 'console'
+import SupportDateService from '../support/date.service.js'
 
 
 const ShopStatisticsService =
@@ -50,27 +48,7 @@ const ShopStatisticsService =
             return finalResult
         }
 
-        const getTargetIntervals = (start, end) =>
-        {
-            const result = []
-            const worker = new FromDateStringToUTCTime()
-            let moment = start
-            while(moment < end)
-            {
-                let nextMoment = worker.getNextMoment(step, moment)
-                if(nextMoment > end)
-                {
-                    nextMoment = end
-                }
-                const interval = [moment, nextMoment]
-                result.push(interval)
-                moment = nextMoment
-            }
-
-            return result
-        }
-
-        const targetIntervals = getTargetIntervals(startTimeToCheck, endTimeToCheck)
+        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
 
         //record of result will be:
         /**
@@ -103,7 +81,7 @@ const ShopStatisticsService =
             for(; indexOfOrder < statistics.statisticData.length && indexOfInterval < targetIntervals.length; )
             {
                 const targetOrderToCheck = statistics.statisticData[indexOfOrder]
-                const timeToCheck = new Date(targetOrderToCheck.confirmStatus.time)
+                const timeToCheck = new Date(targetOrderToCheck.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
                 {
@@ -122,9 +100,18 @@ const ShopStatisticsService =
 
                     indexOfOrder += 1
                 }
+                else
+                {
+                    indexOfInterval += 1
+                }
             }
 
-            return Array.from(mapOfIntervals.values())
+            const result = targetIntervals.map((interval, index) =>
+            {
+                return mapOfIntervals.get(index)
+            })
+
+            return result
         }
 
         const statisticsDataForEachInterval = getStatisticForEachInterval()
@@ -145,7 +132,7 @@ const ShopStatisticsService =
     async getRevenueOfShop(shopId, startTime, endTime, step)
     {
         const targetOrderStatus = OrderStatus.COMPLETED
-        const statistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
+        const statistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime, true)
 
         if(step == undefined || statistics.statisticData.length == 0)
         {
@@ -163,28 +150,8 @@ const ShopStatisticsService =
         {
             endTimeToCheck = new Date(endTime)
         }
-
-        const getTargetIntervals = (start, end) =>
-            {
-                const result = []
-                const worker = new FromDateStringToUTCTime()
-                let moment = start
-                while(moment < end)
-                {
-                    let nextMoment = worker.getNextMoment(step, moment)
-                    if(nextMoment > end)
-                    {
-                        nextMoment = end
-                    }
-                    const interval = [moment, nextMoment]
-                    result.push(interval)
-                    moment = nextMoment
-                }
     
-                return result
-            }
-    
-        const targetIntervals = getTargetIntervals(startTimeToCheck, endTimeToCheck)
+        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
 
         //record of result will be:
         /**
@@ -217,7 +184,7 @@ const ShopStatisticsService =
             for(; indexOfOrder < statistics.statisticData.length && indexOfInterval < targetIntervals.length; )
             {
                 const targetOrderToCheck = statistics.statisticData[indexOfOrder]
-                const timeToCheck = new Date(targetOrderToCheck.confirmStatus.time)
+                const timeToCheck = new Date(targetOrderToCheck.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
                 {
@@ -236,9 +203,18 @@ const ShopStatisticsService =
 
                     indexOfOrder += 1
                 }
+                else
+                {
+                    indexOfInterval += 1
+                }
             }
 
-            return Array.from(mapOfIntervals.values())
+            const result = targetIntervals.map((interval, index) =>
+            {
+                return mapOfIntervals.get(index)
+            })
+
+            return result
         }
 
         const statisticsDataForEachInterval = getStatisticForEachInterval()
@@ -262,7 +238,7 @@ const ShopStatisticsService =
         // let startTimeToCheck = 0
 
         const targetOrderStatus = OrderStatus.PENDING
-        const orderStatistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
+        const orderStatistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime, true)
         if(orderStatistics == null)
         {
             console.log("Null orderStatistics in getConversionOfViewAndSale")
@@ -333,28 +309,8 @@ const ShopStatisticsService =
         {
             endTimeToCheck = new Date(endTime)
         }
-
-        const getTargetIntervals = (start, end) =>
-            {
-                const result = []
-                const worker = new FromDateStringToUTCTime()
-                let moment = start
-                while(moment < end)
-                {
-                    let nextMoment = worker.getNextMoment(step, moment)
-                    if(nextMoment > end)
-                    {
-                        nextMoment = end
-                    }
-                    const interval = [moment, nextMoment]
-                    result.push(interval)
-                    moment = nextMoment
-                }
     
-                return result
-            }
-    
-        const targetIntervals = getTargetIntervals(startTimeToCheck, endTimeToCheck)
+        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
 
         let intervalsHaveConversionRate = 0
         let totalConversionRate = 0
@@ -385,7 +341,7 @@ const ShopStatisticsService =
             for(; indexOfOrder < orderStatistics.statisticData.length && indexOfInterval < targetIntervals.length; )
             {
                 const targetOrderToCheck = orderStatistics.statisticData[indexOfOrder]
-                const timeToCheck = new Date(targetOrderToCheck.confirmStatus.time)
+                const timeToCheck = new Date(targetOrderToCheck.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
                 {
@@ -403,6 +359,10 @@ const ShopStatisticsService =
                     currentStatistics.statisticData.push(targetOrderToCheck)
                     mapOfIntervals.set(indexOfInterval, currentStatistics)
                     indexOfOrder += 1
+                }
+                else
+                {
+                    indexOfInterval += 1
                 }
             }
 
@@ -431,8 +391,9 @@ const ShopStatisticsService =
                 }
             }
 
-            mapOfIntervals.forEach((statistic, key) =>
+            const result = targetIntervals.map((interval, index) =>
             {
+                const statistic = mapOfIntervals.get(index)
                 const conversionRate = statistic.access > 0 ? statistic.orders / statistic.access : null
                 if(conversionRate != null)
                 {
@@ -441,9 +402,11 @@ const ShopStatisticsService =
                 }
 
                 statistic.conversionRate = conversionRate
+
+                mapOfIntervals.set(index, statistic)
             })
 
-            return Array.from(mapOfIntervals.values())
+            return result
         }
 
         const statisticData = getStatisticForEachInterval()
@@ -700,7 +663,7 @@ const ShopStatisticsService =
             {
                 const keys = key.split(":")
                 const userType = keys[0]
-                const user = key[1]
+                const user = keys[1]
                 const userAccessRecord = 
                 {
                     user: user,
@@ -730,28 +693,8 @@ const ShopStatisticsService =
         {
             endTimeToCheck = new Date(endTime)
         }
-
-        const getTargetIntervals = (start, end) =>
-            {
-                const result = []
-                const worker = new FromDateStringToUTCTime()
-                let moment = start
-                while(moment < end)
-                {
-                    let nextMoment = worker.getNextMoment(step, moment)
-                    if(nextMoment > end)
-                    {
-                        nextMoment = end
-                    }
-                    const interval = [moment, nextMoment]
-                    result.push(interval)
-                    moment = nextMoment
-                }
     
-                return result
-            }
-    
-        const targetIntervals = getTargetIntervals(startTimeToCheck, endTimeToCheck)
+        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
 
         const mapOfAllUser = new Map()
 
@@ -816,11 +759,16 @@ const ShopStatisticsService =
 
                     indexOfAccess += 1
                 }
+                else
+                {
+                    indexOfInterval += 1
+                }
             }
 
             //count access by mapOfUsers attributes
-            mapOfIntervals.forEach((statistics, keyIndex) =>
+            const result = targetIntervals.map((interval, index) =>
             {
+                const statistics = mapOfIntervals.get(index)
                 const statisticData = []
                 let users = 0
                 statistics.mapOfAccessUsers.forEach((value, key) =>{
@@ -828,7 +776,8 @@ const ShopStatisticsService =
 
                     const keys = key.split(":")
                     const userType = keys[0]
-                    const user = key[1]
+                    const user = keys[1]
+
                     const userAccessRecord = 
                     {
                         user: user,
@@ -843,9 +792,13 @@ const ShopStatisticsService =
                 statistics.users = users
                 statistics.statisticData = statisticData
                 statistics.mapOfAccessUsers = undefined
+
+                mapOfIntervals.set(index, statistics)
+
+                return statistics
             })
 
-            return Array.from(mapOfIntervals.values())
+            return result
         }
 
         const statisticData = getStatisticForEachInterval()
