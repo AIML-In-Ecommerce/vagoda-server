@@ -50,7 +50,7 @@ const ShopDetailSchema = new Schema({
     type: Number,
     default: 0.0000
   },
-  operationalQuanlity: {
+  operationalQuality: {
     type: Number,
     default: 5
   }
