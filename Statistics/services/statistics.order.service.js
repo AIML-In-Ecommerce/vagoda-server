@@ -6,6 +6,115 @@ import SupportDateService from "../support/date.service.js"
 
 const StatisticsOrderService = 
 {
+
+    fromOrderStatisticsToCloseIntervals(orderStatistics, startTime = undefined, endTime = undefined, step = undefined)
+    {
+        if(orderStatistics == null)
+        {
+            return null
+        }
+
+        let startTimeToCheck = new Date(2000, 0, 1)
+        let endTimeToCheck = new Date()
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        let targetIntervals = []
+        if(step == undefined || orderStatistics.statisticData.length == 0)
+        {
+            targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        }
+        else
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
+
+        const getStatisticForEachInterval = () =>
+        {
+            const mapOfIntervals = new Map()
+            targetIntervals.forEach((interval, index) =>
+            {
+                const initValue = {
+                    interval: interval,
+                    revenue: 0,
+                    profit: 0,
+                    avgRevenue: 0,
+                    avgProfit: 0,
+                    totalOrders: 0,
+                    statisticData: []
+                }
+                mapOfIntervals.set(index, initValue)
+            })
+
+            let boundaryToChange = targetIntervals[0][1]
+            let indexOfInterval = 0
+            let indexOfOrder = 0
+            
+            for(; indexOfOrder < orderStatistics.statisticData.length && indexOfInterval < targetIntervals.length;)
+            {
+                const targetOrderRecord = orderStatistics.statisticData[indexOfOrder]
+                const timeToCheck = new Date(targetOrderRecord.confirmedStatus.time)
+                
+                if(timeToCheck > boundaryToChange)
+                {
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] && timeToCheck <= targetIntervals[indexOfInterval][1])
+                {
+                    const currentStatistics = mapOfIntervals.get(indexOfInterval)
+                    if(currentStatistics != undefined)
+                    {
+                        currentStatistics.revenue += targetOrderRecord.totalPrice
+                        currentStatistics.profit += targetOrderRecord.profit
+                        currentStatistics.statisticData.push(targetOrderRecord)
+                        currentStatistics.totalOrders += 1
+
+                        mapOfIntervals.set(indexOfInterval, currentStatistics)
+
+                        indexOfOrder += 1
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            const result = targetIntervals.map((interval, index) =>
+            {
+                const statistics = mapOfIntervals.get(index)
+                if(statistics.totalOrders > 0)
+                {
+                    statistics.avgRevenue = statistics.revenue / statistics.totalOrders
+                    statistics.avgProfit = statistics.avgProfit / statistics.totalOrders
+                }
+
+                return statistics
+            })
+
+            return result
+        }
+
+        const statisticsDataForEachInterval = getStatisticForEachInterval()
+
+        const finalResult = {
+            totalRevenue: orderStatistics.totalRevenue,
+            totalProfit: orderStatistics.totalProfit,
+            avgRevenue: orderStatistics.avgRevenue,
+            avgProfit: orderStatistics.avgProfit,
+            totalOrders: orderStatistics.totalOrders,
+            statisticData: statisticsDataForEachInterval
+        }
+
+        return finalResult
+    },
     
     /**
      * Get all orders of a shop at the moment that is between startTime and endTime,

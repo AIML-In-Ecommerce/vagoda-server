@@ -204,8 +204,9 @@ const ShopStatisticsController =
 
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statistics = await ShopStatisticsService.getReturningRateOfShop(shopId, startTime, endTime)
+            const statistics = await ShopStatisticsService.getReturningRateOfShop(shopId, startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
@@ -270,12 +271,12 @@ const ShopStatisticsController =
             const endTime = req.body.endTime
             const amount = req.body.amount ? req.body.amount : undefined
 
-            const statistics = ShopStatisticsService.getTopCityInSales(shopId, startTime, endTime, amount)
+            const statistics = await ShopStatisticsService.getTopCityInSales(shopId, startTime, endTime, amount)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
             }
-
+            
             return res.json(
                 {
                     message: "Get top cities in sales successfully",

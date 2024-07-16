@@ -227,7 +227,7 @@ const PromotionService = {
         const promotionId = promotion._id.toString()
 
         //if the targetProducts.length == 0 =>  this promotion can be apply for all products of this shop
-        //then we only need to store the promotion with the great status of sentinel_requiredConditionCount's value
+        //then we only need to store the promotion with the greatest status of sentinel_requiredConditionCount's value
         if(promotion.targetProducts.length == 0)
         {
           const currentRelevantPromotion = relevantPromotions.get(promotionId)

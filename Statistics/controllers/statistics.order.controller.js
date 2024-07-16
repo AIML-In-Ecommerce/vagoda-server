@@ -15,18 +15,21 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
             const isAscending = req.body.isAscending
     
-            const statisticsResult = await StatisticsOrderService.getOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, isAscending)    
-            if(statisticsResult == null)
+            const statisticsResult = await StatisticsOrderService.getOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, true)
+            const convertedResult = StatisticsOrderService.fromOrderStatisticsToCloseIntervals(statisticsResult, startTime, endTime, step)
+            if(convertedResult == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
             }
 
+
             return res.json(
                 {
                     message: "Get statistics of order successfully",
-                    data: statisticsResult
+                    data: convertedResult
                 }
             )
         }
@@ -48,9 +51,11 @@ const StatisticsOrderController =
             const startTime = req.body.startTime
             const endTime = req.body.endTime
             const isAscending = req.body.isAscending
+            const step = req.body.step
     
-            const statisticsResult = await StatisticsOrderService.getOrderByShopWithLatestStatus(shopId, orderStatus, startTime, endTime, isAscending)    
-            if(statisticsResult == null)
+            const statisticsResult = await StatisticsOrderService.getOrderByShopWithLatestStatus(shopId, orderStatus, startTime, endTime, true)    
+            const convertedResult = StatisticsOrderService.fromOrderStatisticsToCloseIntervals(statisticsResult, startTime, endTime, step)
+            if(convertedResult == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
             }
@@ -58,7 +63,7 @@ const StatisticsOrderController =
             return res.json(
                 {
                     message: "Get statistics of order successfully",
-                    data: statisticsResult
+                    data: convertedResult
                 }
             )
         }
@@ -107,10 +112,12 @@ const StatisticsOrderController =
 
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
             const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getLatePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending)
-            if(statistics == null)
+            const statistics = await StatisticsOrderService.getLatePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, true)
+            const convertedResult = StatisticsOrderService.fromOrderStatisticsToCloseIntervals(statistics, startTime, endTime, step)
+            if(convertedResult == null)
             {
                 return next(createError("Cannot get the statistics"))
             }
@@ -118,7 +125,7 @@ const StatisticsOrderController =
             return res.json(
                 {
                     message: "Get late pending and processing orders successfully",
-                    data: statistics
+                    data: convertedResult
                 }
             )
         }
@@ -139,9 +146,11 @@ const StatisticsOrderController =
             const startTime = req.body.startTime
             const endTime = req.body.endTime
             const isAscending = req.body.isAscending
+            const step = req.body.step
 
-            const statistics = await StatisticsOrderService.getOnTimePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending)
-            if(statistics == null)
+            const statistics = await StatisticsOrderService.getOnTimePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, true)
+            const convertedResult = StatisticsOrderService.fromOrderStatisticsToCloseIntervals(statistics, startTime, endTime, step)
+            if(convertedResult == null)
             {
                 return next(createError("Cannot get the statistics"))
             }
@@ -149,7 +158,7 @@ const StatisticsOrderController =
             return res.json(
                 {
                     message: "Get late pending and processing orders successfully",
-                    data: statistics
+                    data: convertedResult
                 }
             )
         }
@@ -170,10 +179,12 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
-            const isAscending = req.body.isAscending
+            const step = req.body.step
+            // const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getOrdersWithOnWaitingForStatus(shopId, orderStatus, startTime, endTime, isAscending)
-            if(statistics == null)
+            const statistics = await StatisticsOrderService.getOrdersWithOnWaitingForStatus(shopId, orderStatus, startTime, endTime, true)
+            const convertedResult = StatisticsOrderService.fromOrderStatisticsToCloseIntervals(statistics, startTime, endTime, step)
+            if(convertedResult == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
             }
@@ -181,7 +192,7 @@ const StatisticsOrderController =
             return res.json(
                 {
                     message: "Get statistics of orders on waiting for process successfully",
-                    data: statistics
+                    data: convertedResult
                 }
             )
         }
@@ -202,10 +213,12 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
-            const isAscending = req.body.isAscending
+            const step = req.step.step
+            // const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getLateOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, isAscending)
-            if(statistics == null)
+            const statistics = await StatisticsOrderService.getLateOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, true)
+            const convertedResult = StatisticsOrderService.fromOrderStatisticsToCloseIntervals(statistics, startTime, endTime, step)
+            if(convertedResult == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
             }
@@ -213,7 +226,7 @@ const StatisticsOrderController =
             return res.json(
                 {
                     message: "Get statistics of orders on waiting for process successfully",
-                    data: statistics
+                    data: convertedResult
                 }
             )
         }
@@ -234,10 +247,12 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
             const isAscending = req.body.isAscending
 
-            const statistics = await StatisticsOrderService.getOnTimeOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, isAscending)
-            if(statistics == null)
+            const statistics = await StatisticsOrderService.getOnTimeOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, true)
+            const convertedResult = StatisticsOrderService.fromOrderStatisticsToCloseIntervals(statistics, startTime, endTime, step)
+            if(convertedResult == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get the statistics"))
             }
@@ -245,7 +260,7 @@ const StatisticsOrderController =
             return res.json(
                 {
                     message: "Get statistics of orders on waiting for process successfully",
-                    data: statistics
+                    data: convertedResult
                 }
             )
         }

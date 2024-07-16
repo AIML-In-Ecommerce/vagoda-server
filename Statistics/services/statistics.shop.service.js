@@ -329,7 +329,8 @@ const ShopStatisticsService =
                 }
                 else
                 {
-                    indexOfInterval += 1
+                    // indexOfInterval += 1
+                    break
                 }
             }
 
@@ -508,10 +509,10 @@ const ShopStatisticsService =
         return finalResult
     },
 
-    async getReturningRateOfShop(shopId, startTime, endTime)
+    async getReturningRateOfShop(shopId, startTime, endTime, step = undefined)
     {
         const targetOrderStatus = OrderStatus.PENDING
-        const rawTargetOrderStatistics = await StatisticsOrderService.getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
+        const rawTargetOrderStatistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime, true)
         if(rawTargetOrderStatistics == null)
         {
             return null
@@ -524,84 +525,154 @@ const ShopStatisticsService =
             previousEndTime = new Date(new Date(startTime).setSeconds((new Date(startTime).getSeconds() - 1)))
         }
 
-        const allRawOrderStatistics = await StatisticsOrderService.getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, undefined, previousEndTime)
+        const allRawOrderStatistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, undefined, previousEndTime, true)
         if(allRawOrderStatistics == null)
         {
             return null
         }
 
+        let startTimeToCheck = new Date(2000, 0, 1)
+        let endTimeToCheck = new Date()
+        if(startTime != undefined)
+        {
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
 
-        const mapOfReturningUserToOrders = new Map()
+        let targetIntervals = []
+        if(step == undefined)
+        {
+            targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        }
+        else
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
+
+        const mapOfAllUsers = new Map()
 
         allRawOrderStatistics.statisticData.forEach((orderRecord) =>
         {
             const userId = orderRecord.user
-            mapOfReturningUserToOrders.set(userId, [])
+            mapOfAllUsers.set(userId, {})
         })
 
-        let totalOrdersOfReturningUsers = 0
-
-        rawTargetOrderStatistics.statisticData.forEach((orderRecord, index) =>
+        const getStatisticForEachInterval = () =>
         {
-            const userId = orderRecord.user
-            const listOfOrderIndex = mapOfReturningUserToOrders.get(userId)
-            if(listOfOrderIndex != undefined)
+            const mapOfIntervals = new Map()
+            targetIntervals.forEach((interval, index) =>
             {
-                //this is a user who returns to make a transaction
-                listOfOrderIndex.push(index)
-                totalOrdersOfReturningUsers += 1 
-                mapOfReturningUserToOrders.set(userId, listOfOrderIndex)
-            }
-        })
-
-        let totalUsers = 0
-        let totalOrders = rawTargetOrderStatistics.statisticData.length
-        let totalRevenue = 0
-        let totalProfit = 0
-        const listOfReturningUsers = []
-
-        mapOfReturningUserToOrders.forEach((value, key) =>
-        {
-            totalUsers += 1
-
-            if(value.length > 0)
-            {
-                //this is a returning user
-                let revenue = 0
-                let profit = 0
-                const orders = value.map((orderRecordIndex) =>
-                {
-                    const orderRecord = rawTargetOrderStatistics.statisticData[orderRecordIndex]
-                    revenue += orderRecord.totalPrice
-                    profit += orderRecord.profit
-                    return orderRecord
-                })
-                
-                totalRevenue += revenue
-                totalProfit += profit
-
-                const returningUserRecord = {
-                    user: key,
-                    revenue: revenue,
-                    profit: profit,
-                    orders: orders
+                const initValue = {
+                    interval: interval,
+                    totalOrders: 0,
+                    totalUsers: 0,
+                    totalReturingUsers: 0,
+                    returningRate: null,
+                    mapOfReturningUsers: new Map()
                 }
 
-                listOfReturningUsers.push(returningUserRecord)
+                mapOfIntervals.set(index, initValue)
+            })
+
+            let boundaryToChange = targetIntervals[0][1]
+            // let startIndexOfCheckingOrder= 0
+            let indexOfInterval = 0
+            let indexOfOrder = 0
+
+            for(; indexOfOrder < rawTargetOrderStatistics.statisticData.length && indexOfInterval < targetIntervals.length;)
+            {
+                const targetOrderRecord = rawTargetOrderStatistics.statisticData[indexOfOrder]
+                const timeToCheck = new Date(targetOrderRecord.confirmedStatus.time)
+
+                if(timeToCheck > boundaryToChange)
+                {
+                    //update mapOfAllUsers
+                    //by adding new users rawTargetOrderStatistics.statisticData from startIndexOfCheckingOrder to (indexOfOrder - 1)
+                    // for(; startIndexOfCheckingOrder < indexOfOrder;)
+                    // {
+                    //     const newUserId = rawTargetOrderStatistics.statisticData[startIndexOfCheckingOrder].user
+                    //     mapOfAllUsers.set(newUserId, {})
+
+                    //     startIndexOfCheckingOrder += 1
+                    // }
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] && timeToCheck <= targetIntervals[indexOfInterval][1])
+                {
+                    const targetUserId = targetOrderRecord.user
+
+                    const currentStatistics = mapOfIntervals.get(indexOfInterval)
+                    const mapOfReturningUsers = currentStatistics.mapOfReturningUsers
+
+                    currentStatistics.totalOrders += 1
+
+                    if(mapOfAllUsers.get(targetUserId) != undefined)
+                    {
+                        // this is a returning user
+                        const userStatistics = mapOfReturningUsers.get(targetUserId)
+                        if(userStatistics == undefined)
+                        {
+                            const initUserStatistics = [targetOrderRecord]
+                            mapOfReturningUsers.set(targetUserId, initUserStatistics)
+                        }
+                        else
+                        {
+                            userStatistics.push(targetOrderRecord)
+                            mapOfReturningUsers.set(targetUserId, userStatistics)
+                        }
+                    }
+                    else
+                    {
+                        //this is a new user
+                        mapOfAllUsers.set(targetUserId, {})
+                    }
+
+                    mapOfIntervals.set(indexOfInterval, currentStatistics)
+                    indexOfOrder += 1
+                }
+                else
+                {
+                    break;
+                }
             }
-        })
 
-        const returningRate = totalUsers > 0 ? listOfReturningUsers.length / totalUsers : null
+            const result = targetIntervals.map((interval, index) =>
+            {
+                const intervalStatistics = mapOfIntervals.get(index)
+                const mapOfReturningUsers = intervalStatistics.mapOfReturningUsers
+                
+                
+                let statisticData = []
+                mapOfReturningUsers.forEach((value, key) =>
+                {
+                    intervalStatistics.totalUsers += 1
+                    if(value.length > 1)
+                    {
+                        //this is a returning user
+                        intervalStatistics.totalReturingUsers += 1
+                        statisticData = statisticData.concat(value)
+                    }
+                })
 
-        const finalResult = 
-        {
-            revenue: totalRevenue,
-            profit: totalProfit,
-            totalOrders: totalOrders,
-            totalUsers: totalUsers,
-            totalReturningUsers: listOfReturningUsers.length,
-            returningRate: returningRate,
-            statisticData: listOfReturningUsers
+                const returningRate = intervalStatistics.totalUsers > 0 ? (intervalStatistics.totalReturingUsers / intervalStatistics.totalUsers) : null
+                intervalStatistics.returningRate = returningRate
+                intervalStatistics.statisticData = statisticData
+                intervalStatistics.mapOfReturningUsers = undefined
+
+                return intervalStatistics
+            })
+
+            return result
+        }
+
+        const statisticsDataForEachInterval = getStatisticForEachInterval()
+
+        const finalResult = {
+            statisticData: statisticsDataForEachInterval
         }
 
         return finalResult
@@ -765,9 +836,9 @@ const ShopStatisticsService =
 
         rawSalesStatistics.statisticData.forEach((orderRecord) =>
         {
-            const idDistrict = orderRecord.shippingAddress.idDistrict
+            const idProvince = orderRecord.shippingAddress.idProvince
 
-            const currentValue = mapOfCityOrDistrictsSales.get(idDistrict)
+            const currentValue = mapOfCityOrDistrictsSales.get(idProvince)
             if(currentValue == undefined)
             {
                 //initialize a new value
@@ -776,14 +847,14 @@ const ShopStatisticsService =
                 const statisticData = [orderRecord]
 
                 const initValue = {
-                    idDistrict: idDistrict,
+                    idProvince: idProvince,
                     revenue: revenue,
                     profit: profit,
                     count: 1,
                     statisticData: statisticData
                 }
 
-                mapOfCityOrDistrictsSales.set(idDistrict, initValue)
+                mapOfCityOrDistrictsSales.set(idProvince, initValue)
             }
             else
             {
@@ -794,7 +865,7 @@ const ShopStatisticsService =
                 currentValue.count += 1
                 currentValue.statisticData.push(orderRecord)
 
-                mapOfCityOrDistrictsSales.set(idDistrict, currentValue)
+                mapOfCityOrDistrictsSales.set(idProvince, currentValue)
             }
         })
 

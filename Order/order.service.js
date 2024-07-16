@@ -125,6 +125,7 @@ const OrderService = {
         targetProduct.color = product.color,
         targetProduct.size = product.size
         targetProduct.quantity = product.quantity
+        targetProduct.itemId = product.product.toString()
 
         return targetProduct
         // return(
@@ -232,6 +233,7 @@ const OrderService = {
         targetProduct.color = value.color
         targetProduct.size = value.size
         targetProduct.quantity = value.quantity
+        targetProduct.itemId = value.product.toString()
 
         return targetProduct
       })
@@ -570,6 +572,7 @@ const OrderService = {
         targetProduct.finalPrice = undefined
         targetProduct.purchasedPrice = product.purchasedPrice
         targetProduct.quantity = product.quantity
+        targetProduct.itemId = product.product.toString()
 
         return targetProduct
       })

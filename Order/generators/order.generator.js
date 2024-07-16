@@ -131,6 +131,7 @@ async function generateOrder(requiredData)
       const productInfosInOrder = []
       let promotion = null
       
+      //this can ensures savedOrders[i].products[j].product == ProductsOnShop.get(savedOrders[i].shop)[j] is true
       for(let i = 0; i < targetProducts.length; i++)
       {
         const product = targetProducts[i]
@@ -229,6 +230,7 @@ async function generateOrder(requiredData)
       for(let i = 0; i < targetProducts.length; i++)
       {
         const purchasedPrice = clonedOrder.products[i].purchasedPrice
+        targetProducts[i].itemId = clonedOrder.products[i].product
         targetProducts[i].purchasedPrice = purchasedPrice
         targetProducts[i].finalPrice = undefined
         targetProducts[i].size = clonedOrder.products[i].size
