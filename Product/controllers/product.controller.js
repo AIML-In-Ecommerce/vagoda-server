@@ -7,7 +7,7 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import cloudinary from "cloudinary";
 import FileService from "../services/file.service.js";
-import pkg from 'body-parser';
+import pkg from "body-parser";
 const { json } = pkg;
 
 cloudinary.config({
@@ -284,7 +284,7 @@ const ProductController = {
       const sheetName = workbook.SheetNames[1];
       console.log("sheetName", sheetName);
       const worksheet = workbook.Sheets[sheetName];
-      let data = xlsx.utils.sheet_to_json(worksheet,{blankrows: false});
+      let data = xlsx.utils.sheet_to_json(worksheet, { blankrows: false });
       //remove blank row in data
       data = data.filter((item) => {
         return item["Tên sản phẩm *"] !== undefined;
@@ -334,7 +334,7 @@ const ProductController = {
         url: cloudinaryUrl,
         shop: shopId,
         products: [],
-        status: "FALURE",
+        status: "FAILURE",
       };
       const result = await FileService.create(fileDataError);
       res.json({
@@ -346,26 +346,22 @@ const ProductController = {
     }
   },
 
-  async getFlashSalesProducts(req, res, next)
-  {
-    try
-    {
-      const flashSalesProducts = await ProductService.getAllFlashSalesProducts(undefined)
-      if(flashSalesProducts == null)
-      {
-        return next(createError.BadRequest("Cannot get flash sales products"))
+  async getFlashSalesProducts(req, res, next) {
+    try {
+      const flashSalesProducts = await ProductService.getAllFlashSalesProducts(
+        undefined
+      );
+      if (flashSalesProducts == null) {
+        return next(createError.BadRequest("Cannot get flash sales products"));
       }
 
       return res.json({
         message: "Get flash sales products successfully",
-        data: flashSalesProducts
-      })
-
-    }
-    catch(error)
-    {
-      console.log(error)
-      return next(createError.InternalServerError(error.message))
+        data: flashSalesProducts,
+      });
+    } catch (error) {
+      console.log(error);
+      return next(createError.InternalServerError(error.message));
     }
   },
   async getRelatedProductsBySubCategory(req, res, next) {
@@ -374,9 +370,10 @@ const ProductController = {
       if (!subCategories) {
         return next(createError.BadRequest("Bad request!"));
       }
-  
-      const relatedProducts = await ProductService.getRelatedProductsBySubCategory(subCategories);
-  
+
+      const relatedProducts =
+        await ProductService.getRelatedProductsBySubCategory(subCategories);
+
       return res.json({
         message: "Get related products successfully",
         status: 200,
@@ -385,8 +382,7 @@ const ProductController = {
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
-  }
-
+  },
 };
 
 export default ProductController;
