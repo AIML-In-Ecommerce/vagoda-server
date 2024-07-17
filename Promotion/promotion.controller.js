@@ -142,12 +142,12 @@ const PromotionController = {
   {
     try
     {
-      const shopIds = req.body.shopIds
+      const shopId = req.body.shopId
       const lowerBoundaryForOrder = req.body.lowerBoundaryForOrder
       const targetProducts = req.body.targetProducts
       const inActive = req.body.inActive
 
-      const promotions = await PromotionService.getPromotionBySelectionFromBuyer(shopIds, lowerBoundaryForOrder, targetProducts, inActive)
+      const promotions = await PromotionService.getPromotionBySelectionFromBuyer(shopId, lowerBoundaryForOrder, targetProducts, inActive)
       if(promotions == null)
       {
         return next(createError.BadRequest("Missing parameters"))

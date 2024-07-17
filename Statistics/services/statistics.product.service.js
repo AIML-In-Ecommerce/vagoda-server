@@ -379,7 +379,7 @@ const StatisticsProductService =
 
     async getViewsAndViewersOfProducts(shopId, productIds, targetAccessType = undefined, startTime = undefined, endTime = undefined, step = undefined)
     {
-        let startTimeToCheck = new Date(2000, 1, 1)
+        let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
 
         if(startTime != undefined)
@@ -396,7 +396,7 @@ const StatisticsProductService =
         if(targetAccessType == undefined)
         {
             rawAccessedProducts = await ProductAccess.find({shop: shopId, product: {$in: productIds},
-                                                            time: {$gte: startTimeToCheck, $lte: endTimeToCheck}}).sort({time: 1})
+                                                            time: {$gte: startTimeToCheck, $lte: endTimeToCheck}})
         }
         else
         {
@@ -409,6 +409,7 @@ const StatisticsProductService =
             return null
         }
 
+        console.log("access count: ", rawAccessedProducts.length)
         const totalViews = rawAccessedProducts.length
 
         let targetIntervals = []
@@ -604,6 +605,14 @@ const StatisticsProductService =
             return null
         }
 
+        /**
+         *  {
+                interval: [ 1999-12-31T17:00:00.000Z, 2024-07-17T08:47:27.475Z ],
+                mapOfProductsStatistics: undefined,
+                groupOfViews_Products: undefined,
+                statisticData: record[]
+            }
+         */
         //record =  {
             //     productId: string,
             //     views: number,
@@ -618,12 +627,12 @@ const StatisticsProductService =
 
         for(let i = 0; i < addToCartStatistics.statisticData.length ; i++)
         {
-            const addToCartRecord = addToCartStatistics.statisticData[i]
-            const viewsAndViewersRecord = viewsAndViewersStatistics.statisticData[i]
-            const productId = addToCartRecord.productId
+            const addToCartIntervalRecord = addToCartStatistics.statisticData[i]
+            const viewsAndViewersIntervalRecord = viewsAndViewersStatistics.statisticData[i]
+            const productId = addToCartIntervalRecord.statisticData[0].productId
 
-            const viewerCount = viewsAndViewersRecord.viewers
-            const addToCartCount = addToCartRecord.viewers
+            const viewerCount = viewsAndViewersIntervalRecord.statisticData[0].viewers
+            const addToCartCount = addToCartIntervalRecord.statisticData[0].viewers
             let ratio = null
 
             if(viewerCount != 0)
@@ -920,7 +929,7 @@ const StatisticsProductService =
 
     async getFrequentItemsetsAnIntervalOfTime(minSupport, startTime = undefined, endTime = undefined)
     {
-        const targetOrderStatus = OrderStatus.PROCESSING
+        const targetOrderStatus = OrderStatus.PENDING
         const orderStatistics = await StatisticsOrderService.getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime)
         if(orderStatistics == null)
         {
@@ -962,7 +971,7 @@ const StatisticsProductService =
 
     async getFrequentItemsToSuggest(productId, startTime, endTime)
     {
-        const frequentItemsets = await this.getFrequentItemsetsAnIntervalOfTime(0.2, startTime, endTime)
+        const frequentItemsets = await this.getFrequentItemsetsAnIntervalOfTime(0.0, startTime, endTime)
         if(frequentItemsets == null)
         {
             return null
