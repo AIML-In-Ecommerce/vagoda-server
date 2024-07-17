@@ -24,7 +24,7 @@ const FileSchema = new Schema({
   },
   status: {
     type: String,
-    enum: Object.values(["SUCCESS", "FALURE"]),
+    enum: Object.values(["SUCCESS", "FAILURE"]),
   },
   createdAt: {
     type: Date,

@@ -5,11 +5,11 @@ admin:
   host: localhost
 apiEndpoints:
   product_api:
-    host: 'localhost'
-    paths: ["/swagger", "/swagger/*"]
+    host: "localhost"
+    paths: ["/product", "/swagger/*"]
 serviceEndpoints:
   product_service:
-    url: "http://localhost:3006/api-docs"
+    url: "http://localhost:3006/product"
 policies:
   - proxy
 pipelines:
