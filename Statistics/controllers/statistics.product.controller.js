@@ -173,6 +173,7 @@ const StatisticsProductController =
             const productIds = req.body.productIds
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            
 
             const statistics = await StatisticsProductService.getAddToCartRatio(shopId, productIds, startTime, endTime)
             if(statistics == null)

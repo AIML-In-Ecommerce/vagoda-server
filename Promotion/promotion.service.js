@@ -1,4 +1,5 @@
 import Promotion from "./promotion.model.js";
+import SupportProductService from "./support/product.service.js";
 import SupportShopService from "./support/shop.service.js";
 
 const PromotionService = {
@@ -149,22 +150,24 @@ const PromotionService = {
     return clonedPromotions;
   },
 
-  async getPromotionBySelectionFromBuyer(shopIds, lowerBoundaryForOrder, targetProducts, inActive = false)
+  async getPromotionBySelectionFromBuyer(shopId, lowerBoundaryForOrder, targetProducts, inActive = false)
   {
     const currentDatetime = new Date()
     let sentinel_requiredConditionCount = 0
 
-    if(shopIds == undefined)
-    {
-      return null
-    }
-    else if(shopIds.length == 0)
+    if(shopId == undefined || shopId == null)
     {
       return null
     }
 
+    if(shopId.length == 0)
+    {
+      return null
+    }
+
+
     let filterOption = {
-      shop: {$in: shopIds},
+      shop: shopId,
     }
     if(inActive != undefined && inActive == true)
     {
@@ -177,6 +180,11 @@ const PromotionService = {
     if(rawPromtions == null)
     {
       return null
+    }
+
+    if(rawPromtions.length == 0)
+    {
+      return []
     }
 
     let relevantPromotions = new Map()
@@ -216,10 +224,29 @@ const PromotionService = {
       })
     }
 
+    const listOfProductInfos = await SupportProductService.getProductInfosByIds(targetProducts)
+    const shopInfo = await SupportShopService.getShopInfoByShopId(shopId, true, false)
+    if(listOfProductInfos == null)
+    {
+      return []
+    }
+    else if(listOfProductInfos.length == 0)
+    {
+      return []
+    }
+
+    //check the targetProducts input
+    const listOfValidProductInfos = listOfProductInfos.filter((record) => record.shop == shopId)
+    if(listOfValidProductInfos.length == 0)
+    {
+      return []
+    }
+    
     const mapOfProductCanUsePromotion = new Map()
 
     if(targetProducts != undefined && targetProducts != null && targetProducts.length != 0)
     {
+
       sentinel_requiredConditionCount += 1
 
       rawPromtions.forEach((promotion) =>
@@ -257,9 +284,9 @@ const PromotionService = {
         }
       })
 
-      targetProducts.forEach((targetProductId) =>
+      listOfValidProductInfos.forEach((record) =>
       {
-        const targetPromotionIds = mapOfProductCanUsePromotion.get(targetProductId)
+        const targetPromotionIds = mapOfProductCanUsePromotion.get(record._id)
         if(targetPromotionIds != undefined)
         {
           targetPromotionIds.forEach((targetPromotionId) =>
@@ -274,12 +301,34 @@ const PromotionService = {
         }
       })
     }
+    // else
+    // {
+    //   sentinel_requiredConditionCount += 1
+
+    //   rawPromtions.forEach((promotion) =>
+    //   {
+    //     const promotionId = promotion._id.toString()
+
+    //     //if the targetProducts.length == 0 =>  this promotion can be apply for all products of this shop
+    //     //then we only need to store the promotion with the greatest status of sentinel_requiredConditionCount's value
+    //     if(promotion.targetProducts.length == 0)
+    //     {
+    //       const currentRelevantPromotion = relevantPromotions.get(promotionId)
+    //       if(currentRelevantPromotion != undefined)
+    //       {
+    //         currentRelevantPromotion.requiredConditionCount = sentinel_requiredConditionCount
+    //         relevantPromotions.set(promotionId, currentRelevantPromotion)
+    //       }
+    //     }
+    //   })
+    // }
 
     mapOfProductCanUsePromotion.clear()
 
     //group by shop ID and choose suitable promotion record
     //by required-condition-count value
-    const groupOfPromotionsOfShops = new Map()
+
+    const finalResult = []
 
     relevantPromotions.forEach((value, key) =>
     {
@@ -288,61 +337,21 @@ const PromotionService = {
 
       if(requiredConditionCount == sentinel_requiredConditionCount)
       {
-        const targetShopId = promotion.shop
-        const listOfPromotions = groupOfPromotionsOfShops.get(targetShopId)
-        if(listOfPromotions == undefined)
-        {
-          groupOfPromotionsOfShops.set(targetShopId, [promotion])
-        }
-        else
-        {
-          listOfPromotions.push(promotion)
-          groupOfPromotionsOfShops.set(targetShopId, listOfPromotions)
-        }
+        finalResult.push(promotion)
       }
     })
 
-    const targetShopInfos = await SupportShopService.getShopInfosByShopIds(Array.from(groupOfPromotionsOfShops.keys()), true, false)
-
-    let mapOfShopInfos = null
-    if(targetShopInfos != null)
+    if(shopInfo != null)
     {
-      mapOfShopInfos = new Map()
-
-      targetShopInfos.forEach((shopInfo, index) =>
+      for(let i = 0; i< finalResult.length; i++)
         {
-          mapOfShopInfos.set(shopInfo._id, index)
-        })
-    }
-
-    //convert into list of promotions according to list of shop's ID
-    const finalResult = []
-
-    groupOfPromotionsOfShops.forEach((value, key) =>
-    {
-      if(mapOfShopInfos != null)
-      {
-        for(let i = 0; i < value.length; i++)
-        {
-          const targetShopInfoIndex = mapOfShopInfos.get(value[i].shop)
-          if(targetShopInfoIndex != undefined)
-          {
-            const targetShopInfo = targetShopInfos[targetShopInfoIndex]
-            value[i].shop = {
-              _id: targetShopInfo._id,
-              name: targetShopInfo.name,
-              avatarUrl: targetShopInfo.shopInfoDesign.avatarUrl
-            }
+          finalResult[i].shop = {
+            _id: shopInfo._id,
+            name: shopInfo.name,
+            avatarUrl: shopInfo.shopInfoDesign.avatarUrl
           }
         }
-      }
-      const recordOfResult = {
-        shopId: key,
-        promotions: value
-      }
-
-      finalResult.push(recordOfResult)
-    })
+    }
 
     return finalResult
   },

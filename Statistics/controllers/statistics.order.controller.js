@@ -213,7 +213,7 @@ const StatisticsOrderController =
             const orderStatus = req.body.orderStatus
             const startTime = req.body.startTime
             const endTime = req.body.endTime
-            const step = req.step.step
+            const step = req.body.step
             // const isAscending = req.body.isAscending
 
             const statistics = await StatisticsOrderService.getLateOrderByShopWithStatus(shopId, orderStatus, startTime, endTime, true)
