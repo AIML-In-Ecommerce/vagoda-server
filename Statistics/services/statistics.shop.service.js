@@ -553,6 +553,11 @@ const ShopStatisticsService =
         }
 
         const mapOfAllUsers = new Map()
+        const mapOfAllReturningUsers = new Map()
+        let totalRevenue = 0
+        let totalProfit = 0
+        let totalReturningRevenue = 0
+        let totalReturningProfit = 0
 
         allRawOrderStatistics.statisticsData.forEach((orderRecord) =>
         {
@@ -568,6 +573,10 @@ const ShopStatisticsService =
                 const initValue = {
                     interval: interval,
                     totalOrders: 0,
+                    totalRevenue: 0,
+                    totalProfit: 0,
+                    totalReturningRevenue: 0,
+                    totalReturningProfit: 0,
                     totalUsers: 0,
                     totalReturingUsers: 0,
                     returningRate: null,
@@ -589,15 +598,6 @@ const ShopStatisticsService =
 
                 if(timeToCheck > boundaryToChange)
                 {
-                    //update mapOfAllUsers
-                    //by adding new users rawTargetOrderStatistics.statisticsData from startIndexOfCheckingOrder to (indexOfOrder - 1)
-                    // for(; startIndexOfCheckingOrder < indexOfOrder;)
-                    // {
-                    //     const newUserId = rawTargetOrderStatistics.statisticsData[startIndexOfCheckingOrder].user
-                    //     mapOfAllUsers.set(newUserId, {})
-
-                    //     startIndexOfCheckingOrder += 1
-                    // }
                     indexOfInterval += 1
                     boundaryToChange = targetIntervals[indexOfInterval][1]
                 }
@@ -609,10 +609,17 @@ const ShopStatisticsService =
                     const mapOfReturningUsers = currentStatistics.mapOfReturningUsers
 
                     currentStatistics.totalOrders += 1
+                    currentStatistics.totalRevenue += targetOrderRecord.totalPrice
+                    currentStatistics.totalProfit += targetOrderRecord.profit
 
                     if(mapOfAllUsers.get(targetUserId) != undefined)
                     {
                         // this is a returning user
+                        mapOfAllReturningUsers.set(targetUserId, true)
+                        
+                        currentStatistics.totalReturningRevenue += targetOrderRecord.totalPrice
+                        currentStatistics.totalReturningProfit += targetOrderRecord.profit
+
                         const userStatistics = mapOfReturningUsers.get(targetUserId)
                         if(userStatistics == undefined)
                         {
@@ -628,6 +635,7 @@ const ShopStatisticsService =
                     else
                     {
                         //this is a new user
+                        mapOfAllReturningUsers.set(targetUserId, false)
                         mapOfAllUsers.set(targetUserId, {})
                     }
 
@@ -645,6 +653,10 @@ const ShopStatisticsService =
                 const intervalStatistics = mapOfIntervals.get(index)
                 const mapOfReturningUsers = intervalStatistics.mapOfReturningUsers
                 
+                totalRevenue += intervalStatistics.totalRevenue
+                totalProfit += intervalStatistics.totalProfit
+                totalReturningRevenue += intervalStatistics.totalReturningRevenue
+                totalReturningProfit += intervalStatistics.totalReturningProfit
                 
                 let statisticsData = []
                 mapOfReturningUsers.forEach((value, key) =>
@@ -671,7 +683,27 @@ const ShopStatisticsService =
 
         const statisticsDataForEachInterval = getStatisticForEachInterval()
 
+        const usersInBigInterval = []
+        const returtingUsersInBigInterval = []
+
+        mapOfAllReturningUsers.forEach((isReturningUser, userId) =>
+        {
+            usersInBigInterval.push(userId)
+            if(isReturningUser == true)
+            {
+                returtingUsersInBigInterval.push(userId)
+            }
+        })
+
+
         const finalResult = {
+            totalOrders: rawTargetOrderStatistics.statisticsData.length,
+            totalRevenue: totalRevenue,
+            totalProfit: totalProfit,
+            totalReturningRevenue: totalReturningRevenue, 
+            totalReturningProfit: totalReturningProfit,
+            totalUsers: usersInBigInterval.length,
+            totalReturingUsers: returtingUsersInBigInterval.length,
             statisticsData: statisticsDataForEachInterval
         }
 
