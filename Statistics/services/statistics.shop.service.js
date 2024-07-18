@@ -35,7 +35,7 @@ const ShopStatisticsService =
 
         let targetIntervals = []
 
-        if(step == undefined || statistics.statisticData.length == 0)
+        if(step == undefined || statistics.statisticsData.length == 0)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -50,7 +50,7 @@ const ShopStatisticsService =
          *      interval: [start; end]
          *      revenue: number
          *      count: number,
-         *      statisticData: Order[]
+         *      statisticsData: Order[]
          * }
          */
         const getStatisticForEachInterval = () =>
@@ -63,7 +63,7 @@ const ShopStatisticsService =
                     revenue: 0,
                     profit: 0,
                     count: 0,
-                    statisticData: []
+                    statisticsData: []
                 })
             })
 
@@ -71,10 +71,10 @@ const ShopStatisticsService =
             let indexOfOrder = 0
             let indexOfInterval = 0
 
-            // statistics.statisticData is an array of order which was sorted by the moment to check the target status
-            for(; indexOfOrder < statistics.statisticData.length && indexOfInterval < targetIntervals.length; )
+            // statistics.statisticsData is an array of order which was sorted by the moment to check the target status
+            for(; indexOfOrder < statistics.statisticsData.length && indexOfInterval < targetIntervals.length; )
             {
-                const targetOrderToCheck = statistics.statisticData[indexOfOrder]
+                const targetOrderToCheck = statistics.statisticsData[indexOfOrder]
                 const timeToCheck = new Date(targetOrderToCheck.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
@@ -90,7 +90,7 @@ const ShopStatisticsService =
                     currentStatistics.revenue += targetOrderToCheck.totalPrice
                     currentStatistics.profit += targetOrderToCheck.profit
                     currentStatistics.count += 1
-                    currentStatistics.statisticData.push(targetOrderToCheck)
+                    currentStatistics.statisticsData.push(targetOrderToCheck)
 
                     indexOfOrder += 1
                 }
@@ -142,7 +142,7 @@ const ShopStatisticsService =
     
         let targetIntervals = []
 
-        if(step == undefined || statistics.statisticData.length == 0)
+        if(step == undefined || statistics.statisticsData.length == 0)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -157,7 +157,7 @@ const ShopStatisticsService =
          *      interval: [start; end]
          *      revenue: number
          *      count: number,
-         *      statisticData: Order[]
+         *      statisticsData: Order[]
          * }
          */
         const getStatisticForEachInterval = () =>
@@ -170,7 +170,7 @@ const ShopStatisticsService =
                     revenue: 0,
                     profit: 0,
                     count: 0,
-                    statisticData: []
+                    statisticsData: []
                 })
             })
 
@@ -178,10 +178,10 @@ const ShopStatisticsService =
             let indexOfOrder = 0
             let indexOfInterval = 0
 
-            // statistics.statisticData is an array of order which was sorted by the moment to check the target status
-            for(; indexOfOrder < statistics.statisticData.length && indexOfInterval < targetIntervals.length; )
+            // statistics.statisticsData is an array of order which was sorted by the moment to check the target status
+            for(; indexOfOrder < statistics.statisticsData.length && indexOfInterval < targetIntervals.length; )
             {
-                const targetOrderToCheck = statistics.statisticData[indexOfOrder]
+                const targetOrderToCheck = statistics.statisticsData[indexOfOrder]
                 const timeToCheck = new Date(targetOrderToCheck.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
@@ -197,7 +197,7 @@ const ShopStatisticsService =
                     currentStatistics.revenue += targetOrderToCheck.totalPrice
                     currentStatistics.profit += targetOrderToCheck.profit
                     currentStatistics.count += 1
-                    currentStatistics.statisticData.push(targetOrderToCheck)
+                    currentStatistics.statisticsData.push(targetOrderToCheck)
 
                     indexOfOrder += 1
                 }
@@ -235,7 +235,7 @@ const ShopStatisticsService =
         // let endTimeToCheck = new Date().getTime()
         // let startTimeToCheck = 0
 
-        const targetOrderStatus = OrderStatus.PENDING
+        const targetOrderStatus = OrderStatus.PROCESSING
         const orderStatistics = await StatisticsOrderService.getOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime, true)
         if(orderStatistics == null)
         {
@@ -292,7 +292,7 @@ const ShopStatisticsService =
                     mapOfUsers: new Map(),
                     mapOfAccessUsers: new Map(),
                     conversionRate: null,
-                    statisticData: []
+                    statisticsData: []
                 })
             })
 
@@ -301,10 +301,10 @@ const ShopStatisticsService =
             let indexOfInterval = 0
             let indexOfAccess = 0
 
-            // statistics.statisticData is an array of order which was sorted by the moment to check the target status
-            for(; indexOfOrder < orderStatistics.statisticData.length && indexOfInterval < targetIntervals.length; )
+            // statistics.statisticsData is an array of order which was sorted by the moment to check the target status
+            for(; indexOfOrder < orderStatistics.statisticsData.length && indexOfInterval < targetIntervals.length; )
             {
-                const targetOrderToCheck = orderStatistics.statisticData[indexOfOrder]
+                const targetOrderToCheck = orderStatistics.statisticsData[indexOfOrder]
                 const timeToCheck = new Date(targetOrderToCheck.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
@@ -320,7 +320,7 @@ const ShopStatisticsService =
                     currentStatistics.revenue += targetOrderToCheck.totalPrice
                     currentStatistics.profit += targetOrderToCheck.profit
                     currentStatistics.orders += 1
-                    currentStatistics.statisticData.push(targetOrderToCheck)
+                    currentStatistics.statisticsData.push(targetOrderToCheck)
 
                     currentStatistics.mapOfUsers.set(targetOrderToCheck.user, true)
 
@@ -401,7 +401,7 @@ const ShopStatisticsService =
             return result
         }
 
-        const statisticData = getStatisticForEachInterval()
+        const statisticsData = getStatisticForEachInterval()
 
         const avgConversionRate = intervalsHaveConversionRate > 0 ? totalConversionRate / intervalsHaveConversionRate : null
         
@@ -413,7 +413,7 @@ const ShopStatisticsService =
             totalOrders: orderStatistics.totalOrders,
             totalAccess: productAccessStatistics.length,
             conversionRate: avgConversionRate,
-            statisticData: statisticData
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -554,7 +554,7 @@ const ShopStatisticsService =
 
         const mapOfAllUsers = new Map()
 
-        allRawOrderStatistics.statisticData.forEach((orderRecord) =>
+        allRawOrderStatistics.statisticsData.forEach((orderRecord) =>
         {
             const userId = orderRecord.user
             mapOfAllUsers.set(userId, {})
@@ -582,18 +582,18 @@ const ShopStatisticsService =
             let indexOfInterval = 0
             let indexOfOrder = 0
 
-            for(; indexOfOrder < rawTargetOrderStatistics.statisticData.length && indexOfInterval < targetIntervals.length;)
+            for(; indexOfOrder < rawTargetOrderStatistics.statisticsData.length && indexOfInterval < targetIntervals.length;)
             {
-                const targetOrderRecord = rawTargetOrderStatistics.statisticData[indexOfOrder]
+                const targetOrderRecord = rawTargetOrderStatistics.statisticsData[indexOfOrder]
                 const timeToCheck = new Date(targetOrderRecord.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
                 {
                     //update mapOfAllUsers
-                    //by adding new users rawTargetOrderStatistics.statisticData from startIndexOfCheckingOrder to (indexOfOrder - 1)
+                    //by adding new users rawTargetOrderStatistics.statisticsData from startIndexOfCheckingOrder to (indexOfOrder - 1)
                     // for(; startIndexOfCheckingOrder < indexOfOrder;)
                     // {
-                    //     const newUserId = rawTargetOrderStatistics.statisticData[startIndexOfCheckingOrder].user
+                    //     const newUserId = rawTargetOrderStatistics.statisticsData[startIndexOfCheckingOrder].user
                     //     mapOfAllUsers.set(newUserId, {})
 
                     //     startIndexOfCheckingOrder += 1
@@ -646,7 +646,7 @@ const ShopStatisticsService =
                 const mapOfReturningUsers = intervalStatistics.mapOfReturningUsers
                 
                 
-                let statisticData = []
+                let statisticsData = []
                 mapOfReturningUsers.forEach((value, key) =>
                 {
                     intervalStatistics.totalUsers += 1
@@ -654,13 +654,13 @@ const ShopStatisticsService =
                     {
                         //this is a returning user
                         intervalStatistics.totalReturingUsers += 1
-                        statisticData = statisticData.concat(value)
+                        statisticsData = statisticsData.concat(value)
                     }
                 })
 
                 const returningRate = intervalStatistics.totalUsers > 0 ? (intervalStatistics.totalReturingUsers / intervalStatistics.totalUsers) : null
                 intervalStatistics.returningRate = returningRate
-                intervalStatistics.statisticData = statisticData
+                intervalStatistics.statisticsData = statisticsData
                 intervalStatistics.mapOfReturningUsers = undefined
 
                 return intervalStatistics
@@ -672,7 +672,7 @@ const ShopStatisticsService =
         const statisticsDataForEachInterval = getStatisticForEachInterval()
 
         const finalResult = {
-            statisticData: statisticsDataForEachInterval
+            statisticsData: statisticsDataForEachInterval
         }
 
         return finalResult
@@ -781,7 +781,7 @@ const ShopStatisticsService =
             const result = targetIntervals.map((interval, index) =>
             {
                 const statistics = mapOfIntervals.get(index)
-                const statisticData = []
+                const statisticsData = []
                 let users = 0
                 statistics.mapOfAccessUsers.forEach((value, key) =>{
                     users += 1
@@ -796,13 +796,13 @@ const ShopStatisticsService =
                         userType: userType,
                         access: value
                     }
-                    statisticData.push(userAccessRecord)
+                    statisticsData.push(userAccessRecord)
 
                     mapOfAllUser.set(user, {})
                 })
 
                 statistics.users = users
-                statistics.statisticData = statisticData
+                statistics.statisticsData = statisticsData
                 statistics.mapOfAccessUsers = undefined
 
                 mapOfIntervals.set(index, statistics)
@@ -813,12 +813,12 @@ const ShopStatisticsService =
             return result
         }
 
-        const statisticData = getStatisticForEachInterval()
+        const statisticsData = getStatisticForEachInterval()
 
         const finalResult = {
             totalAccess: rawProductAccessRecords.length,
             totalUsers: Array.from(mapOfAllUser.keys()).length,
-            statisticData: statisticData
+            statisticsData: statisticsData
         }
         
         return finalResult
@@ -834,7 +834,7 @@ const ShopStatisticsService =
 
         const mapOfCityOrDistrictsSales = new Map()
 
-        rawSalesStatistics.statisticData.forEach((orderRecord) =>
+        rawSalesStatistics.statisticsData.forEach((orderRecord) =>
         {
             const idProvince = orderRecord.shippingAddress.idProvince
 
@@ -844,14 +844,14 @@ const ShopStatisticsService =
                 //initialize a new value
                 const revenue = orderRecord.totalPrice
                 const profit = orderRecord.profit
-                const statisticData = [orderRecord]
+                const statisticsData = [orderRecord]
 
                 const initValue = {
                     idProvince: idProvince,
                     revenue: revenue,
                     profit: profit,
                     count: 1,
-                    statisticData: statisticData
+                    statisticsData: statisticsData
                 }
 
                 mapOfCityOrDistrictsSales.set(idProvince, initValue)
@@ -863,7 +863,7 @@ const ShopStatisticsService =
                 currentValue.revenue += revenue
                 currentValue.profit += profit
                 currentValue.count += 1
-                currentValue.statisticData.push(orderRecord)
+                currentValue.statisticsData.push(orderRecord)
 
                 mapOfCityOrDistrictsSales.set(idProvince, currentValue)
             }
@@ -875,7 +875,7 @@ const ShopStatisticsService =
             avgRevenue: rawSalesStatistics.avgRevenue,
             avgProfit: rawSalesStatistics.avgProfit,
             totalOrders: rawSalesStatistics.totalOrders,
-            statisticData: Array.from(mapOfCityOrDistrictsSales.values())
+            statisticsData: Array.from(mapOfCityOrDistrictsSales.values())
         }
 
         return finalResult

@@ -4,6 +4,7 @@ import { Product } from "../models/product/product.model.js"
 import Review from "../models/review/review.model.js"
 import { CachePrefix, OrderStatus, ProductAccessType } from "../shared/enums.js"
 import SupportDateService from "../support/date.service.js"
+import StatisticsAccessService from "./statistics.access.service.js"
 import StatisticsOrderService from "./statistics.order.service.js"
 import nodeFpgrowth from 'node-fpgrowth'
 
@@ -23,7 +24,7 @@ const StatisticsProductService =
 
         const productCount = new Map()
 
-        orderStatistics.statisticData.forEach((order) =>
+        orderStatistics.statisticsData.forEach((order) =>
         {
             order.products.forEach((product) =>
             {
@@ -147,7 +148,7 @@ const StatisticsProductService =
         }
 
         let targetIntervals = []
-        if(step == undefined || completedOrderStatistics.statisticData.length == 0)
+        if(step == undefined || completedOrderStatistics.statisticsData.length == 0)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -174,9 +175,9 @@ const StatisticsProductService =
             let indexOfInterval = 0
             let boundaryToChange = targetIntervals[0][1]
 
-            for(; indexOfOrder < completedOrderStatistics.statisticData.length && indexOfInterval < targetIntervals.length;)
+            for(; indexOfOrder < completedOrderStatistics.statisticsData.length && indexOfInterval < targetIntervals.length;)
             {
-                const targetOrderRecord = completedOrderStatistics.statisticData[indexOfOrder]
+                const targetOrderRecord = completedOrderStatistics.statisticsData[indexOfOrder]
                 const timeToCheck = new Date(targetOrderRecord.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
@@ -231,7 +232,7 @@ const StatisticsProductService =
             {
                 const intervalStatistics = mapOfIntervals.get(index)
                 const listOfProductStatistics = Array.from(intervalStatistics.mapOfProductStatistics.values())
-                intervalStatistics.statisticData = listOfProductStatistics
+                intervalStatistics.statisticsData = listOfProductStatistics
                 intervalStatistics.mapOfProductStatistics = undefined
 
                 return intervalStatistics
@@ -240,11 +241,11 @@ const StatisticsProductService =
             return result
         }
 
-        const statisticData = getStatisticForEachInterval()
+        const statisticsData = getStatisticForEachInterval()
 
         const finalResult = {
             totalSoldProducts: totalSoldProducts,
-            statisticData: statisticData
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -274,7 +275,7 @@ const StatisticsProductService =
 
         let targetIntervals = []
 
-        if(step == undefined || completedOrderStatistics.statisticData.length == 0)
+        if(step == undefined || completedOrderStatistics.statisticsData.length == 0)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -301,9 +302,9 @@ const StatisticsProductService =
             let indexOfInterval = 0
             let boundaryToChange = targetIntervals[0][1]
 
-            for(; indexOfOrder < completedOrderStatistics.statisticData.length && indexOfInterval < targetIntervals.length;)
+            for(; indexOfOrder < completedOrderStatistics.statisticsData.length && indexOfInterval < targetIntervals.length;)
             {
-                const targetOrderRecord = completedOrderStatistics.statisticData[indexOfOrder]
+                const targetOrderRecord = completedOrderStatistics.statisticsData[indexOfOrder]
                 const timeToCheck = new Date(targetOrderRecord.confirmedStatus.time)
 
                 if(timeToCheck > boundaryToChange)
@@ -358,7 +359,7 @@ const StatisticsProductService =
             {
                 const intervalStatistics = mapOfIntervals.get(index)
                 const listOfProductStatistics = Array.from(intervalStatistics.mapOfProductStatistics.values())
-                intervalStatistics.statisticData = listOfProductStatistics
+                intervalStatistics.statisticsData = listOfProductStatistics
                 intervalStatistics.mapOfProductStatistics = undefined
 
                 return intervalStatistics
@@ -367,11 +368,11 @@ const StatisticsProductService =
             return result
         }
 
-        const statisticData = getStatisticForEachInterval()
+        const statisticsData = getStatisticForEachInterval()
 
         const finalResult = {
             totalSoldProducts: totalSoldProducts,
-            statisticData: statisticData
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -519,7 +520,7 @@ const StatisticsProductService =
             }
         }
 
-        const statisticData = targetIntervals.map((interval, index) =>
+        const statisticsData = targetIntervals.map((interval, index) =>
         {
             const intervalStatistics = mapOfIntervals.get(index)
             const groupOfViews_Products = intervalStatistics.groupOfViews_Products
@@ -560,7 +561,7 @@ const StatisticsProductService =
             let viewers = 0
             let views = 0
 
-            const productStatisticData = productIds.map((productId) =>
+            const productStatisticsData = productIds.map((productId) =>
             {
                 const productStatisticsValue = mapOfProductsStatistics.get(productId)
 
@@ -576,7 +577,7 @@ const StatisticsProductService =
                 return result
             })
 
-            intervalStatistics.statisticData = productStatisticData
+            intervalStatistics.statisticsData = productStatisticsData
             intervalStatistics.interval = interval
             intervalStatistics.mapOfProductsStatistics = undefined
             
@@ -585,7 +586,7 @@ const StatisticsProductService =
 
         const finalResult = {
             totalViews: totalViews,
-            statisticData: statisticData
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -610,7 +611,7 @@ const StatisticsProductService =
                 interval: [ 1999-12-31T17:00:00.000Z, 2024-07-17T08:47:27.475Z ],
                 mapOfProductsStatistics: undefined,
                 groupOfViews_Products: undefined,
-                statisticData: record[]
+                statisticsData: record[]
             }
          */
         //record =  {
@@ -620,19 +621,19 @@ const StatisticsProductService =
             //     authViewers: string[]
             // }
 
-        //since addToCartStatistics.statisticData[i].productId == viewsAndViewersStatistics.statisticsData[i].productId
+        //since addToCartStatistics.statisticsData[i].productId == viewsAndViewersStatistics.statisticsData[i].productId
         // 0 <= i <= length
 
         const finalResult = []
 
-        for(let i = 0; i < addToCartStatistics.statisticData.length ; i++)
+        for(let i = 0; i < addToCartStatistics.statisticsData.length ; i++)
         {
-            const addToCartIntervalRecord = addToCartStatistics.statisticData[i]
-            const viewsAndViewersIntervalRecord = viewsAndViewersStatistics.statisticData[i]
-            const productId = addToCartIntervalRecord.statisticData[0].productId
+            const addToCartIntervalRecord = addToCartStatistics.statisticsData[i]
+            const viewsAndViewersIntervalRecord = viewsAndViewersStatistics.statisticsData[i]
+            const productId = addToCartIntervalRecord.statisticsData[0].productId
 
-            const viewerCount = viewsAndViewersIntervalRecord.statisticData[0].viewers
-            const addToCartCount = addToCartIntervalRecord.statisticData[0].viewers
+            const viewerCount = viewsAndViewersIntervalRecord.statisticsData[0].viewers
+            const addToCartCount = addToCartIntervalRecord.statisticsData[0].viewers
             let ratio = null
 
             if(viewerCount != 0)
@@ -653,138 +654,348 @@ const StatisticsProductService =
         return finalResult
     },
 
-    async getAmountOfBuyersOfProducts(shopId, productIds, startTime, endTime)
+    async getAmountOfBuyersOfProducts(shopId, productIds, startTime, endTime, step = undefined)
     {
         const targetOrderStatus = OrderStatus.PROCESSING
-        const statisticOrderData = await StatisticsOrderService.getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime)
+        const statisticOrderData = await StatisticsOrderService.getCompletedOrderByShopWithStatus(shopId, targetOrderStatus, startTime, endTime, true)
         if(statisticOrderData == null)
         {
             return null
         }
 
-        const mapOfProductsStatistics = new Map()
-        productIds.forEach((productId) =>
-        {
-            mapOfProductsStatistics.set(productId, {
-                productId: productId,
-                sold: 0,
-                revenue: 0,
-                buyers: [],
-                statisticData: []
-            })
-        })
+        const rawAccessedProducts = await StatisticsAccessService.getAccessProductRecordsByShopId(shopId, startTime, endTime, undefined, undefined, true)
 
-        const groupOfViews_Products = new Map()
+        let startTimeToCheck = new Date(2000, 0, 1)
+        let endTimeToCheck = new Date()
 
-        statisticOrderData.statisticData.forEach((order) =>
+        if(startTime != undefined)
         {
-            const userId = order.user
-            order.products.forEach((item) =>
+            startTimeToCheck = new Date(startTime)
+        }
+        if(endTime != undefined)
+        {
+            endTimeToCheck = new Date(endTime)
+        }
+
+        let targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        if(step != undefined && step != null && statisticOrderData.statisticsData.length > 1)
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
+
+        const getStatisticForEachInterval = () =>
+        {
+            const mapOfIntervals = new Map()
+
+            targetIntervals.forEach((interval, index) =>
             {
-                const productId = item.product
-                const combinedId = userId + "+" + productId
-                const currentValue = groupOfViews_Products.get(combinedId)
-                const record = {
-                    orderId: order._id,
-                    sold: item.quantity,
-                    purchasedPrice: item.purchasedPrice,
-                    revenue: item.quantity*item.purchasedPrice
+                const mapOfProductStatistics = new Map()
+                productIds.forEach((targetProductId) =>
+                {
+                    const initProductStatistics = {
+                        product: targetProductId,
+                        sold: 0,
+                        revenue: 0,
+                        viewers: [],
+                        buyers: [],
+                        orders: []
+                    }
+                    
+                    mapOfProductStatistics.set(targetProductId, initProductStatistics)
+                })
+
+                const initValue = {
+                    interval: interval,
+                    totalProductSold: 0,
+                    totalProductRevenue: 0,
+                    // mapOfUsers: new Map(),
+                    mapOfViewersOfProducts: new Map(),
+                    mapOfProducts: mapOfProductStatistics,
+                    mapOfUsersBoughtProduct: new Map()
                 }
 
-                if(currentValue == undefined)
+                mapOfIntervals.set(index, initValue)
+            })
+
+            let indexOfInterval = 0
+            let indexOfOrder = 0
+            let boundaryToChange = targetIntervals[0][1]
+
+            for(; indexOfOrder < statisticOrderData.statisticsData.length && indexOfInterval < targetIntervals.length; )
+            {
+                const targetOrderRecord = statisticOrderData.statisticsData[indexOfOrder]
+                const timeToCheck = new Date(targetOrderRecord.confirmedStatus.time)
+
+                if(timeToCheck > boundaryToChange)
                 {
-                    //initialize the first value
-                    groupOfViews_Products.set(combinedId, [record])
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] && timeToCheck <= targetIntervals[indexOfInterval][1])
+                {
+                    const userId = targetOrderRecord.user
+                    const intervalStatistics = mapOfIntervals.get(indexOfInterval)
+                    const mapOfUsersBoughtProduct = intervalStatistics.mapOfUsersBoughtProduct
+                    // const mapOfUsers = intervalStatistics.mapOfUsers
+
+                    targetOrderRecord.products.forEach((item) =>
+                    {
+                        const productId = item.product
+                        const sold = item.quantity
+                        const revenue = item.purchasedPrice*sold
+                        const combinedKey = `${userId}+${productId}`
+
+                        const userProductStatistics = mapOfUsersBoughtProduct.get(combinedKey)
+                        if(userProductStatistics == undefined)
+                        {
+                            //init new value
+                            const newUserProductValue = {
+                                sold: sold,
+                                revenue: revenue,
+                                orders: [targetOrderRecord]
+                            }
+
+                            mapOfUsersBoughtProduct.set(combinedKey, newUserProductValue)
+                        }
+                        else
+                        {
+                            userProductStatistics.sold += sold
+                            userProductStatistics.revenue += revenue
+                            userProductStatistics.orders.push(targetOrderRecord)
+                        }
+                    })
+
+                    // mapOfUsers.set(userId, {})
+                    mapOfIntervals.set(indexOfInterval, intervalStatistics)
+
+                    indexOfOrder += 1
                 }
                 else
                 {
-                    currentValue.push(record)
-                    groupOfViews_Products.set(combinedId, currentValue)
+                    break
                 }
-            })
-
-        })
-
-        groupOfViews_Products.forEach((value, key) =>
-        {
-            const splitedKey = key.split("+")
-            const buyerId = splitedKey[0]
-            const targetProductId = splitedKey[1]
-
-            /**
-             * record = {
-                    orderId: order._id,
-                    sold: item.quantity,
-                    purchasedPrice: item.purchasedPrice,
-                    revenue: item.quantity*item.purchasedPrice
-                }
-             */
-
-            //currentValue = {
-            //     productId: string,
-            //     sold: number,
-            //     revenue: number,
-            //     buyers: string[],
-            //     statisticData: record[]
-            // }
-            const currentValue = mapOfProductsStatistics.get(targetProductId)
-            if(currentValue != undefined)
-            {
-                const productId = currentValue.productId
-                let newSold = currentValue.sold
-                let newRevenue = currentValue.revenue
-                const newBuyers = currentValue.buyers
-                let newStatisticData = currentValue.statisticData
-
-                value.forEach((record) =>
-                {
-                    newSold += record.sold
-                    newRevenue += record.revenue
-                })
-
-                newBuyers.push(buyerId)
-                newStatisticData = newStatisticData.concat(value)
-
-                const newValue = 
-                {
-                    productId: productId,
-                    sold: newSold,
-                    revenue: newRevenue,
-                    buyers: newBuyers,
-                    statisticData: newStatisticData
-                }
-
-                mapOfProductsStatistics.set(productId, newValue)
             }
 
-        })
+            let indexOfAccess = 0
+            //reset the index of interval and the boundaryToChange value
+            indexOfInterval = 0
+            boundaryToChange = targetIntervals[0][1]
 
-        let totalQueryOrders = statisticOrderData.totalOrders
-        let totalRelevantOrders = 0
-        let totalSold = 0
-        let totalRevenue = 0
-        let totalBuyers = 0
+            for(; indexOfAccess < rawAccessedProducts.length;)
+            {
+                const targetAccessRecord = rawAccessedProducts[indexOfAccess]
+                const timeToCheck = new Date(targetAccessRecord.time)
 
-        const statisticData = productIds.map((productId) =>
-        {
-            const productStatistic = mapOfProductsStatistics.get(productId)
-            totalSold += productStatistic.sold
-            totalRevenue += productStatistic.revenue
-            totalBuyers += productStatistic.buyers.length
-            totalRelevantOrders += productStatistic.statisticData.length
+                if(timeToCheck > boundaryToChange)
+                {
+                    indexOfInterval += 1
+                    boundaryToChange = targetIntervals[indexOfInterval][1]
+                }
+                else if(timeToCheck >= targetIntervals[indexOfInterval][0] && timeToCheck <= targetIntervals[indexOfInterval][1])
+                {
+                    const intervalStatistics = mapOfIntervals.get(indexOfInterval)
+                    const mapOfViewersOfProducts = intervalStatistics.mapOfViewersOfProducts
 
-            return productStatistic
-        })
+                    const targetProductId = targetAccessRecord.product
+                    let targetUserId = "NullUserId"
+                    if(targetAccessRecord.user != null)
+                    {
+                        targetUserId = targetAccessRecord.user
+                    }
+                    else
+                    {
+                        targetUserId = targetAccessRecord.sessionUser
+                    }
 
-        const finalResult = 
-        {
-            totalQueryOrders: totalQueryOrders,
-            totalRelevantOrders: totalRelevantOrders,
-            totalSold: totalSold,
-            totalRevenue: totalRevenue,
-            totalBuyers: totalBuyers,
-            statisticData: statisticData
+                    const combinedKey = `${targetUserId}+${targetProductId}`
+
+                    const viewersOfProductsStatistics = mapOfViewersOfProducts.get(combinedKey)
+                    if(viewersOfProductsStatistics == undefined)
+                    {
+                        const initValue = {
+                            view: 1
+                        }
+
+                        mapOfViewersOfProducts.set(combinedKey, initValue)
+                    }
+                    else
+                    {
+                        viewersOfProductsStatistics.view += 1
+                    }
+
+                    intervalStatistics.mapOfViewersOfProducts = mapOfViewersOfProducts
+                    mapOfIntervals.set(indexOfInterval, intervalStatistics)
+
+                    indexOfAccess += 1
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+
+            // mapOfIntervals.forEach((intervalStatistics, intervalIndex) =>
+            // {
+            //     const mapOfUsersBoughtProduct = intervalStatistics.mapOfUsersBoughtProduct
+            //     const mapOfUsers = intervalStatistics.mapOfUsers
+            //     const mapOfProducts = intervalStatistics.mapOfProducts
+
+            //     mapOfUsersBoughtProduct.forEach((productStatistics, combinedKey) =>
+            //     {
+            //         //combinedKey = userId + productId
+            //         const keys = combinedKey.split("+")
+            //         const userId = keys[0]
+            //         const productId = keys[1]
+
+            //         mapOfUsers.set(userId, {})
+            //         const currentProductStatistics = mapOfProducts.get(productId)
+            //         if(currentProductStatistics != undefined)
+            //         {
+            //             currentProductStatistics.sold += productStatistics.sold
+            //             currentProductStatistics.revenue += productStatistics.revenue
+            //             currentProductStatistics.orders = currentProductStatistics.orders.concat(productStatistics.orders)
+            //             currentProductStatistics.buyers.push(userId)
+
+            //             mapOfProducts.set(productId, currentProductStatistics)
+            //         }
+                    
+            //     })
+
+            //     console.log(Array.from(mapOfProducts.values()))
+            // })
+
+            
         }
+
+
+        // const mapOfProductsStatistics = new Map()
+        // productIds.forEach((productId) =>
+        // {
+        //     mapOfProductsStatistics.set(productId, {
+        //         productId: productId,
+        //         sold: 0,
+        //         revenue: 0,
+        //         buyers: [],
+        //         statisticsData: []
+        //     })
+        // })
+
+        // const groupOfViews_Products = new Map()
+
+        // statisticOrderData.statisticsData.forEach((order) =>
+        // {
+        //     const userId = order.user
+        //     order.products.forEach((item) =>
+        //     {
+        //         const productId = item.product
+        //         const combinedId = userId + "+" + productId
+        //         const currentValue = groupOfViews_Products.get(combinedId)
+        //         const record = {
+        //             orderId: order._id,
+        //             sold: item.quantity,
+        //             purchasedPrice: item.purchasedPrice,
+        //             revenue: item.quantity*item.purchasedPrice
+        //         }
+
+        //         if(currentValue == undefined)
+        //         {
+        //             //initialize the first value
+        //             groupOfViews_Products.set(combinedId, [record])
+        //         }
+        //         else
+        //         {
+        //             currentValue.push(record)
+        //             groupOfViews_Products.set(combinedId, currentValue)
+        //         }
+        //     })
+
+        // })
+
+        // groupOfViews_Products.forEach((value, key) =>
+        // {
+        //     const splitedKey = key.split("+")
+        //     const buyerId = splitedKey[0]
+        //     const targetProductId = splitedKey[1]
+
+        //     /**
+        //      * record = {
+        //             orderId: order._id,
+        //             sold: item.quantity,
+        //             purchasedPrice: item.purchasedPrice,
+        //             revenue: item.quantity*item.purchasedPrice
+        //         }
+        //      */
+
+        //     //currentValue = {
+        //     //     productId: string,
+        //     //     sold: number,
+        //     //     revenue: number,
+        //     //     buyers: string[],
+        //     //     statisticsData: record[]
+        //     // }
+        //     const currentValue = mapOfProductsStatistics.get(targetProductId)
+        //     if(currentValue != undefined)
+        //     {
+        //         const productId = currentValue.productId
+        //         let newSold = currentValue.sold
+        //         let newRevenue = currentValue.revenue
+        //         const newBuyers = currentValue.buyers
+        //         let newStatisticsData = currentValue.statisticsData
+
+        //         value.forEach((record) =>
+        //         {
+        //             newSold += record.sold
+        //             newRevenue += record.revenue
+        //         })
+
+        //         newBuyers.push(buyerId)
+        //         newStatisticsData = newStatisticsData.concat(value)
+
+        //         const newValue = 
+        //         {
+        //             productId: productId,
+        //             sold: newSold,
+        //             revenue: newRevenue,
+        //             buyers: newBuyers,
+        //             statisticsData: newStatisticsData
+        //         }
+
+        //         mapOfProductsStatistics.set(productId, newValue)
+        //     }
+
+        // })
+
+        // let totalQueryOrders = statisticOrderData.totalOrders
+        // let totalRelevantOrders = 0
+        // let totalSold = 0
+        // let totalRevenue = 0
+        // let totalBuyers = 0
+
+        // const statisticsData = productIds.map((productId) =>
+        // {
+        //     const productStatistic = mapOfProductsStatistics.get(productId)
+        //     totalSold += productStatistic.sold
+        //     totalRevenue += productStatistic.revenue
+        //     totalBuyers += productStatistic.buyers.length
+        //     totalRelevantOrders += productStatistic.statisticsData.length
+
+        //     return productStatistic
+        // })
+
+        // const finalResult = 
+        // {
+        //     totalQueryOrders: totalQueryOrders,
+        //     totalRelevantOrders: totalRelevantOrders,
+        //     totalSold: totalSold,
+        //     totalRevenue: totalRevenue,
+        //     totalBuyers: totalBuyers,
+        //     statisticsData: statisticsData
+        // }
+
+        const statisticsDataForEachInterval = getStatisticForEachInterval()
+
+        const finalResult = {}
 
         return finalResult
     },
@@ -800,7 +1011,7 @@ const StatisticsProductService =
 
         const productCount = new Map()
 
-        orderStatistics.statisticData.forEach((order) =>
+        orderStatistics.statisticsData.forEach((order) =>
         {
             order.products.forEach((product) =>
             {
@@ -940,7 +1151,7 @@ const StatisticsProductService =
         const listOfItemSets = []
         const currentIndex = 0
 
-        orderStatistics.statisticData.forEach((orderRecord) =>
+        orderStatistics.statisticsData.forEach((orderRecord) =>
         {
             const mapOfProductsIds = new Map()
             for(let i = 0; i < orderRecord.products.length ; i++)
@@ -1183,7 +1394,7 @@ const StatisticsProductService =
             const resultRecord = {
                 range: range,
                 totalReviews: totalReviews,
-                statisticData: Array.from(mapOfProductReviews.values())
+                statisticsData: Array.from(mapOfProductReviews.values())
             }
 
             finalResult.push(resultRecord)
@@ -1258,7 +1469,7 @@ const StatisticsProductService =
                 const resultRecord = {
                     range: range,
                     totalReviews: totalReviews,
-                    statisticData: Array.from(mapOfProductReviews.values())
+                    statisticsData: Array.from(mapOfProductReviews.values())
                 }
 
                 finalResult.push(resultRecord)
