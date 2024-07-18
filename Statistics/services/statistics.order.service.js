@@ -26,7 +26,7 @@ const StatisticsOrderService =
         }
 
         let targetIntervals = []
-        if(step == undefined || orderStatistics.statisticData.length == 0)
+        if(step == undefined || orderStatistics.statisticsData.length == 0)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -47,7 +47,7 @@ const StatisticsOrderService =
                     avgRevenue: 0,
                     avgProfit: 0,
                     totalOrders: 0,
-                    statisticData: []
+                    statisticsData: []
                 }
                 mapOfIntervals.set(index, initValue)
             })
@@ -56,9 +56,9 @@ const StatisticsOrderService =
             let indexOfInterval = 0
             let indexOfOrder = 0
             
-            for(; indexOfOrder < orderStatistics.statisticData.length && indexOfInterval < targetIntervals.length;)
+            for(; indexOfOrder < orderStatistics.statisticsData.length && indexOfInterval < targetIntervals.length;)
             {
-                const targetOrderRecord = orderStatistics.statisticData[indexOfOrder]
+                const targetOrderRecord = orderStatistics.statisticsData[indexOfOrder]
                 const timeToCheck = new Date(targetOrderRecord.confirmedStatus.time)
                 
                 if(timeToCheck > boundaryToChange)
@@ -73,7 +73,7 @@ const StatisticsOrderService =
                     {
                         currentStatistics.revenue += targetOrderRecord.totalPrice
                         currentStatistics.profit += targetOrderRecord.profit
-                        currentStatistics.statisticData.push(targetOrderRecord)
+                        currentStatistics.statisticsData.push(targetOrderRecord)
                         currentStatistics.totalOrders += 1
 
                         mapOfIntervals.set(indexOfInterval, currentStatistics)
@@ -110,7 +110,7 @@ const StatisticsOrderService =
             avgRevenue: orderStatistics.avgRevenue,
             avgProfit: orderStatistics.avgProfit,
             totalOrders: orderStatistics.totalOrders,
-            statisticData: statisticsDataForEachInterval
+            statisticsData: statisticsDataForEachInterval
         }
 
         return finalResult
@@ -194,7 +194,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -203,11 +203,11 @@ const StatisticsOrderService =
             totalRevenue += order.totalPrice
             totalProfit += order.profit
 
-            statisticData.push(data)
+            statisticsData.push(data)
         })
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -215,8 +215,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -299,7 +299,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -308,11 +308,11 @@ const StatisticsOrderService =
             totalRevenue += order.totalPrice
             totalProfit += order.profit
             
-            statisticData.push(data)
+            statisticsData.push(data)
         })
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -320,8 +320,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -386,7 +386,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -394,11 +394,11 @@ const StatisticsOrderService =
             totalRevenue += order.totalPrice
             totalProfit += order.profit
 
-            statisticData.push(data)
+            statisticsData.push(data)
         })
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -406,8 +406,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -487,7 +487,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -514,13 +514,13 @@ const StatisticsOrderService =
                 totalRevenue += order.totalPrice
                 totalProfit += order.profit
 
-                statisticData.push(data)
+                statisticsData.push(data)
             }
         })
 
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -528,8 +528,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -609,7 +609,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -633,13 +633,13 @@ const StatisticsOrderService =
                 totalRevenue += order.totalPrice
                 totalProfit += order.profit
 
-                statisticData.push(data)
+                statisticsData.push(data)
             }
         })
 
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -647,8 +647,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -721,7 +721,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -730,11 +730,11 @@ const StatisticsOrderService =
             totalRevenue += order.totalPrice
             totalProfit += order.profit
 
-            statisticData.push(data)
+            statisticsData.push(data)
         })
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -742,8 +742,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -758,7 +758,7 @@ const StatisticsOrderService =
             return null
         }
 
-        if(step == undefined || orderStatistics.statisticData.length == 0)
+        if(step == undefined || orderStatistics.statisticsData.length == 0)
         {
             return orderStatistics
         }
@@ -787,7 +787,7 @@ const StatisticsOrderService =
                     revenue: 0,
                     profit: 0,
                     orders: 0,
-                    statisticData: []
+                    statisticsData: []
                 }
 
                 mapOfIntervals.set(index, initValue)
@@ -797,9 +797,9 @@ const StatisticsOrderService =
             let indexOfInterval = 0
             let indexOfOrder = 0
 
-            for(; indexOfOrder < orderStatistics.statisticData.length && indexOfInterval < targetIntervals.length; )
+            for(; indexOfOrder < orderStatistics.statisticsData.length && indexOfInterval < targetIntervals.length; )
             {
-                const targetOrderRecord = orderStatistics.statisticData[indexOfOrder]
+                const targetOrderRecord = orderStatistics.statisticsData[indexOfOrder]
                 const timeToCheck = new Date(targetOrderRecord.confirmedStatus.time)
                 
                 if(timeToCheck > boundaryToChange)
@@ -815,7 +815,7 @@ const StatisticsOrderService =
                     currentStatistics.revenue += targetOrderRecord.totalPrice
                     currentStatistics.profit += targetOrderRecord.profit
                     currentStatistics.orders += 1
-                    currentStatistics.statisticData.push(targetOrderRecord)
+                    currentStatistics.statisticsData.push(targetOrderRecord)
                     mapOfIntervals.set(indexOfInterval, currentStatistics)
 
                     indexOfOrder += 1
@@ -842,7 +842,7 @@ const StatisticsOrderService =
             avgRevenue: orderStatistics.avgRevenue,
             avgProfit: orderStatistics.avgProfit,
             totalOrders: orderStatistics.totalOrders,
-            statisticData: statisticsDataForEachInterval
+            statisticsData: statisticsDataForEachInterval
         }
 
         return finalResult
@@ -868,7 +868,7 @@ const StatisticsOrderService =
         const avgRevenue = latePendingOrdersStatistics.avgRevenue + lateProcessingOrdersStatistics.avgRevenue
         const avgProfit = latePendingOrdersStatistics.avgProfit + lateProcessingOrdersStatistics.avgProfit
 
-        const statisticData = latePendingOrdersStatistics.statisticData.concat(lateProcessingOrdersStatistics.statisticData)
+        const statisticsData = latePendingOrdersStatistics.statisticsData.concat(lateProcessingOrdersStatistics.statisticsData)
 
         const finalResult = 
         {
@@ -877,7 +877,7 @@ const StatisticsOrderService =
             totalOrders: totalOrders,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            statisticData: statisticData
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -903,7 +903,7 @@ const StatisticsOrderService =
         const avgRevenue = onTimePendingOrdersStatistics.avgRevenue + onTimeProcessingOrdersStatistics.avgRevenue
         const avgProfit = onTimePendingOrdersStatistics.avgProfit + onTimeProcessingOrdersStatistics.avgProfit
 
-        const statisticData = onTimePendingOrdersStatistics.statisticData.concat(onTimeProcessingOrdersStatistics.statisticData)
+        const statisticsData = onTimePendingOrdersStatistics.statisticsData.concat(onTimeProcessingOrdersStatistics.statisticsData)
 
         const finalResult = 
         {
@@ -912,7 +912,7 @@ const StatisticsOrderService =
             totalOrders: totalOrders,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            statisticData: statisticData
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -981,7 +981,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -1007,7 +1007,7 @@ const StatisticsOrderService =
             //         totalRevenue += order.totalPrice
             //         totalProfit += order.profit
     
-            //         statisticData.push(data)
+            //         statisticsData.push(data)
             //     }
             // }
 
@@ -1015,11 +1015,11 @@ const StatisticsOrderService =
             totalRevenue += order.totalPrice
             totalProfit += order.profit
 
-            statisticData.push(data)
+            statisticsData.push(data)
         })
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -1027,8 +1027,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -1099,7 +1099,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -1108,11 +1108,11 @@ const StatisticsOrderService =
             totalRevenue += order.totalPrice
             totalProfit += order.profit
 
-            statisticData.push(data)
+            statisticsData.push(data)
         })
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -1120,8 +1120,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult
@@ -1191,7 +1191,7 @@ const StatisticsOrderService =
 
         let totalRevenue = 0
         let totalProfit = 0
-        const statisticData = []
+        const statisticsData = []
 
         rawOrders.forEach((order) =>
         {
@@ -1200,11 +1200,11 @@ const StatisticsOrderService =
             totalRevenue += order.totalPrice
             totalProfit += order.profit
 
-            statisticData.push(data)
+            statisticsData.push(data)
         })
 
-        const avgRevenue = statisticData.length == 0 ? 0 : totalRevenue / statisticData.length
-        const avgProfit = statisticData.length == 0 ? 0: totalProfit / statisticData.length
+        const avgRevenue = statisticsData.length == 0 ? 0 : totalRevenue / statisticsData.length
+        const avgProfit = statisticsData.length == 0 ? 0: totalProfit / statisticsData.length
 
         const finalResult = 
         {
@@ -1212,8 +1212,8 @@ const StatisticsOrderService =
             totalProfit: totalProfit,
             avgRevenue: avgRevenue,
             avgProfit: avgProfit,
-            totalOrders: statisticData.length,
-            statisticData: statisticData
+            totalOrders: statisticsData.length,
+            statisticsData: statisticsData
         }
 
         return finalResult

@@ -204,8 +204,9 @@ const StatisticsProductController =
             const productIds = req.body.productIds
             const startTime = req.body.startTime
             const endTime = req.body.endTime
+            const step = req.body.step
 
-            const statistics = await StatisticsProductService.getAmountOfBuyersOfProducts(shopId, productIds, startTime, endTime)
+            const statistics = await StatisticsProductService.getAmountOfBuyersOfProducts(shopId, productIds, startTime, endTime, step)
             if(statistics == null)
             {
                 return next(createError.MethodNotAllowed("Cannot get amount of buyers of products"))
