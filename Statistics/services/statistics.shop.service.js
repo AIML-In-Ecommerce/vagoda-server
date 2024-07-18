@@ -35,7 +35,7 @@ const ShopStatisticsService =
 
         let targetIntervals = []
 
-        if(step == undefined || statistics.statisticsData.length == 0)
+        if(step == undefined)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -142,7 +142,7 @@ const ShopStatisticsService =
     
         let targetIntervals = []
 
-        if(step == undefined || statistics.statisticsData.length == 0)
+        if(step == undefined)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -684,14 +684,14 @@ const ShopStatisticsService =
         const statisticsDataForEachInterval = getStatisticForEachInterval()
 
         const usersInBigInterval = []
-        const returtingUsersInBigInterval = []
+        const returningUsersInBigInterval = []
 
         mapOfAllReturningUsers.forEach((isReturningUser, userId) =>
         {
             usersInBigInterval.push(userId)
             if(isReturningUser == true)
             {
-                returtingUsersInBigInterval.push(userId)
+                returningUsersInBigInterval.push(userId)
             }
         })
 
@@ -703,7 +703,7 @@ const ShopStatisticsService =
             totalReturningRevenue: totalReturningRevenue, 
             totalReturningProfit: totalReturningProfit,
             totalUsers: usersInBigInterval.length,
-            totalReturingUsers: returtingUsersInBigInterval.length,
+            totalReturningUsers: returningUsersInBigInterval.length,
             statisticsData: statisticsDataForEachInterval
         }
 
@@ -731,7 +731,7 @@ const ShopStatisticsService =
     
         let targetIntervals = []
 
-        if(step == undefined || rawProductAccessRecords.length == 0)
+        if(step == undefined)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }

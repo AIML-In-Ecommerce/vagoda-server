@@ -148,7 +148,7 @@ const StatisticsProductService =
         }
 
         let targetIntervals = []
-        if(step == undefined || completedOrderStatistics.statisticsData.length == 0)
+        if(step == undefined)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -275,7 +275,7 @@ const StatisticsProductService =
 
         let targetIntervals = []
 
-        if(step == undefined || completedOrderStatistics.statisticsData.length == 0)
+        if(step == undefined)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -415,7 +415,7 @@ const StatisticsProductService =
 
         let targetIntervals = []
 
-        if(step == undefined || totalViews == 0)
+        if(step == undefined)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }

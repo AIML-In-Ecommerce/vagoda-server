@@ -26,7 +26,7 @@ const StatisticsOrderService =
         }
 
         let targetIntervals = []
-        if(step == undefined || orderStatistics.statisticsData.length == 0)
+        if(step == undefined)
         {
             targetIntervals = [[startTimeToCheck, endTimeToCheck]]
         }
@@ -758,11 +758,6 @@ const StatisticsOrderService =
             return null
         }
 
-        if(step == undefined || orderStatistics.statisticsData.length == 0)
-        {
-            return orderStatistics
-        }
-
         let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
 
@@ -775,7 +770,14 @@ const StatisticsOrderService =
             endTimeToCheck = new Date(endTime)
         }
 
-        const targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+
+
+        let targetIntervals = [[startTimeToCheck, endTimeToCheck]]
+        
+        if(step != undefined)
+        {
+            targetIntervals = SupportDateService.getClosedIntervals(startTimeToCheck, endTimeToCheck, step)
+        }
 
         const getStatisticForEachInterval = () =>
         {
@@ -848,7 +850,7 @@ const StatisticsOrderService =
         return finalResult
     },
 
-    async getLatePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending = undefined)
+    async getLatePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending = false)
     {
         const latePendingOrdersStatistics = await this.getLateOrderByShopWithStatus(shopId, OrderStatus.PENDING, startTime, endTime, isAscending)
         if(latePendingOrdersStatistics == null)
@@ -883,7 +885,7 @@ const StatisticsOrderService =
         return finalResult
     },
 
-    async getOnTimePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending = undefined)
+    async getOnTimePendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending = false)
     {
         const onTimePendingOrdersStatistics = await this.getOnTimeOrderByShopWithStatus(shopId, OrderStatus.PENDING, startTime, endTime, isAscending)
         if(onTimePendingOrdersStatistics == null)
@@ -1127,7 +1129,7 @@ const StatisticsOrderService =
         return finalResult
     },
 
-    async getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime, isAscending = undefined)
+    async getGlobalOrdersWithStatus(targetOrderStatus, startTime, endTime, isAscending = false)
     {
         let startTimeToCheck = new Date(2000, 0, 1)
         let endTimeToCheck = new Date()
