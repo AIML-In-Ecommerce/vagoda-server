@@ -4,6 +4,11 @@ import SubCategory from "../models/subCategory.model.js";
 import SubCategoryType from "../models/subCategoryType.model.js";
 import axios from "axios";
 
+const removeDiacritics = (str) => {
+  const normalizeStr = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return normalizeStr.toLowerCase();
+};
+
 const ProductService = {
   async getAll(filter, projection) {
     return await Product.find(filter).select(projection);
@@ -159,49 +164,19 @@ const ProductService = {
   },
 
   async searchProductsByKeyword(filterOptions) {
+    console.log("ccccccccccccccccc");
     const { keyword, quantity, sortBy, sortOrder } = filterOptions;
     // if (!keyword || keyword === "") {
     //   throw new Error("Keyword is required for searching");
     // }
-
-    const query = {
-      $or: [
-        { name: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ],
-    };
-
-    const categories = await Category.find({
-      name: { $regex: keyword, $options: "i" },
-    });
-    const subCategories = await SubCategory.find({
-      name: { $regex: keyword, $options: "i" },
-    });
-    const subCategoryTypes = await SubCategoryType.find({
-      name: { $regex: keyword, $options: "i" },
-    });
-
-    const categoryIds = categories.map((cat) => cat._id);
-    const subCategoryIds = subCategories.map((subCat) => subCat._id);
-    const subCategoryTypeIds = subCategoryTypes.map(
-      (subCatType) => subCatType._id
-    );
-
-    if (categoryIds.length > 0)
-      query.$or.push({ category: { $in: categoryIds } });
-    if (subCategoryIds.length > 0)
-      query.$or.push({ subCategory: { $in: subCategoryIds } });
-    if (subCategoryTypeIds.length > 0)
-      query.$or.push({ subCategoryType: { $in: subCategoryTypeIds } });
-
-    console.log("Query:", JSON.stringify(query, null, 2));
 
     const sortOptions = {};
     if (sortBy) {
       sortOptions[sortBy] = sortOrder.toLowerCase() === "asc" ? 1 : -1;
     }
 
-    const filteredProducts = await Product.find(query)
+    const query = {};
+    const products = await Product.find(query)
       .populate("category")
       .populate("subCategory")
       .populate("subCategoryType")
@@ -209,15 +184,50 @@ const ProductService = {
       .select(
         "_id name attribute originalPrice finalPrice shop brand soldQuantity avgRating images"
       )
-      .sort(sortOptions)
-      .limit(quantity);
+      .sort(sortOptions);
+    // .limit(quantity);
+
+    console.log(products.length);
+    //replate "-" = " "
+    const kw = keyword.replace("-", " ");
+    const normalizedKeyword = await removeDiacritics(kw);
+    console.log("Normalized keyword:", normalizedKeyword);
+
+    const filteredProducts = products.filter((product) => {
+      const normalizedProductName = removeDiacritics(product.name);
+      console.log("Normalized product name:", normalizedProductName);
+      const normalizedProductDescription = removeDiacritics(
+        product.description || ""
+      );
+      const categoryMatch = product.category
+        ? removeDiacritics(product.category.name).includes(normalizedKeyword)
+        : false;
+      const subCategoryMatch = product.subCategory
+        ? removeDiacritics(product.subCategory.name).includes(normalizedKeyword)
+        : false;
+      const subCategoryTypeMatch = product.subCategoryType
+        ? removeDiacritics(product.subCategoryType.name).includes(
+            normalizedKeyword
+          )
+        : false;
+
+      return (
+        normalizedProductName.includes(normalizedKeyword) ||
+        normalizedProductDescription.includes(normalizedKeyword) ||
+        categoryMatch ||
+        subCategoryMatch ||
+        subCategoryTypeMatch
+      );
+    });
+    console.log("Filtered products:", filteredProducts.length);
+    const topProducts = filteredProducts.slice(0, quantity);
 
     // console.log(
     //   "Filtered products:",
     //   JSON.stringify(filteredProducts, null, 2)
     // );
 
-    const formattedProducts = filteredProducts.map((product) => ({
+    const formattedProducts = topProducts.map((product) => ({
       _id: product._id,
       name: product.name,
       description: product.description,
