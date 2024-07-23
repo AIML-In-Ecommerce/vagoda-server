@@ -105,6 +105,42 @@ const CartService =
             return null
         }
     },
+
+    async addToCart(userId, products)
+    {
+        const url = `${publicAPIURL}/system/cart/user/add`
+        const requestBody = {
+            products: products
+        }
+
+        try
+        {
+            const response = await axios.post(url, requestBody, {
+                params: {
+                    userId: userId
+                },
+                headers: {
+                    "origin": `${publicAPIURL}`
+                }
+            })
+
+
+            if(response.status == 200 || response.status == 201)
+            {
+                const data = response.data
+                return data.data
+            }
+            else
+            {
+                return null
+            }
+        }
+        catch(error)
+        {
+            console.log("Axios error at addToCart")
+            return null
+        }
+    }
 }
 
 export default CartService

@@ -4,6 +4,7 @@ import orderGeneratorProvider from "./providers/order.generator.provider.js";
 import orderPaymentInfoProvider from "./providers/order.payment_info.provider.js";
 import orderStatusGeneratorProvider from "./providers/order.status.generator.provider.js";
 import { OrderStatus } from "./shared/enums.js";
+import CartService from "./support/cart.service.js";
 import ProductService from "./support/product.service.js";
 import ShopService from "./support/shop.service.js";
 import UserService from "./support/user.service.js";
@@ -657,6 +658,34 @@ const OrderService = {
 
     return targetProductInfo
   },
+
+  async repurchaseItem(orderId, itemId)
+  {
+    const rawOrder = await Order.findById(orderId)
+    if(rawOrder == null)
+    {
+      return null
+    }
+
+    const targetItem = rawOrder.products.find((item) => item._id.toString() == itemId)
+    if(targetItem == undefined)
+    {
+      return null
+    }
+
+    const targetUserId = rawOrder.user.toString()
+
+    const recontructedItemProps = {
+      product: targetItem.product.toString(),
+      color: targetItem.color,
+      size: targetItem.size,
+      quantity: 1
+    }
+
+    const newProductsInCart = await CartService.addToCart(targetUserId, [recontructedItemProps])
+    
+    return newProductsInCart
+  }
 
 
 };

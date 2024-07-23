@@ -32,6 +32,7 @@ router.get("/system/cart/user", VerificationService.verifySystemRole, SystemCart
 router.put("/system/cart/user", VerificationService.verifySystemRole, SystemCartController.updateProducts)
 router.post("/system/cart/create", VerificationService.verifySystemRole, SystemCartController.create);
 router.delete("/system/cart/delete", VerificationService.verifySystemRole, SystemCartController.delete);
+router.post("/system/cart/user/add", VerificationService.verifySystemRole, SystemCartController.addToCart)
 router.put("/system/cart/user/clear", VerificationService.verifySystemRole, SystemCartController.clearCart)
 router.put("/system/cart/user/clearAll", VerificationService.verifySystemRole, SystemCartController.clearAllCart)
 

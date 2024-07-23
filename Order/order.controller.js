@@ -586,6 +586,36 @@ const OrderController = {
     }
   },
 
+  async repurchaseItem(req, res, next)
+  {
+    try
+    {
+      const orderId = req.body.orderId
+      const itemId = req.body.itemId
+
+      if(orderId == undefined || orderId == null || itemId == undefined || itemId == null)
+      {
+        return next(createError.BadRequest("Missing required parameters"))
+      }
+
+      const newProductsInCart = await OrderService.repurchaseItem(orderId, itemId)
+      if(newProductsInCart == null)
+      {
+        return next(createError.MethodNotAllowed("Cannot repurchase the item"))
+      }
+
+      return res.json({
+        message: "Repurchase the item successfully",
+        data: newProductsInCart
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
 };
 
 export default OrderController;
