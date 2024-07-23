@@ -381,7 +381,7 @@ const PromotionService = {
     for(let i = 0; i< rawPromotions.length; i++)
     {
       const rawPromotion = rawPromotions[i]
-      rawPromotion.quantity = rawPromotion.quantity - 1
+      rawPromotion.redeemedTotal = rawPromotion.redeemedTotal + 1
       const updatedPromotion = await rawPromotion.save()
       updatedPromotionIds.push(updatedPromotion._id.toString())
     }
@@ -428,7 +428,7 @@ const PromotionService = {
     for(let i = 0; i< rawPromotions.length; i++)
     {
       const rawPromotion = rawPromotions[i]
-      rawPromotion.quantity = rawPromotion.quantity + 1
+      rawPromotion.redeemedTotal = rawPromotion.redeemedTotal - 1 < 0 ? 0 : rawPromotion.redeemedTotal - 1
       const updatedPromotion = await rawPromotion.save()
       updatedPromotionIds.push(updatedPromotion._id.toString())
     }

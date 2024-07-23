@@ -245,6 +245,41 @@ const SystemCartController = {
       return next(createError.InternalServerError(error.message))
     }
   },
+
+  async addToCart(req, res, next)
+  {
+    try
+    {
+      const userId = req.query.userId
+
+      if(userId == undefined)
+      {
+        return next(createError.Unauthorized("User not found"))
+      }
+
+      const products = req.body.products
+
+      const updatedProducts = await CartService.addToCart(userId, products)
+      if(updatedProducts == null)
+      {
+        return next(createError.MethodNotAllowed("Cannot add products to cart"))
+      }
+
+      const productInfos = (await CartService.getByUserId(userId)).products
+
+      return res.json({
+        message: "Add products to cart successfully",
+        data: productInfos
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
+  
 };
 
 export default SystemCartController;

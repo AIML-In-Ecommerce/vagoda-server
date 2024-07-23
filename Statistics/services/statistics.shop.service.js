@@ -578,7 +578,7 @@ const ShopStatisticsService =
                     totalReturningRevenue: 0,
                     totalReturningProfit: 0,
                     totalUsers: 0,
-                    totalReturingUsers: 0,
+                    totalReturningUsers: 0,
                     returningRate: null,
                     mapOfReturningUsers: new Map()
                 }
@@ -665,12 +665,12 @@ const ShopStatisticsService =
                     if(value.length > 1)
                     {
                         //this is a returning user
-                        intervalStatistics.totalReturingUsers += 1
+                        intervalStatistics.totalReturningUsers += 1
                         statisticsData = statisticsData.concat(value)
                     }
                 })
 
-                const returningRate = intervalStatistics.totalUsers > 0 ? (intervalStatistics.totalReturingUsers / intervalStatistics.totalUsers) : null
+                const returningRate = intervalStatistics.totalUsers > 0 ? (intervalStatistics.totalReturningUsers / intervalStatistics.totalUsers) : null
                 intervalStatistics.returningRate = returningRate
                 intervalStatistics.statisticsData = statisticsData
                 intervalStatistics.mapOfReturningUsers = undefined
