@@ -631,6 +631,8 @@ const ShopStatisticsService =
                             userStatistics.push(targetOrderRecord)
                             mapOfReturningUsers.set(targetUserId, userStatistics)
                         }
+
+                        currentStatistics.mapOfReturningUsers = mapOfReturningUsers
                     }
                     else
                     {
@@ -662,7 +664,7 @@ const ShopStatisticsService =
                 mapOfReturningUsers.forEach((value, key) =>
                 {
                     intervalStatistics.totalUsers += 1
-                    if(value.length > 1)
+                    if(value.length > 0)
                     {
                         //this is a returning user
                         intervalStatistics.totalReturningUsers += 1

@@ -659,7 +659,7 @@ const OrderService = {
     return targetProductInfo
   },
 
-  async repurchaseItem(orderId, itemId)
+  async repurchaseItem(orderId, itemIds)
   {
     const rawOrder = await Order.findById(orderId)
     if(rawOrder == null)
@@ -667,22 +667,31 @@ const OrderService = {
       return null
     }
 
-    const targetItem = rawOrder.products.find((item) => item._id.toString() == itemId)
-    if(targetItem == undefined)
+    const targetItems = rawOrder.products.filter((item) => itemIds.includes(item._id.toString()))
+    if(targetItems == undefined)
     {
       return null
+    }
+    if(targetItems.length == 0)
+    {
+      return []
     }
 
     const targetUserId = rawOrder.user.toString()
 
-    const recontructedItemProps = {
-      product: targetItem.product.toString(),
-      color: targetItem.color,
-      size: targetItem.size,
-      quantity: 1
-    }
+    const recontructedItemProps = targetItems.map((targetItem) =>
+    {
+      const recontructedItem = {
+        product: targetItem.product.toString(),
+        color: targetItem.color,
+        size: targetItem.size,
+        quantity: 1
+      }
 
-    const newProductsInCart = await CartService.addToCart(targetUserId, [recontructedItemProps])
+      return recontructedItem
+    })
+
+    const newProductsInCart = await CartService.addToCart(targetUserId, recontructedItemProps)
     
     return newProductsInCart
   }

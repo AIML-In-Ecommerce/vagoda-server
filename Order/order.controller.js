@@ -591,14 +591,14 @@ const OrderController = {
     try
     {
       const orderId = req.body.orderId
-      const itemId = req.body.itemId
+      const itemIds = req.body.itemIds
 
-      if(orderId == undefined || orderId == null || itemId == undefined || itemId == null)
+      if(orderId == undefined || itemIds == undefined)
       {
         return next(createError.BadRequest("Missing required parameters"))
       }
 
-      const newProductsInCart = await OrderService.repurchaseItem(orderId, itemId)
+      const newProductsInCart = await OrderService.repurchaseItem(orderId, itemIds)
       if(newProductsInCart == null)
       {
         return next(createError.MethodNotAllowed("Cannot repurchase the item"))
