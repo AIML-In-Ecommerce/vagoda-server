@@ -4,34 +4,44 @@ import SystemPromotionController from "./system.promotion.controller.js";
 
 const router = express.Router();
 
-router.get("/promotion/welcome", (req, res, next) => {return res.json({
+router.get("/promotion/welcome", (req, res, next) => {
+  return res.json({
     message: "welcome to promotion path of Promotion Service",
-    data: {}
-})})
+    data: {},
+  });
+});
 
-router.get("/promotions/welcome", (req, res, next) => {return res.json({
+router.get("/promotions/welcome", (req, res, next) => {
+  return res.json({
     message: "welcome to promotion(s) path of Promotion Service",
-    data: {}
-  })})
+    data: {},
+  });
+});
 
 // router.get("/promotion/", PromotionController.getAll);
 
 router.get("/promotion/info", PromotionController.getById);
-router.post("/promotion/list", PromotionController.getByIds);
-router.post("/promotion/codes", PromotionController.getPromotionsWithCodes)
+router.post("/promotions/list", PromotionController.getByIds);
+router.post("/promotion/codes", PromotionController.getPromotionsWithCodes);
 router.get("/promotion/shop/all", PromotionController.getByShopId);
-router.post("/promotion/shop/selection", PromotionController.getPromotionBySelection)
+router.post(
+  "/promotion/shop/selection",
+  PromotionController.getPromotionBySelection
+);
 
 router.post("/promotion/seller/create", PromotionController.create);
 router.put("/promotion/seller/update", PromotionController.update);
 router.delete("/promotion/seller/delete", PromotionController.delete);
 
-
-
-
 //from system
-router.put("/system/promotions/be_used", SystemPromotionController.updateUsedPromotionsQuantity)
-router.put("/system/promotions/cancel", SystemPromotionController.updateCancelPromotionsQuantity)
+router.put(
+  "/system/promotions/be_used",
+  SystemPromotionController.updateUsedPromotionsQuantity
+);
+router.put(
+  "/system/promotions/cancel",
+  SystemPromotionController.updateCancelPromotionsQuantity
+);
 
 export default router;
 
