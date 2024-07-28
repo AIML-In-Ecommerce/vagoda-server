@@ -6,7 +6,7 @@ import axios from "axios";
 
 const removeDiacritics = (str) => {
   const normalizeStr = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  return normalizeStr.toLowerCase();
+  return normalizeStr.toLowerCase().replace(/\s+/g, "");
 };
 
 const ProductService = {
@@ -194,7 +194,10 @@ const ProductService = {
     console.log("Normalized keyword:", normalizedKeyword);
 
     const filteredProducts = products.filter((product) => {
-      const normalizedProductName = removeDiacritics(product.name);
+      const productName = product.name;
+      const normalizedProductName = removeDiacritics(
+        productName.replace("-", " ")
+      );
       console.log("Normalized product name:", normalizedProductName);
       const normalizedProductDescription = removeDiacritics(
         product.description || ""
