@@ -157,7 +157,7 @@ const StatisticsOrderController =
 
             return res.json(
                 {
-                    message: "Get late pending and processing orders successfully",
+                    message: "Get on-time orders successfully",
                     data: convertedResult
                 }
             )
@@ -263,6 +263,36 @@ const StatisticsOrderController =
                     data: convertedResult
                 }
             )
+        }
+        catch(error)
+        {
+            console.log(error)
+            return next(createError.InternalServerError(error.message))
+        }
+    },
+
+    async getOnWaitingPendingAndProcessingOrdersIntervalsOfTime(req, res, next)
+    {
+        try
+        {
+            const shopId = req.query.shopId
+
+            const startTime = req.body.startTime
+            const endTime = req.body.endTime
+            // const isAscending = req.body.isAscending
+            const step = req.body.step
+
+            const statistics = await StatisticsOrderService.getOnWaitingPendingAndProcessingOrdersBySeller(shopId, startTime, endTime, true)
+            const convertedResult = StatisticsOrderService.fromOrderStatisticsToCloseIntervals(statistics, startTime, endTime, step)
+            if(convertedResult == null)
+            {
+                return next(createError.MethodNotAllowed("Cannot get the statistics"))
+            }
+
+            return res.json({
+                message: "Get the statistics successfully",
+                data: convertedResult
+            })
         }
         catch(error)
         {

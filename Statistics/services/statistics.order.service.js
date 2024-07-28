@@ -659,7 +659,7 @@ const StatisticsOrderService =
         let endTimeToCheck = new Date()
         let startTimeToCheck = new Date(2000, 0, 1)
 
-        if(endTimeToCheck != undefined)
+        if(endTime != undefined)
         {
             endTimeToCheck = new Date(endTime)
         }
@@ -681,14 +681,14 @@ const StatisticsOrderService =
                 $match: {
                     shop: castedShopId,
                     orderStatus: {
-                    $elemMatch: {
-                            status: targetOrderStatus,
-                            time: {
-                                $gte: startTimeToCheck,
-                                $lte: endTimeToCheck
-                            },
-                            complete: {$eq: null}
-                        }   
+                        $elemMatch: {
+                                status: targetOrderStatus,
+                                time: {
+                                    $gte: startTimeToCheck,
+                                    $lte: endTimeToCheck
+                                },
+                                complete: {$eq: null}
+                            }   
                     }
                 }
             },
@@ -899,13 +899,76 @@ const StatisticsOrderService =
             return null
         }
 
-        const totalRevenue = onTimePendingOrdersStatistics.totalRevenue + onTimeProcessingOrdersStatistics.totalRevenue
-        const totalProfit = onTimePendingOrdersStatistics.totalProfit + onTimeProcessingOrdersStatistics.totalProfit
-        const totalOrders = onTimePendingOrdersStatistics.totalOrders + onTimeProcessingOrdersStatistics.totalOrders
-        const avgRevenue = onTimePendingOrdersStatistics.avgRevenue + onTimeProcessingOrdersStatistics.avgRevenue
-        const avgProfit = onTimePendingOrdersStatistics.avgProfit + onTimeProcessingOrdersStatistics.avgProfit
+        const mapOfOnTimeOrders = new Map()
 
-        const statisticsData = onTimePendingOrdersStatistics.statisticsData.concat(onTimeProcessingOrdersStatistics.statisticsData)
+        onTimePendingOrdersStatistics.statisticsData.forEach((orderRecord, index) =>
+        {
+            mapOfOnTimeOrders.set(orderRecord._id, index)
+        })
+
+        let totalRevenue = 0
+        let totalProfit = 0
+        let totalOrders = 0
+        let avgRevenue = 0
+        let avgProfit = 0
+
+        const statisticsData = []
+
+        onTimeProcessingOrdersStatistics.statisticsData.forEach((orderRecord) =>
+        {
+            const orderRecordId = orderRecord._id
+
+            if(mapOfOnTimeOrders.get(orderRecordId) != undefined)
+            {
+                totalRevenue += orderRecord.totalPrice
+                totalProfit += orderRecord.profit
+    
+                statisticsData.push(orderRecord)
+            }
+        })
+
+        totalOrders = statisticsData.length
+
+        if(totalOrders > 0)
+        {
+            avgRevenue = totalRevenue / totalOrders
+            avgProfit = totalProfit / totalOrders
+        }
+
+        const finalResult = 
+        {
+            totalRevenue: totalRevenue,
+            totalProfit: totalProfit,
+            totalOrders: totalOrders,
+            avgRevenue: avgRevenue,
+            avgProfit: avgProfit,
+            statisticsData: statisticsData
+        }
+
+        return finalResult
+    },
+
+    async getOnWaitingPendingAndProcessingOrdersBySeller(shopId, startTime, endTime, isAscending = false)
+    {
+        const onWaitingPendingOrdersStatistics = await this.getOrdersWithOnWaitingForStatus(shopId, OrderStatus.PENDING, startTime, endTime, isAscending)
+        if(onWaitingPendingOrdersStatistics == null)
+        {
+            return null
+        }
+
+        const onWaitingProcessingOrdersStatistics = await this.getOrdersWithOnWaitingForStatus(shopId, OrderStatus.PROCESSING, startTime, endTime, isAscending)
+        if(onWaitingProcessingOrdersStatistics == null)
+        {
+            return null
+        }
+
+        const totalRevenue = onWaitingPendingOrdersStatistics.totalRevenue + onWaitingProcessingOrdersStatistics.totalRevenue
+        const totalProfit = onWaitingPendingOrdersStatistics.totalProfit + onWaitingProcessingOrdersStatistics.totalProfit
+        const totalOrders = onWaitingPendingOrdersStatistics.totalOrders + onWaitingProcessingOrdersStatistics.totalOrders
+        const avgRevenue = onWaitingPendingOrdersStatistics.avgRevenue + onWaitingProcessingOrdersStatistics.avgRevenue
+        const avgProfit = onWaitingPendingOrdersStatistics.avgProfit + onWaitingProcessingOrdersStatistics.avgProfit
+
+        const statisticsData = onWaitingPendingOrdersStatistics.statisticsData.concat(onWaitingProcessingOrdersStatistics.statisticsData)
 
         const finalResult = 
         {

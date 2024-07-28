@@ -19,6 +19,8 @@ router.post("/late_pending_processing", StatisticsOrderController.getLatePending
 
 router.post("/on_time_pending_processing", StatisticsOrderController.getOnTimePendingAndProcessingOrdersInIntervalOfTime)
 
+router.post("/on_waiting_pending_processing", StatisticsOrderController.getOnWaitingPendingAndProcessingOrdersIntervalsOfTime)
+
 router.post("/waiting_for_process", StatisticsOrderController.getOrdersWithOnWaitingForStatus)
 
 router.post("/late_in_process", StatisticsOrderController.getLateOrdersByShopWithStatus)
