@@ -20,14 +20,12 @@ router.get("/promotions/welcome", (req, res, next) => {
 
 // router.get("/promotion/", PromotionController.getAll);
 
-router.get("/promotion/info", PromotionController.getById);
-router.post("/promotions/list", PromotionController.getByIds);
-router.post("/promotion/codes", PromotionController.getPromotionsWithCodes);
-router.get("/promotion/shop/all", PromotionController.getByShopId);
-router.post(
-  "/promotion/shop/selection",
-  PromotionController.getPromotionBySelection
-);
+router.get("/promotion/info", PromotionController.getById)
+router.post("/promotion/codes", PromotionController.getPromotionsWithCodes)
+router.get("/promotion/shop/all", PromotionController.getByShopId)
+router.post("/promotion/shop/selection", PromotionController.getPromotionBySelection)
+router.post("/promotion/list", PromotionController.getByIds)
+
 
 router.post("/promotion/seller/create", PromotionController.create);
 router.put("/promotion/seller/update", PromotionController.update);
