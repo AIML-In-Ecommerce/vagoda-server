@@ -616,6 +616,44 @@ const OrderController = {
     }
   },
 
+  async getBuyerOrdersByIds(req, res, next)
+  {
+    try
+    {
+      const userId = req.query.userId
+
+      if(userId == undefined)
+      {
+        return next(createError(Unauthorized()))
+      }
+
+      const orderIds = req.body.orderIds
+
+      if(orderIds == undefined || orderIds == null)
+      {
+        return next(createError.BadRequest("Missing required parameter"))
+      }
+
+      const orders = await OrderService.getOrdersByIds(userId, orderIds)
+      if(orders == null)
+      {
+        return next(createError.NotFound())
+      }
+
+      return res.json(
+        {
+          message: "Get orders successfully",
+          data: orders
+        }
+      )
+    }
+    catch(error)
+    {
+      console.log(error)
+      return next(createError.InternalServerError(error.message))
+    }
+  },
+
 };
 
 export default OrderController;

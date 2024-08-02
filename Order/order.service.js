@@ -694,7 +694,124 @@ const OrderService = {
     const newProductsInCart = await CartService.addToCart(targetUserId, recontructedItemProps)
     
     return newProductsInCart
-  }
+  },
+
+  async getOrdersByIds(userId, orderIds)
+  {
+    if(Array.isArray(orderIds) == false || orderIds.length == 0)
+    {
+      return []
+    }
+
+    //fetch user's data
+    let userInfo = await UserService.getUserInfo(userId)
+    if(userInfo == null)
+    {
+      return null
+    }
+
+    const listOfOrders = await Order.find({_id: {$in: orderIds}, user: userId})
+    if(listOfOrders.length == 0)
+    {
+      return []
+    }
+
+    const shopInfos = new Map()
+    const productsInfos = new Map()
+
+    listOfOrders.forEach((value) =>
+    {
+      const shopId = value.shop
+      shopInfos.set(shopId.toString(), {})
+    })
+
+    //fetch shop's infos
+    const fetchedShopInfos = await ShopService.getShopInfos(Array.from(shopInfos.keys()))
+    if(fetchedShopInfos == null)
+    {
+      return null;
+    }
+
+    fetchedShopInfos.forEach((value) =>
+    {
+      const item = 
+      {
+        _id: value._id,
+        name: value.name,
+        location: value.location
+      }
+
+      shopInfos.set(item._id.toString(), item)
+    })
+
+    // //fetch payment method
+    // //TODO: update payment method later
+
+    //fetch product's infos
+    listOfOrders.forEach((value) =>
+    {
+      value.products.forEach((item) =>
+      {
+        productsInfos.set(item.product.toString(), {})
+      })
+    })
+
+    const fetchedProductInfos = await ProductService.getProductByIds(Array.from(productsInfos.keys()))
+    if(fetchedProductInfos == null)
+    {
+      return null
+    }
+
+    fetchedProductInfos.forEach((product) =>
+    {
+      productsInfos.set(product._id, product)
+    })
+
+
+    const finalResult = listOfOrders.map((value) =>
+    {
+      const item = JSON.parse(JSON.stringify(value))
+      //map user to Item
+      const user = 
+      {
+        _id: userInfo._id,
+        fullName: userInfo.fullName,
+      }
+
+      const targetShop = shopInfos.get(item.shop.toString())
+
+      const shop = 
+      {
+        _id: targetShop._id,
+        name: targetShop.name,
+        location: targetShop.location
+      }
+
+      const products = item.products.map((product) =>
+      {
+        const targetProduct = JSON.parse(JSON.stringify(productsInfos.get(product.product.toString())))
+
+        targetProduct.finalPrice = undefined
+        targetProduct.purchasedPrice = product.purchasedPrice
+        targetProduct.color = product.color,
+        targetProduct.size = product.size
+        targetProduct.quantity = product.quantity
+        targetProduct.itemId = product._id.toString()
+
+        return targetProduct
+      })
+
+      //finally, re-assign fields of item
+      item.user = user
+      item.shop = shop
+      item.products = products
+
+      return item
+    })
+
+
+    return finalResult
+  },
 
 
 };

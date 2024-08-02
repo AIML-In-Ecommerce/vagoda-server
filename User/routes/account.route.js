@@ -15,8 +15,8 @@ router.get("/accounts/welcome", (req, res, next) => {return res.json({
     data: {}
 })})
 
-router.get("/accounts", AccountController.getAll);
-router.put("/account/:id", AccountController.update);
+// router.get("/accounts", AccountController.getAll);
+// router.put("/account/:id", AccountController.update);
 
 
 // from system

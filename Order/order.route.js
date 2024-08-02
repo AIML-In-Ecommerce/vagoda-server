@@ -20,6 +20,7 @@ buyerRouter.get("/orders",  OrderController.getAllCustomerLatestOrders);
 buyerRouter.get("/order",  OrderController.getCustomerOrderById);
 buyerRouter.post("/create",  OrderController.create);
 buyerRouter.post("/repurchase_item", OrderController.repurchaseItem)
+buyerRouter.post("/list_of_orders", OrderController.getBuyerOrdersByIds)
 
 buyerRouter.put("/status/cancel",  OrderController.cancelOrderByBuyer);
 // buyerRouter.get("/statuses", OrderController.getStatus);
