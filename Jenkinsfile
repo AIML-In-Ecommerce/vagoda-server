@@ -1,7 +1,5 @@
     pipeline {
-        options {
-            timeout(time: 3, unit: 'HOURS')
-        }
+
         agent any
         tools {
             nodejs 'NodeJS'
@@ -17,6 +15,9 @@
             
 
             stage('Install Dependencies') {
+                options {
+                    timeout(time: 30, unit: 'MINUTES')
+                }
                 steps {
                     // Bước này để cài đặt các dependencies của Node.js
                     script {
@@ -56,21 +57,24 @@
 
 
             stage('Build') {
-            steps {
-                // Kiểm tra và down container
-                script {
-                    sh 'docker-compose ps'
-                    sh 'docker-compose down --remove-orphans'
+                options {
+                    timeout(time: 30, unit: 'MINUTES')
                 }
-                sh 'docker-compose build --no-cache'
-                // Build và chạy container mới
-                sh 'docker-compose up -d'
+                steps {
+                    // Kiểm tra và down container
+                    script {
+                        sh 'docker-compose ps'
+                        sh 'docker-compose down --remove-orphans'
+                    }
+                    sh 'docker-compose build --no-cache'
+                    // Build và chạy container mới
+                    sh 'docker-compose up -d'
 
-                // Kiểm tra lại trạng thái của container
-                sh 'docker-compose ps'
-                sh 'docker-compose logs'
+                    // Kiểm tra lại trạng thái của container
+                    sh 'docker-compose ps'
+                    sh 'docker-compose logs'
+                }
             }
-        }
 
             
 
