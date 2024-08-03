@@ -410,7 +410,7 @@ const StatisticsProductService =
             return null
         }
 
-        console.log("access count: ", rawAccessedProducts.length)
+        // console.log("access count: ", rawAccessedProducts.length)
         const totalViews = rawAccessedProducts.length
 
         let targetIntervals = []

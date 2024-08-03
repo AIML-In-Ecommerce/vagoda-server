@@ -14,6 +14,14 @@ const StatisticsAccessService =
         const searchTime = new Date(execTime)
         const startTime = new Date(new Date(searchTime).setDate(searchTime.getDate() - 14))
 
+        // store ADD-TO-CART record directly into database
+        if(accessType == ProductAccessType.ADD_TO_CART)
+        {
+            const recordProps = generateProductAccessRecordProp(productId, searchTime, accessType, shopId, buyerId, undefined)
+            const newRecord = new ProductAccess(recordProps)
+            await newRecord.save()
+        }
+
         const cacheKey = `${CachePrefix.USER_SEARCH_PRODUCT_PREFIX}${buyerId}`
         const currentCacheProductList = await redisClient.get(cacheKey)
 
