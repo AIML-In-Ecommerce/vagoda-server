@@ -249,7 +249,15 @@ const OrderGenerators =
 {
   async generateOrderWhenCOD(requiredData)
   {
-      return await generateOrder(requiredData)
+
+    const newOrders = await generateOrder(requiredData)
+
+    const newOrderIds = newOrders.map((orderInfo) =>
+    {
+      return orderInfo._id
+    })
+
+    return newOrderIds
   },
 
 
@@ -284,7 +292,8 @@ const OrderGenerators =
   
       const finalResult = 
       {
-        order_url: zalopayResponse.order_url
+        order_url: zalopayResponse.order_url,
+        orderIds: orderIds
       }
   
       return finalResult
