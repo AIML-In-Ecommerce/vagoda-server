@@ -283,7 +283,7 @@ const OrderGenerators =
       })
   
       const zalopayResponse = await PaymentService.getZaloPayURL(requiredData.userId, totalAmount, products, orderIds)
-      // console.log(zalopayResponse)
+      console.log(zalopayResponse)
       if(zalopayResponse.order_url == undefined)
       {
         //TODO: set status to failed
