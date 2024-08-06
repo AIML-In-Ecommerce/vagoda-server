@@ -1,9 +1,11 @@
 import createError from "http-errors";
 import axios from "axios";
 import moment from "moment";
+import momentTimezone from "moment-timezone"
 import CryptoJS from "crypto-js";
 import qs from "qs";
 import OrderService from "../support/order.service.js";
+import TimeZoneDefinitions from "../shared/MomentTimezone.js";
 
 const ZaloPayController = {
 
@@ -34,10 +36,13 @@ const ZaloPayController = {
       redirecturl: `${process.env.FRONTEND_PATH}/payment`, //khi front-end chưa lên production -> tạm comment lại
     };
     const transID = Math.floor(Math.random() * 1000000);
+    const currentTimeUTC = moment().utc()
+    const vnTime = currentTimeUTC.tz(TimeZoneDefinitions.ASIA_HCM)
+    const requiredFormatTime = vnTime.format("YYMMDD")
 
     const order = {
       app_id: Number(process.env.ZALOPAY_APP_ID),
-      app_trans_id: `${moment().format("YYMMDD")}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
+      app_trans_id: `${requiredFormatTime}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
       app_user: userId,
       app_time: Date.now(), // miliseconds
       item: JSON.stringify([{}]),
