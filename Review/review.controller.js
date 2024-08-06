@@ -114,6 +114,10 @@ const ReviewController = {
         return next(createError.BadRequest("Bad request!"));
       }
       await ReviewService.addCommentIdToReview(data.review, object._id);
+
+      //if this is a shop's comment => update isResponseByShop attribute to TRUE
+      await ReviewService.update(data.review, {isResponseByShop: true})
+
       res.json({
         message: "Create" + " comment " + "successfully",
         status: 200,
