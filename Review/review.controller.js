@@ -116,7 +116,7 @@ const ReviewController = {
       await ReviewService.addCommentIdToReview(data.review, object._id);
 
       //if this is a shop's comment => update isResponseByShop attribute to TRUE
-      // await ReviewService.update(data.review, {isResponseByShop: true})
+      await ReviewService.update(object.review.toString(), {isResponseByShop: true})
 
       res.json({
         message: "Create" + " comment " + "successfully",
