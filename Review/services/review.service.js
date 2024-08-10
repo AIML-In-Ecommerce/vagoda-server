@@ -1,6 +1,6 @@
 import Review from "../models/review.model.js";
 import { Product } from "../models/product.model.js";
-
+import axios from "axios";
 const ReviewService = {
   async getAll(filter, projection) {
     return await Review.find(filter).select(projection);
@@ -125,6 +125,38 @@ const ReviewService = {
     // console.log("Filtered Reviews:", JSON.stringify(filteredReviews, null, 2));
 
     return { filteredReviews, total };
+  },
+  async refreshReviewAnalytics(productId) {
+    console.log(productId);
+    //find review by productid
+    const reviews = await Review.find({ product: productId });
+    //get new review analytics by that api:
+    // curl --location 'https://ai_apis.fashionstyle.io.vn/genai/review-synthesis' \
+    // --header 'Content-Type: application/json' \
+    // --data '{
+    //     "reviews": ["Sản phẩm rất tốt, tôi rất hài lòng với chất lượng và dịch vụ của công ty.", "Không thích sản phẩm này chút nào, chất lượng kém và không đáng giá với giá tiền, đóng gói tệ, hàng nhận được không giống với mô tả.", "Sản phẩm đáng mua, vải dày dặn và giao hàng nhanh chóng.", "Rất thất vọng với sản phẩm này, không giống như quảng cáo và hình ảnh trên trang web.", "Sản phẩm siêu xinh, màu sắc đẹp, chất lượng vải tốt thoáng mát."]
+    // }'
+    const reviewsText = reviews.map((review) => review.content);
+    const response = await axios.post(
+      "https://ai_apis.fashionstyle.io.vn/genai/review-synthesis",
+      {
+        reviews: reviewsText,
+      }
+    );
+    //update review analytics
+    const reviewSynthesisJson = response.data.data;
+    //convert to object
+    const reviewSynthesis = JSON.parse(reviewSynthesisJson);
+    console.log("Review Synthesis:", reviewSynthesis);
+    const updatedProductResponse = await axios.put(
+      "http://14.225.218.109:3006/product/" + productId,
+      {
+        reviewSynthesis,
+      }
+    );
+    const updatedProduct = updatedProductResponse.data.data;
+    console.log("Updated Product:", updatedProduct);
+    return updatedProduct;
   },
 };
 

@@ -63,6 +63,10 @@ const ReviewController = {
       if (!object) {
         return next(createError.BadRequest("Bad request!"));
       }
+      const updatedProduct = await ReviewService.refreshReviewAnalytics(
+        data.product.toString()
+      );
+
       res.json({
         message: "Create" + model + "successfully",
         status: 200,
@@ -116,7 +120,9 @@ const ReviewController = {
       await ReviewService.addCommentIdToReview(data.review, object._id);
 
       //if this is a shop's comment => update isResponseByShop attribute to TRUE
-      await ReviewService.update(object.review.toString(), {isResponseByShop: true})
+      await ReviewService.update(object.review.toString(), {
+        isResponseByShop: true,
+      });
 
       res.json({
         message: "Create" + " comment " + "successfully",
@@ -124,19 +130,19 @@ const ReviewController = {
         data: object,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       next(createError.InternalServerError(error.message));
     }
   },
   averageRating: async (req, res, next) => {
     try {
       const { productId } = req.params;
-      const avg = await ReviewService.averageRating(productId) || 0;
+      const avg = (await ReviewService.averageRating(productId)) || 0;
       res.json({
         message: "Get average rating successfully",
         status: 200,
         data: avg.toFixed(2),
-      })
+      });
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
@@ -145,7 +151,7 @@ const ReviewController = {
     try {
       const filterOptions = {
         shop: req.body.shopId || "", //shop id
-        product: req.body.product || "", // product.name contains 
+        product: req.body.product || "", // product.name contains
         category: req.body.category || "", //category id
         rating: req.body.rating || null,
         isResponse: req.body.isResponse,
@@ -156,8 +162,9 @@ const ReviewController = {
       console.log(req.body);
       console.log(filterOptions);
       if (filterOptions.index < 1) filterOptions.index = 1;
-      const { filteredReviews, total } =
-        await ReviewService.getFilteredReviews(filterOptions);
+      const { filteredReviews, total } = await ReviewService.getFilteredReviews(
+        filterOptions
+      );
       const totalPages = Math.ceil(total / filterOptions.amount);
       // console.log(filteredProducts.length ,total, totalPages)
       res.json({
@@ -166,7 +173,7 @@ const ReviewController = {
         data: filteredReviews,
         total: total,
         totalPages: totalPages,
-        length: filteredReviews.length
+        length: filteredReviews.length,
       });
     } catch (error) {
       console.log(error);
@@ -192,18 +199,16 @@ const ReviewController = {
     }
   },
 
-  getProductReviewsContent: async (req, res, next) =>
-  {
+  getProductReviewsContent: async (req, res, next) => {
     try {
       const { productId } = req.params;
       const list = await ReviewService.getByProductId(productId);
       if (!list) {
         return next(createError.BadRequest(Model + " list not found"));
       }
-      const listOfContents = list.map((record) =>
-      {
-        return record.content
-      })
+      const listOfContents = list.map((record) => {
+        return record.content;
+      });
 
       res.json({
         message: "Get " + model + " list by productId successfully",
@@ -213,7 +218,7 @@ const ReviewController = {
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }
-  }
+  },
 };
 
 export default ReviewController;
