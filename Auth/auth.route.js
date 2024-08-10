@@ -20,7 +20,7 @@ router.post("/auth/register/", AuthController.register)
 router.post("/auth/refresh_token", AuthController.refreshToken)
 router.post("/auth/logout", AuthController.logout)
 
-router.get("/auth/session", AuthController.getSessionId)
+router.post("/auth/session", AuthController.getSessionId)
 router.delete("/auth/session", AuthController.removeSession)
 
 // from system

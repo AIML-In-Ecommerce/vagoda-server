@@ -366,7 +366,7 @@ const AuthService = {
     }
   },
 
-  async generateSessionId(appTime)
+  async generateSessionId(appTime, clientFingerprint)
   {
     let appTimeToExec = new Date()
     if(appTime != undefined)
@@ -376,69 +376,53 @@ const AuthService = {
     const userRandomUUID = crypto.randomUUID()
     const nonce = crypto.randomUUID()
 
+
     const data = 
     {
       nonce: nonce,
+      clientFingerprint: clientFingerprint,
+      serverFingerprint: userRandomUUID,
       appTime: appTimeToExec
     }
 
     const stringifiedData = JSON.stringify(data)
 
-    const mac = CryptoJs.HmacSHA256(stringifiedData, process.env.SESS_SECRET_KEY).toString();
-
-    data.mac = mac
+    const generatedSessionId = CryptoJs.AES.encrypt(stringifiedData, process.env.SESS_SECRET_KEY, CryptoJs.enc.Utf8)
 
     return {
-
       uuid: userRandomUUID,
       data: data,
-      sessionId: `${userRandomUUID}-${mac}`
+      sessionId: `${generatedSessionId}`
     }
   },
 
-  async setSessionIdIntoCache(providedUUID, data)
+  async setSessionIdIntoCache(providedSessionId, data)
   {
     const stringifiedData = JSON.stringify(data)
-    const cacheKey = `${sessionIdStoragePrefix}{${providedUUID}}`
+    const cacheKey = `${sessionIdStoragePrefix}{${providedSessionId}}`
     await redisClient.set(cacheKey, stringifiedData, {
       EX: EXPIRY_TIME_OF_CACHE_SESSION_ID
     })
   },
 
-  extractUUIDandSessionIdFromSessionId(sessionId)
+  extractDataFromSessionId(sessionId)
   {
-    if(sessionId == undefined)
+    try
+    {
+      const decryptedPayload = CryptoJs.AES.decrypt(sessionId, process.env.SESS_SECRET_KEY)
+      const decodedPayload = decryptedPayload.toString(CryptoJs.enc.Utf8)
+      return JSON.parse(decodedPayload)
+    }
+    catch(error)
     {
       return null
-    }
-    if(sessionId.length == 0)
-    {
-      return null
-    }
-
-    const encodedTexts = sessionId.split("-")
-    if(encodedTexts.length != 6)
-    {
-      return null
-    }
-
-    let uuid = encodedTexts[0] + "-" + encodedTexts[1] + "-" + encodedTexts[2] + "-" + encodedTexts[3] + "-" + encodedTexts[4]
-    const mac = encodedTexts[5]
-
-    return {
-      uuid: uuid,
-      mac: mac
     }
   },
 
   async verifySessionId(providedSessionId)
   {
-    const extractedData = this.extractUUIDandSessionIdFromSessionId(providedSessionId)
-    if(extractedData == null)
-    {
-      return null
-    }
-    const cacheKey = `${sessionIdStoragePrefix}{${extractedData.uuid}}`
+    const cacheKey = `${sessionIdStoragePrefix}{${providedSessionId}}`
+
     const stringifiedData = await redisClient.get(cacheKey)
     if(stringifiedData == null)
     {
@@ -446,14 +430,20 @@ const AuthService = {
     }
 
     const parsedData = JSON.parse(stringifiedData)
-    if(parsedData.mac != extractedData.mac)
+
+    const extractedData = this.extractDataFromSessionId(providedSessionId)
+    if(extractedData == null)
+    {
+      return null
+    }
+    
+    if((parsedData.clientFingerprint != extractedData.clientFingerprint) || (parsedData.serverFingerprint != extractedData.serverFingerprint))
     {
       return null
     }
 
     return {
-      uuid: extractedData.uuid,
-      mac: extractedData.mac
+      uuid: extractedData.clientFingerprint
     }
   },
 
