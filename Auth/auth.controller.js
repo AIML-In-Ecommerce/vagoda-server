@@ -274,12 +274,14 @@ const AuthController = {
   {
     try
     {
-      const appTime = req.query.appTime
+      const appTime = req.body.appTime
+      const clientFingerprint = req.body.fingerprint
 
-      const sessionData = await AuthService.generateSessionId(appTime)
+
+      const sessionData = await AuthService.generateSessionId(appTime, clientFingerprint)
 
       //store session id in Redis
-      await AuthService.setSessionIdIntoCache(sessionData.uuid, sessionData.data)
+      await AuthService.setSessionIdIntoCache(`${sessionData.sessionId}`, sessionData.data)
 
       //set to cookie
       res.cookie(SESSION_ID_COOKIE_KEY, sessionData.sessionId)
@@ -300,7 +302,7 @@ const AuthController = {
   {
     try
     {
-      const sessionId = req.cookies[`${sessionIdCookieKey}`]
+      const sessionId = req.cookies[`${SESSION_ID_COOKIE_KEY}`]
       console.log(sessionId)
       if(sessionId == undefined)
       {
