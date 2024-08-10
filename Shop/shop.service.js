@@ -120,7 +120,7 @@ const ShopService = {
     });
     //console.log(formattedDesign);
     console.log("templates");
-    const templates = await axios.get("http://14.225.218.109/templates");
+    const templates = await axios.get("http://14.225.218.109:3010/templates");
     console.log("templates");
     console.log(templates.data.data);
     //console.log(jsonDesign);
