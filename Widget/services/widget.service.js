@@ -17,6 +17,10 @@ const WidgetService = {
     return await newObject.save();
   },
 
+  async createMany(objectData) {
+    return await Widget.insertMany(objectData);
+  },
+
   async update(id, updateData) {
     return await Widget.findByIdAndUpdate(id, updateData, { new: true });
   },
@@ -26,7 +30,7 @@ const WidgetService = {
   },
   async getListByIds(ids) {
     const list = await Widget.find({ _id: { $in: ids } });
-  
+
     return list;
   },
 };

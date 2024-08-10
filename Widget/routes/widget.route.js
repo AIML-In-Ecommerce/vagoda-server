@@ -4,25 +4,33 @@ import uploadCloud from "../shared/uploader.js";
 
 const router = express.Router();
 
-router.get("/widget/welcome", (req, res, next) => {return res.json({
-  message: "welcome to widget path of Widget Service",
-  data: {}
-})})
+router.get("/widget/welcome", (req, res, next) => {
+  return res.json({
+    message: "welcome to widget path of Widget Service",
+    data: {},
+  });
+});
 
-router.get("/widgets/welcome", (req, res, next) => {return res.json({
-  message: "welcome to widget(s) path of Widget Service",
-  data: {}
-})})
+router.get("/widgets/welcome", (req, res, next) => {
+  return res.json({
+    message: "welcome to widget(s) path of Widget Service",
+    data: {},
+  });
+});
 
-router.get("/upload/welcome", (req, res, next) => {return res.json({
-  message: "welcome to upload path of Widget Service",
-  data: {}
-})})
+router.get("/upload/welcome", (req, res, next) => {
+  return res.json({
+    message: "welcome to upload path of Widget Service",
+    data: {},
+  });
+});
 
-router.get("/deleteFile/welcome", (req, res, next) => {return res.json({
-  message: "welcome to deleteFile path of Widget Service",
-  data: {}
-})})
+router.get("/deleteFile/welcome", (req, res, next) => {
+  return res.json({
+    message: "welcome to deleteFile path of Widget Service",
+    data: {},
+  });
+});
 
 router.get("/widgets", WidgetController.getAll);
 router.get("/widget/:id", WidgetController.getById);
@@ -40,6 +48,8 @@ router.delete("/widget/:id", WidgetController.delete);
 router.post("/widgets/list", WidgetController.getListByIds);
 router.post("/upload", uploadCloud.single("image"), WidgetController.upload);
 router.post("/deleteFile", WidgetController.deleteFile);
+
+router.post("/widget/insertBatch", WidgetController.createMany);
 
 export default router;
 

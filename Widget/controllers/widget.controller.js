@@ -64,10 +64,31 @@ const WidgetController = {
         data: object,
       });
     } catch (error) {
+      console.log(error.message);
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  createMany: async (req, res, next) => {
+    try {
+      const data = req.body.widgets;
+      if (!data || data.length === 0) {
+        return next(createError.BadRequest("Bad request!"));
+      }
+      const objects = await WidgetService.createMany(data);
+      if (!objects) {
+        return next(createError.BadRequest("Bad request!"));
+      }
+      res.json({
+        message: "Create" + model + "successfully",
+        status: 200,
+        data: objects,
+      });
+    } catch (error) {
       console.log(error);
       next(createError.InternalServerError(error.message));
     }
   },
+
   update: async (req, res, next) => {
     try {
       const data = req.body;
@@ -131,7 +152,7 @@ const WidgetController = {
     }
   },
   upload: async (req, res, next) => {
-    console.log("ok",req.body);
+    console.log("ok", req.body);
     try {
       // const data = req.body;
       if (!req.files && !req.file) {
@@ -145,7 +166,7 @@ const WidgetController = {
           },
         });
       } else {
-        console.log(req.file)
+        console.log(req.file);
         res.json({
           message: "upload file successfully",
           status: 200,
@@ -162,21 +183,20 @@ const WidgetController = {
     }
   },
   deleteFile: async (req, res, next) => {
-    const url = req.body.url 
-    if(!url){
-      return next(createError.BadRequest("Url can not be empty"))
+    const url = req.body.url;
+    if (!url) {
+      return next(createError.BadRequest("Url can not be empty"));
     }
     try {
       // const data = req.body;
-      await deleteFileByUrl(url)
+      await deleteFileByUrl(url);
       res.json({
         message: "delete file successfully",
         status: 200,
         data: {
           path: url,
         },
-      })
-      
+      });
 
       // console.log(req.file.path);
     } catch (error) {

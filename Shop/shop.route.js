@@ -5,34 +5,54 @@ import SystemShopController from "./controller/system.shop.controller.js";
 
 const router = express.Router();
 
-router.get("/shops/welcome", (req, res, next) => {return res.json({
+router.get("/shops/welcome", (req, res, next) => {
+  return res.json({
     message: "welcome to shop(s) path of Shop Service",
-    data: {}
-})})
+    data: {},
+  });
+});
 
-router.get("/shop/welcome", (req, res, next) => {return res.json({
+router.get("/shop/welcome", (req, res, next) => {
+  return res.json({
     message: "welcome to shop path of Shop Service",
-    data: {}
-})})
+    data: {},
+  });
+});
 
 router.get("/shops", ShopController.getAll);
 router.get("/shop/:id", ShopController.getById);
 router.put("/shop/:id", ShopController.update);
 router.delete("/shop/:id", ShopController.delete);
 
-router.put("/shop/addImgCollection/:shop", ShopController.addImageLinks)
-router.put("/shop/removeImgCollection/:shop", ShopController.removeImageLinks)
+router.put("/shop/addImgCollection/:shop", ShopController.addImageLinks);
+router.put("/shop/removeImgCollection/:shop", ShopController.removeImageLinks);
+router.post("/shop/useTemplate", ShopController.useTemplate);
 
-router.get("/shop_info", ShopController.getShopBySelection)
-router.post("/shops", ShopController.getShopByIdList)
-router.get("/shop_info/shopDetail", ShopController.getShopDetail)
-
+router.get("/shop_info", ShopController.getShopBySelection);
+router.post("/shops", ShopController.getShopByIdList);
+router.get("/shop_info/shopDetail", ShopController.getShopDetail);
 
 // from system
-router.post("/system/shops", VerificationService.verifySystemRole, ShopController.getShopByIdList)
-router.post("/system/shop", VerificationService.verifySystemRole, ShopController.create);
-router.delete("/system/shop", VerificationService.verifySystemRole, SystemShopController.delete);
-router.get("/system/shop_info", VerificationService.verifySystemRole, ShopController.getShopBySelection)
+router.post(
+  "/system/shops",
+  VerificationService.verifySystemRole,
+  ShopController.getShopByIdList
+);
+router.post(
+  "/system/shop",
+  VerificationService.verifySystemRole,
+  ShopController.create
+);
+router.delete(
+  "/system/shop",
+  VerificationService.verifySystemRole,
+  SystemShopController.delete
+);
+router.get(
+  "/system/shop_info",
+  VerificationService.verifySystemRole,
+  ShopController.getShopBySelection
+);
 
 export default router;
 
