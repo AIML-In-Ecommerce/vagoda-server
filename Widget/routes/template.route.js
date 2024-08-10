@@ -13,11 +13,11 @@ const router = express.Router();
 //     data: {}
 // })})
 
-router.get("/widget/templates", TemplateController.getAll);
-router.get("/widget/template/:id", TemplateController.getById);
-router.post("/widget/template", TemplateController.create);
-router.put("/widget/template/:id", TemplateController.update);
-router.delete("/widget/template/:id", TemplateController.delete);
+router.get("/templates", TemplateController.getAll);
+router.get("/template/:id", TemplateController.getById);
+router.post("/template", TemplateController.create);
+router.put("/template/:id", TemplateController.update);
+router.delete("/template/:id", TemplateController.delete);
 
 // router.get("/collectionTypes/shop/:shopId", CollectionTypeController.getByShopId);
 // router.post("/collectionTypes/list", CollectionTypeController.getListByIds)
