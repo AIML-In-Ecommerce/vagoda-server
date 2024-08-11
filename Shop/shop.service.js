@@ -111,9 +111,11 @@ const ShopService = {
     return shop.imageCollection;
   },
   async useDesign(shop, template) {
+    console.log("http://14.225.218.109:3010/template/" + template);
     const templateObject = await axios.get(
-      "14.225.218.109:3010/templates/" + template
+      "http://14.225.218.109:3010/template/" + template
     );
+    console.log("templateObject");
     if (!templateObject) {
       throw new Error("Template not found");
     }
@@ -126,10 +128,10 @@ const ShopService = {
       return rest;
     });
     //console.log(formattedDesign);
-    console.log("templates");
-    const templates = await axios.get("http://14.225.218.109:3010/templates");
-    console.log("templates");
-    console.log(templates.data.data);
+    // console.log("templates");
+    // const templates = await axios.get("http://14.225.218.109:3010/templates");
+    // console.log("templates");
+    // console.log(templates.data.data);
     //console.log(jsonDesign);
     //create new widgets from formatted design
     const response = await axios.post(
@@ -152,7 +154,7 @@ const ShopService = {
     console.log(updatedShop);
     //increate "usage" field of template
     const usage = templateObject.data.data.usage || 0;
-    await axios.put("http://14.225.218.109:3010/templates/" + template, {
+    await axios.put("http://14.225.218.109:3010/template/" + template, {
       usage: usage + 1,
     });
     return updatedShop;
