@@ -79,7 +79,7 @@ http {
     }
 
     upstream bankstatement_service_backend {
-        server host.docker.internal:3020
+        server host.docker.internal:3020;
     }
         
     server {
@@ -392,6 +392,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
+        #Settlement Service
         location /settlement/ {
             proxy_pass http://bankstatement_service_backend;
             proxy_set_header Host $host;

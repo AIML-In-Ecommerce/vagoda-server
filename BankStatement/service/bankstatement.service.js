@@ -1,4 +1,3 @@
-import Order from "../../Order/order.model.js"
 import BankStatementModel, { generateStatementRecord } from "../model/bank_statement.model.js"
 import { OrderStatus } from "../shared/enums.js"
 import SupportOrderService from "../support/order/order.support.service.js"
@@ -204,6 +203,8 @@ const BankStatementService =
         return {
             totalAmount: totalAmount,
             totalRevenue: totalRevenue,
+            period: rawStatement.period,
+            statementDate: rawStatement.statementDate,
             productStatements: productStatements
         }
     },  
