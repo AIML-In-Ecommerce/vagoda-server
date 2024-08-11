@@ -135,6 +135,10 @@ const ProductSchema = new Schema({
       type: String,
     },
   },
+  garmentCategory: {
+    type: String,
+    default: ""
+  }
 });
 ProductSchema.plugin(mongooseAutoPopulate);
 export const Product = mongoose.model("Product", ProductSchema);

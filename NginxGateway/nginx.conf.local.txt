@@ -77,6 +77,10 @@ http {
     upstream statistics_service_backend {
         server host.docker.internal:3012;  
     }
+
+    upstream bankstatement_service_backend {
+        server host.docker.internal:3020
+    }
         
     server {
         listen 80;
@@ -382,6 +386,14 @@ http {
 
         location /statistics/ {
             proxy_pass http://statistics_service_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /settlement/ {
+            proxy_pass http://bankstatement_service_backend;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

@@ -634,7 +634,7 @@ const OrderController = {
         return next(createError.BadRequest("Missing required parameter"))
       }
 
-      const orders = await OrderService.getOrdersByIds(userId, orderIds)
+      const orders = await OrderService.getBuyerOrdersByIds(userId, orderIds)
       if(orders == null)
       {
         return next(createError.NotFound())
