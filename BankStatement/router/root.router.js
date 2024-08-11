@@ -1,10 +1,10 @@
-import express from "express"
-import bankstatementRouter from "./bankstatement.router.js"
+import express from "express";
+import bankstatementRouter from "./bankstatement.router.js";
+import transactionRouter from "./transaction.router.js";
 
-const rootRouter = express.Router()
+const rootRouter = express.Router();
 
+rootRouter.use("/settlement", bankstatementRouter);
+rootRouter.use("/transaction", transactionRouter);
 
-
-rootRouter.use("/settlement", bankstatementRouter)
-
-export default rootRouter
+export default rootRouter;

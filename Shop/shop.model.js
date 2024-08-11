@@ -2,11 +2,45 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
+// create child schema "bank card for shop schema":
+// bankcard {
+//   bankName: TP Bank
+//   owner: Nguyễn Võ Minh Trí
+//   accountNUmber: 002984010192
+// }
+
+const WalletSchema = new Schema({
+  balance: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  bankCard: {
+    type: [BankCardSchema],
+    default: [],
+  },
+});
+
+const BankCardSchema = new Schema({
+  bankName: {
+    type: String,
+    required: true,
+  },
+  owner: {
+    type: String,
+    required: true,
+  },
+  accountNumber: {
+    type: String,
+    required: true,
+  },
+});
+
 const ShopInfoDesignSchema = new Schema({
   color: {
     type: String,
     // required: true,
-    default: "white"
+    default: "white",
   },
   avatarUrl: {
     type: String,
@@ -16,20 +50,20 @@ const ShopInfoDesignSchema = new Schema({
   bannerUrl: {
     type: String,
     // required: true,
-    default: new String("")
-  }
+    default: new String(""),
+  },
 });
 
 const ShopDetailSchema = new Schema({
   cancelPercentage: {
     type: Number,
     required: true,
-    default: 0.0000,
+    default: 0.0,
   },
   refundPercentage: {
     type: Number,
     required: true,
-    default: 0.0000,
+    default: 0.0,
   },
   sinceYear: {
     type: Number,
@@ -44,16 +78,16 @@ const ShopDetailSchema = new Schema({
   rating: {
     type: Number,
     required: true,
-    default: 5.0
+    default: 5.0,
   },
   replyPercentage: {
     type: Number,
-    default: 0.0000
+    default: 0.0,
   },
   operationalQuality: {
     type: Number,
-    default: 5
-  }
+    default: 5,
+  },
 });
 
 const ShopSchema = new Schema({
@@ -68,16 +102,16 @@ const ShopSchema = new Schema({
   },
   avatar: {
     type: String,
-    default: "https://cdn-icons-png.flaticon.com/128/1653/1653671.png"
+    default: "https://cdn-icons-png.flaticon.com/128/1653/1653671.png",
   },
   location: {
     type: String,
     required: true,
-    default: "TP Hồ Chí Minh"
+    default: "TP Hồ Chí Minh",
   },
   description: {
     type: String,
-    default: ""
+    default: "",
   },
   design: {
     type: [mongoose.Schema.Types.ObjectId],
@@ -86,16 +120,21 @@ const ShopSchema = new Schema({
   shopInfoDesign: {
     type: ShopInfoDesignSchema,
     required: true,
-    default: () => ({})
+    default: () => ({}),
   },
   shopDetail: {
     type: ShopDetailSchema,
     required: true,
-    default: () => ({})
+    default: () => ({}),
   },
   imageCollection: {
     type: [String],
-    default: []
+    default: [],
+  },
+  wallet: {
+    type: WalletSchema,
+    required: true,
+    default: () => ({}),
   },
   createAt: {
     type: Date,
