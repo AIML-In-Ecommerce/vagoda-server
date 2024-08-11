@@ -1,6 +1,7 @@
 import express from "express"
 import StatisticsOrderController from "../controllers/statistics.order.controller.js"
 import VerificationService from "../services/verification.service.js"
+import StatisticsSystemController from "../system.controller/system.statistics.controller.js"
 
 const router = express.Router()
 
@@ -26,5 +27,7 @@ router.post("/waiting_for_process", StatisticsOrderController.getOrdersWithOnWai
 router.post("/late_in_process", StatisticsOrderController.getLateOrdersByShopWithStatus)
 
 router.post("/on_time_process", StatisticsOrderController.getOnTimeOrdersByShopIdWithStatus)
+
+router.post("/global/latest_status", VerificationService.verifySystemRole, StatisticsSystemController.getGlobalOrdersWithStatus)
 
 export default router

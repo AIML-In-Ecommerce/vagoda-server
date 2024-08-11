@@ -23,4 +23,5 @@ router.post("/amount_of_buyers", StatisticsProductController.getAmountOfBuyersOf
 router.post("/reviews", StatisticsProductController.getReviewsOfProductsInRanges)
 
 
+
 export default router

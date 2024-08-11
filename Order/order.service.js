@@ -696,7 +696,7 @@ const OrderService = {
     return newProductsInCart
   },
 
-  async getOrdersByIds(userId, orderIds)
+  async getBuyerOrdersByIds(userId, orderIds)
   {
     if(Array.isArray(orderIds) == false || orderIds.length == 0)
     {
@@ -813,6 +813,125 @@ const OrderService = {
     return finalResult
   },
 
+  async getOrdersByIds(orderIds)
+  {
+    const listOfOrders = await Order.find({_id: {$in: orderIds}})
+    if(listOfOrders == null)
+    {
+      return null
+    }
+    if(listOfOrders.length == 0)
+    {
+      return []
+    }
+
+    const userInfos = new Map()
+    const productsInfos = new Map()
+    const shopInfos = new Map()
+
+    listOfOrders.forEach((value) =>
+    {
+      const userId = value.user
+      userInfos.set(userId.toString(), {})
+
+      const shopId = value.shop.toString()
+      shopInfos.set(shopId, {})
+
+      value.products.forEach((item) =>
+      {
+        productsInfos.set(item.product.toString(), {})
+      })
+    })
+
+    //fetch userinfo
+    const fetchedUserInfos = await UserService.getListOfUserInfos(Array.from(userInfos.keys()), false)
+    if(fetchedUserInfos == null)
+    {
+      return null
+    }
+
+    fetchedUserInfos.forEach((value) =>
+    {
+      const info = 
+      {
+        _id: value._id,
+        fullName: value.fullName,
+      }
+
+      userInfos.set(value._id, info)
+    })
+
+    //fetch shop's infos
+    const fetchedShopInfos = await ShopService.getShopInfos(Array.from(shopInfos.keys()))
+    if(fetchedShopInfos == null)
+    {
+      return null;
+    }
+
+    fetchedShopInfos.forEach((value) =>
+    {
+      const item = 
+      {
+        _id: value._id,
+        name: value.name,
+        location: value.location
+      }
+
+      shopInfos.set(item._id, item)
+    })
+
+    // //fetch payment method
+    // //TODO: update payment method later
+
+    //fetch product's infos
+
+    const fetchedProductInfos = await ProductService.getProductByIds(Array.from(productsInfos.keys()))
+    if(fetchedProductInfos == null)
+    {
+      return null
+    }
+
+    fetchedProductInfos.forEach((product) =>
+    {
+      productsInfos.set(product._id, product)
+    })
+
+
+    const finalResult = listOfOrders.map((value) =>
+    {
+      const item = JSON.parse(JSON.stringify(value))
+      //map user to Item
+
+      const user = userInfos.get(item.user.toString())
+      const shop = shopInfos.get(item.shop)
+
+      const products = item.products.map((product) =>
+      {
+        const targetProduct = JSON.parse(JSON.stringify(productsInfos.get(product.product.toString())))
+
+        targetProduct.finalPrice = undefined
+        targetProduct.purchasedPrice = product.purchasedPrice
+        targetProduct.quantity = product.quantity
+        targetProduct.itemId = product._id.toString()
+        targetProduct.color = product.color
+        targetProduct.size = product.size
+
+        return targetProduct
+      })
+
+      //construct promotion and paymemt method here, later
+
+      //finally, re-assign fields of item
+      item.user = user
+      item.products = products
+      item.shop = shop
+      //item.promotion = promotion
+
+      return item
+    })
+
+    return finalResult
+  },
 
 };
 

@@ -150,6 +150,17 @@ services:
     # volumes:
     #   - .:/usr/src/datn/payment
 
+  bankstatement:
+    build:
+      context: ./BankStatement
+      dockerfile: Dockerfile
+    ports:
+      - "3020:3020"
+    env_file:
+      - .env
+    # volumes:
+    #   - .:/usr/src/datn/bankstatement
+
   nginx-gateway:
     build:
       context: ./NginxGateway

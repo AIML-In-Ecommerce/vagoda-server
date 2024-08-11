@@ -134,6 +134,10 @@ const ProductSchema = new Schema({
     negativeSummary: {
       type: String,
     },
+  },
+  garmentCategory: {
+    type: String,
+    default: ""
   }
 });
 ProductSchema.plugin(mongooseAutoPopulate);

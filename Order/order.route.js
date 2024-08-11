@@ -1,6 +1,7 @@
 import express from "express"
 import VerificationService from "./verification.service.js";
 import OrderController from "./order.controller.js";
+import SystemOrderController from "./system.order.controller.js";
 
 const buyerRouter = express.Router()
 const sellerRouter = express.Router()
@@ -42,7 +43,7 @@ sellerRouter.get('/revenue', OrderController.getRevenue)
 
 // from system
 systemRouter.post("/system/order/zalopay/update_callback", VerificationService.verifySystemRole, OrderController.updateOrderStatusWhenZaloPayCallback)
-
+systemRouter.post("/system/order/list_of_orders", VerificationService.verifySystemRole, SystemOrderController.getOrdersByIds)
 
 //general router
 
