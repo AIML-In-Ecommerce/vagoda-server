@@ -9,6 +9,7 @@ import { errorHandler, notFound } from "./shared/helper/errorHandler.js";
 import db from "./configs/db.js";
 
 import promotionRoute from "./promotion.route.js";
+import defaultCronJobController from "./cron_job/cron_job.controller.js";
 const app = express();
 
 dotenv.config();
@@ -16,6 +17,7 @@ const port = process.env.PROMOTION_PORT;
 // const port = 3008;
 
 db();
+defaultCronJobController.start()
 
 const initializeExpress = (app) => {
   //app.use(express.static(path.join(__dirname, "public")));
