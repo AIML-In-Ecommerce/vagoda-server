@@ -124,7 +124,7 @@ const ProductSchema = new Schema({
       type: Number,
       default: 0,
     },
-    normalCount: {
+    trashCount: {
       type: Number,
       default: 0,
     },
@@ -134,7 +134,7 @@ const ProductSchema = new Schema({
     negativeSummary: {
       type: String,
     },
-  }
+  },
 });
 ProductSchema.plugin(mongooseAutoPopulate);
 export const Product = mongoose.model("Product", ProductSchema);
