@@ -24,7 +24,7 @@ const initializeExpress = (app) => {
 
 initializeExpress(app);
 
-// defaultCronJobManager.start()
+defaultCronJobManager.start()
 
 //router here
 app.use(rootRouter)
