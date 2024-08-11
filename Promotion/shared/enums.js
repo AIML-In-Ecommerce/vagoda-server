@@ -34,7 +34,8 @@ const DiscountType = {
 const PromotionStatus = {
   UPCOMMING: "UPCOMMING",
   IN_PROGRESS: "IN_PROGRESS",
-  EXPIRED: "EXPIRED"
+  EXPIRED: "EXPIRED",
+  NOT_AVAILABLE: "NOT_AVAILABLE"
 }
 
 export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType,
