@@ -33,6 +33,12 @@ const TransactionService = {
     }
     return await Transaction.find(filter);
   },
+  async getShopById(shopId) {
+    const url = `http://14.225.218.109:3004/shop/${shopId}`;
+    const response = await axios.get(url);
+    const shop = response.data.data;
+    return shop;
+  },
 };
 
 export default TransactionService;

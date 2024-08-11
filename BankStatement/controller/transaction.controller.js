@@ -79,8 +79,28 @@ const TransactionController = {
   },
   async create(req, res, next) {
     try {
-      const data = req.body;
-      const newTransaction = await TransactionService.create(data);
+      const { shop, category, type, description, money } = req.body;
+      const shopObject = await TransactionService.getShopById(shop);
+      if (!shopObject) {
+        return next(createError.BadRequest("Shop not found"));
+      }
+      const currentBalance = shopObject.wallet.balance;
+      const newBalance =
+        type === "income" ? currentBalance + money : currentBalance - money;
+      if (newBalance < 0) {
+        return next(createError.BadRequest("Not enough money"));
+      }
+      const newTransactionData = {
+        shop,
+        category,
+        type,
+        description,
+        money,
+        balance: newBalance,
+      };
+      const newTransaction = await TransactionService.create(
+        newTransactionData
+      );
       res.json({
         message: "Create transaction successfully",
         status: 201,

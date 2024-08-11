@@ -1,15 +1,24 @@
 import mongoose from "mongoose";
 
+const transactionType = ["income", "expense"];
+
 const TransactionSchema = new mongoose.Schema({
   shop: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
-  transactionCategory: {
+  category: {
     type: String,
     default: "",
   },
-  transactionDescription: {
+  // transaction type:  enum transaction type: {income, expense}
+  type: {
+    type: String,
+    required: true,
+    enum: Object.values(transactionType),
+  },
+
+  description: {
     type: String,
     default: "",
   },
@@ -18,12 +27,12 @@ const TransactionSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  //   balance: {
-  //     type: Number,
-  //     required: true,
-  //     default: 0,
-  //   },
-  createAt: {
+  balance: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  date: {
     type: Date,
     required: true,
     default: Date.now,
