@@ -110,7 +110,14 @@ const ShopService = {
     await shop.save();
     return shop.imageCollection;
   },
-  async useDesign(shop, design) {
+  async useDesign(shop, template) {
+    const templateObject = await axios.get(
+      "14.225.218.109:3010/templates/" + template
+    );
+    if (!templateObject) {
+      throw new Error("Template not found");
+    }
+    const design = templateObject.data.data.design;
     console.log(design);
     //formatted design without _id and __v
     console.log("formattedDesign");
@@ -143,6 +150,11 @@ const ShopService = {
     });
     console.log("updatedShop");
     console.log(updatedShop);
+    //increate "usage" field of template
+    const usage = templateObject.data.data.usage || 0;
+    await axios.put("http://14.225.218.109:3010/templates/" + template, {
+      usage: usage + 1,
+    });
     return updatedShop;
   },
 };

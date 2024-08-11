@@ -307,10 +307,10 @@ const ShopController = {
   useTemplate: async (req, res, next) => {
     console.log("use template");
     try {
-      const { shop, design } = req.body;
+      const { shop, template } = req.body;
       console.log(shop);
 
-      const updatedShop = await ShopService.useDesign(shop, design);
+      const updatedShop = await ShopService.useDesign(shop, template);
 
       return res.json({
         message: "Use template successfully",

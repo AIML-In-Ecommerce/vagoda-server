@@ -9,18 +9,6 @@ const Schema = mongoose.Schema;
 //   accountNUmber: 002984010192
 // }
 
-const WalletSchema = new Schema({
-  balance: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  bankCard: {
-    type: [BankCardSchema],
-    default: [],
-  },
-});
-
 const BankCardSchema = new Schema({
   bankName: {
     type: String,
@@ -33,6 +21,18 @@ const BankCardSchema = new Schema({
   accountNumber: {
     type: String,
     required: true,
+  },
+});
+
+const WalletSchema = new Schema({
+  balance: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  bankCard: {
+    type: [BankCardSchema],
+    default: [],
   },
 });
 
