@@ -74,6 +74,8 @@ const BankStatementController =
                 totalPages: totalPages,
                 totalAmount: detail.totalAmount,
                 totalRevenue:detail.totalRevenue,
+                statementPeriod: detail.period,
+                statementDate: detail.statementDate,
                 productStatements: detail.productStatements
             }
 

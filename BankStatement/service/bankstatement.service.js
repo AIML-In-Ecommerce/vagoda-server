@@ -204,6 +204,8 @@ const BankStatementService =
         return {
             totalAmount: totalAmount,
             totalRevenue: totalRevenue,
+            period: rawStatement.period,
+            statementDate: rawStatement.statementDate,
             productStatements: productStatements
         }
     },  
