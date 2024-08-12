@@ -21,6 +21,7 @@
                 steps {
                     // Bước này để cài đặt các dependencies của Node.js
                     script {
+                        docker ps -a
                         // sh 'npm install'
                         // dir('Auth') {
                         //     sh 'npm install'
@@ -57,9 +58,9 @@
 
 
             stage('Build') {
-                options {
-                    timeout(time: 30, unit: 'MINUTES')
-                }
+                // options {
+                //     timeout(time: 30, unit: 'MINUTES')
+                // }
                 steps {
                     // Kiểm tra và down container
                     script {
