@@ -15,13 +15,13 @@
             
 
             stage('Install Dependencies') {
-                options {
-                    timeout(time: 30, unit: 'MINUTES')
-                }
+                // options {
+                //     timeout(time: 30, unit: 'MINUTES')
+                // }
                 steps {
                     // Bước này để cài đặt các dependencies của Node.js
                     script {
-                        sh 'npm install'
+                        // sh 'npm install'
                         // dir('Auth') {
                         //     sh 'npm install'
                         // }
