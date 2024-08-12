@@ -147,11 +147,15 @@ const ReviewService = {
     const reviewSynthesisJson = response.data.data;
     //convert to object
     const reviewSynthesis = JSON.parse(reviewSynthesisJson);
+    //avgrating in review.rating
+    const avgRating =
+      reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
     console.log("Review Synthesis:", reviewSynthesis);
     const updatedProductResponse = await axios.put(
       "http://14.225.218.109:3006/product/" + productId,
       {
         reviewSynthesis,
+        avgRating,
       }
     );
     const updatedProduct = updatedProductResponse.data.data;

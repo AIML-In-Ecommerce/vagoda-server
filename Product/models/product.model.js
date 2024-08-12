@@ -69,7 +69,7 @@ const ProductSchema = new Schema({
   images: [{ type: String }],
   avgRating: {
     type: Number,
-    default: 0,
+    default: 3,
   },
   createdAt: {
     type: Date,
@@ -137,8 +137,8 @@ const ProductSchema = new Schema({
   },
   garmentCategory: {
     type: String,
-    default: ""
-  }
+    default: "",
+  },
 });
 ProductSchema.plugin(mongooseAutoPopulate);
 export const Product = mongoose.model("Product", ProductSchema);
