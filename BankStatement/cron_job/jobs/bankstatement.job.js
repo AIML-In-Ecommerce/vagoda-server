@@ -1,11 +1,16 @@
 import { CronJob } from "cron"
 import BankStatementService from "../../service/bankstatement.service.js"
+import { TransactionType } from "../../shared/enums.js"
+import { generateTransactionRecordProp } from "../../model/transaction.model.js"
+import TransactionService from "../../service/transaction.service.js"
+// import moment from "moment"
 
 class BankStatementCronJob
 {
-    constructor(key = undefined, isAutoRestarted = false)
+    constructor(key = undefined, isAutoRestarted = false, isOnceTimeJob = false)
     {
         this.key = key ? key : null
+        this.isOnceTimeJob = isOnceTimeJob
         this.isAutoRestarted = isAutoRestarted
         this.jobs = []
         this.numberDateOfMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -20,6 +25,10 @@ class BankStatementCronJob
         if(isAutoRestarted != undefined)
         {
             this.isAutoRestarted = isAutoRestarted
+        }
+        if(isOnceTimeJob != undefined)
+        {
+            this.isOnceTimeJob = isOnceTimeJob
         }
 
         this.isAutoRestarted = isAutoRestarted
@@ -37,13 +46,28 @@ class BankStatementCronJob
 
         this.jobs.push(CronJob.from({
             // second|minute|hour|day_of_month|month|day_of_week
-            cronTime: `* * * 16,${finalDateOfMonth} * *`,
+            cronTime: `* * * 11,21,${finalDateOfMonth} * *`,
             // cronTime: "*/2 * * * * *",
             onTick: async () =>
             {
-                await BankStatementService.generateBankStatementRecord(startDate, undefined)
-                // console.log(new Date().getSeconds())
-                if(isOnceTimeJob == true)
+                const bankStatements = await BankStatementService.generateBankStatementRecord(startDate, undefined)
+
+                if(bankStatements != null)
+                {
+                    for(let i = 0; i < bankStatements.length; i++)
+                    {
+                        const category = `Doanh thu`
+                        const type = TransactionType.INCOME
+                        const shopId = bankStatements[i].shopId.toString()
+                        const description = `${bankStatements[i].name} (${bankStatements[i].period})`
+                        const money = bankStatements[i].revenue
+
+                        const recordProp = generateTransactionRecordProp(shopId, type, category, description, money, undefined, undefined)
+                        await TransactionService.create(recordProp)
+                    }
+                }
+
+                if(this.isOnceTimeJob == true)
                 {
                     this.#stop()
                 }
@@ -80,7 +104,7 @@ class BankStatementCronJob
 
     #regenerate()
     {
-        const newJob = new BankStatementCronJob(this.key, this.isAutoRestarted)
+        const newJob = new BankStatementCronJob(this.key, this.isAutoRestarted, this.isOnceTimeJob)
         this.jobs.push(newJob)
         this.jobs.shift()
     }

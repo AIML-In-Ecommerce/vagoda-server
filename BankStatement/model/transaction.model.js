@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { TransactionType } from "../shared/enums.js";
 
-const transactionType = ["income", "expense"];
+const transactionType = Object.values(TransactionType);
 
 const TransactionSchema = new mongoose.Schema({
   shop: {
@@ -38,6 +39,21 @@ const TransactionSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+export function generateTransactionRecordProp(shopId, type, category = undefined, description = undefined, money = undefined, balance = undefined, date = undefined)
+{
+  const recordProp = {
+    shop: shopId,
+    category: category,
+    type: type,
+    description: description,
+    money: money,
+    balance: balance,
+    date: date
+  }
+
+  return recordProp
+}
 
 const Transaction = mongoose.model("Transaction", TransactionSchema);
 
