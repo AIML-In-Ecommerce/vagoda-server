@@ -1,5 +1,6 @@
 import TransactionService from "../service/transaction.service.js";
 import createError from "http-errors";
+import axios from "axios";
 
 const TransactionController = {
   async getAllTransaction(req, res, next) {
@@ -85,7 +86,7 @@ const TransactionController = {
       }
       const currentBalance = shopObject.wallet.balance;
       const newBalance =
-        type === "income" ? currentBalance + money : currentBalance - money;
+        type === "INCOME" ? currentBalance + money : currentBalance - money;
       if (newBalance < 0) {
         return next(createError.BadRequest("Not enough money"));
       }
@@ -100,6 +101,12 @@ const TransactionController = {
       const newTransaction = await TransactionService.create(
         newTransactionData
       );
+      //update shop wallet balance
+      const newInfoShop = await TransactionService.updateShopBalance(
+        shop,
+        newBalance
+      );
+      console.log(newInfoShop);
       res.json({
         message: "Create transaction successfully",
         status: 201,

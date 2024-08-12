@@ -1,4 +1,5 @@
 import Transaction from "../model/transaction.model.js";
+import axios from "axios";
 
 const TransactionService = {
   async getAll(filter, projection) {
@@ -41,6 +42,17 @@ const TransactionService = {
     const response = await axios.get(url);
     const shop = response.data.data;
     return shop;
+  },
+  //update shop wallet balance
+  //   {
+  //     "wallet": {
+  //         "balance": 120
+  //     }
+  // }
+  async updateShopBalance(shopId, balance) {
+    const url = `http://14.225.218.109:3004/shop/${shopId}`;
+    const response = await axios.put(url, { wallet: { balance } });
+    return response.data.data;
   },
 };
 
