@@ -67,7 +67,7 @@
                         sh 'docker-compose ps'
                         sh 'docker-compose down --remove-orphans'
                     }
-                    sh 'docker-compose build --no-cache'
+                    sh 'docker-compose build'
                     // Build và chạy container mới
                     sh 'docker-compose up -d'
 
