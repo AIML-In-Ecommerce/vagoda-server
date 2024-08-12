@@ -14,46 +14,46 @@
             }
             
 
-            stage('Install Dependencies') {
-                // options {
-                //     timeout(time: 30, unit: 'MINUTES')
-                // }
-                steps {
-                    // Bước này để cài đặt các dependencies của Node.js
-                    script {
-                        docker ps -a
-                        // sh 'npm install'
-                        // dir('Auth') {
-                        //     sh 'npm install'
-                        // }
-                        // dir('Cart') {
-                        //     sh 'npm install'
-                        // }
-                        // dir('Category') {
-                        //     sh 'npm install'
-                        // }
-                        // dir('Order') {
-                        //     sh 'npm install'
-                        // }
-                        // dir('Product') {
-                        //     sh 'npm install'
-                        // }
-                        // dir('Promotion') {
-                        //     sh 'npm install'
-                        // }
-                        // dir('Review') {
-                        //     sh 'npm install'
-                        // }
-                        // dir('Shop') {
-                        //     sh 'npm install'
-                        // }
-                        // dir('User') {
-                        //     sh 'npm install'
-                        // }
+            // stage('Install Dependencies') {
+            //     // options {
+            //     //     timeout(time: 30, unit: 'MINUTES')
+            //     // }
+            //     steps {
+            //         // Bước này để cài đặt các dependencies của Node.js
+            //         script {
+            //             sh 'docker ps -a'
+            //             // sh 'npm install'
+            //             // dir('Auth') {
+            //             //     sh 'npm install'
+            //             // }
+            //             // dir('Cart') {
+            //             //     sh 'npm install'
+            //             // }
+            //             // dir('Category') {
+            //             //     sh 'npm install'
+            //             // }
+            //             // dir('Order') {
+            //             //     sh 'npm install'
+            //             // }
+            //             // dir('Product') {
+            //             //     sh 'npm install'
+            //             // }
+            //             // dir('Promotion') {
+            //             //     sh 'npm install'
+            //             // }
+            //             // dir('Review') {
+            //             //     sh 'npm install'
+            //             // }
+            //             // dir('Shop') {
+            //             //     sh 'npm install'
+            //             // }
+            //             // dir('User') {
+            //             //     sh 'npm install'
+            //             // }
 
-                    }
-                }
-            }
+            //         }
+            //     }
+            // }
             
 
 
