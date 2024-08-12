@@ -16,8 +16,11 @@ const TransactionService = {
     const newObject = new Transaction(objectData);
     return await newObject.save();
   },
-  async filterByShopIdCategoryDate(shopId, category, startDate, endDate) {
+  async filter(_id, shopId, category, startDate, endDate) {
     const filter = {};
+    if (_id) {
+      filter._id = _id;
+    }
     if (shopId) {
       filter.shop = shopId;
     }

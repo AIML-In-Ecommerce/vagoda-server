@@ -55,22 +55,20 @@ const TransactionController = {
   },
   async filterTransaction(req, res, next) {
     try {
-      const { shopId, category, startDate, endDate } = req.query;
-      if (!shopId) {
-        return res.status(400).json({ message: "ShopId is required" });
-      }
+      const { _id, shopId, category, startDate, endDate } = req.query;
 
       const start = startDate ? new Date(startDate) : null;
       const end = endDate ? new Date(endDate) : null;
 
-      const transactions = await TransactionService.filterByShopIdCategoryDate(
+      const transactions = await TransactionService.filter(
+        _id,
         shopId,
         category,
         start,
         end
       );
       res.json({
-        message: "Get transactions successfully",
+        message: "Filter transactions successfully",
         status: 200,
         data: transactions,
       });
