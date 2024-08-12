@@ -37,6 +37,11 @@ const PromotionStatus = {
   EXPIRED: "EXPIRED"
 }
 
+const TransactionType = {
+  INCOME: "INCOME",
+  EXPENSE: "EXPENSE"
+}
+
 export { ProductStatus, AccountStatus, AccountType, OrderStatus, DiscountType,
-  PromotionStatus
+  PromotionStatus, TransactionType
  };

@@ -6,13 +6,22 @@ import SupportStatisticsService from "../support/statistics/statistics.support.j
 const NULL_COLOR_CONVENTION = "NULL_COLOR"
 const NULL_SIZE_CONVENTION ="NULL_SIZE"
 
+const LIST_OF_STATEMENT_DATES = [
+    {date: 11, season: 1},
+    {date: 21, season: 2}, 
+    {date: 28, season: 3},
+    {date: 29, season: 3},
+    {date: 30, season: 3},
+    {date: 31, season: 3}
+]
+
 const BankStatementService = 
 {
     async generateBankStatementRecord(startTime, endTime, executeTime)
     {
         if(startTime == undefined || endTime == undefined)
         {
-            return 
+            return null
         }
 
         let executeTimeToDo = new Date()
@@ -56,12 +65,16 @@ const BankStatementService =
             const orders = []
             let season = 1
 
-            if(executeTimeToDo.getMonth() > endTimeToDo.getMonth())
+            for(let i = 0; i < LIST_OF_STATEMENT_DATES.length; i++)
             {
-                season = 2
+                if(LIST_OF_STATEMENT_DATES[i].date == executeTimeToDo.getDate())
+                {
+                    season = LIST_OF_STATEMENT_DATES[i].season
+                    break
+                }
             }
 
-            const name = `Sao kê kì ${season} Tháng ${endTimeToDo.getMonth()}-${endTimeToDo.getFullYear()}`
+            const name = `Sao kê kì ${season} Tháng ${endTimeToDo.getMonth() + 1}-${endTimeToDo.getFullYear()}`
             const period = `${startTimeToDo.getDate()}/${startTimeToDo.getMonth() + 1}/${startTimeToDo.getFullYear()} - ${endTimeToDo.getDate()}/${endTimeToDo.getMonth() + 1}/${endTimeToDo.getFullYear()}`
 
             listOfIndex.forEach((index) =>
@@ -77,7 +90,7 @@ const BankStatementService =
             targetRecords.push(record)
         })
 
-        await BankStatementModel.create(targetRecords)
+        return await BankStatementModel.create(targetRecords)
     },
 
     async getAllBankStatementOfShop(shopId, index = undefined, amount = undefined, isAscending = true)
